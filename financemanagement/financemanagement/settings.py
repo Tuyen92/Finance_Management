@@ -37,7 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'finance.apps.FinanceConfig'
+    'finance.apps.FinanceConfig',
+    'ckeditor',
+    'ckeditor_uploader',
+    'rest_framework',
+    'drf_yasg',
+    'oauth2_provider',
 ]
 
 MIDDLEWARE = [
@@ -52,7 +57,17 @@ MIDDLEWARE = [
 
 AUTH_USER_MODEL = 'finance.User'
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    )
+}
+
 ROOT_URLCONF = 'financemanagement.urls'
+
+MEDIA_ROOT = '%s/finance/static/' % BASE_DIR
+
+CKEDITOR_UPLOAD_PATH = "picture/"
 
 TEMPLATES = [
     {
@@ -82,9 +97,9 @@ pymysql.install_as_MySQLdb()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
+        'NAME': 'financemanagement',
+        'USER': 'root',
+        'PASSWORD': '09022001',
         'HOST': ''
     }
 }
@@ -120,7 +135,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
@@ -130,3 +144,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CLIENT_ID = 'hZqRUItZZ7rAW0ShqENtqeswfJPmQ8CEAAre3Lmf'
+CLIENT_SECRET = 'WvAJVz728xVvIEE5e4fnVzv4fAXOr8c8Rm7AnwvUkcIBe9WmzCvMi0j4bVwk2G9mzS1py1TfGIuQ1KydybkcGqdLsIF3EeiP8u0gcpRI48t3PwAnEu8ixYOh7LdNR27i'
