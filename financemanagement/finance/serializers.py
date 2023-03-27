@@ -1,5 +1,15 @@
 from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from .models import *
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField('avatar')
+
+    def get_image(self, obj):
+        if obj.avatar:
+            request = self.context.get('request')
+            return request.build_absolute_uri('/static/%s' % obj.avatar.name) if request else ''
 
 
 class RoleSerializer(ModelSerializer):
@@ -14,13 +24,13 @@ class LimitRuleSerializer(ModelSerializer):
         fields = ['id', 'spending_limit', 'income_limit', 'from_date', 'to_date', 'type']
 
 
-class UserSerializer(ModelSerializer):
+class UserSerializer(ImageSerializer):
     role = RoleSerializer()
     limit_rule = LimitRuleSerializer()
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'sex', 'birthday', 'address', 'phone', 'email', 'is_active', 'role', 'limit_rule']
+        fields = ['id', 'first_name', 'last_name', 'sex', 'birthday', 'address', 'phone', 'email', 'is_active', 'avatar', 'role', 'limit_rule']
         extra_kwargs = {
             'avatar': {'write_only': True},
             'password': {'write_only': True}

@@ -9,7 +9,6 @@ class User(AbstractUser):
     birthday = models.DateField(null=True)
     address = models.CharField(null=True, max_length=255)
     phone = models.CharField(null=False, max_length=50)
-
     role = models.ForeignKey('Role', on_delete=models.CASCADE, default=1)
     limit_rule = models.ForeignKey('LimitRule', on_delete=models.CASCADE, default=1)
 
