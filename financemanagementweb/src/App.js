@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Footer from './layouts/Footer';
 import Projects from './components/Projects';
@@ -23,11 +23,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Button from '@mui/material/Button';
 import Header from './layouts/Header';
+import Login from './components/Login';
 
 
 function App() {
@@ -93,111 +90,89 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
   return (
     <>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
-      <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <AppBar position="fixed" open={open}>
-          <Toolbar>
-            <IconButton color="inherit" aria-label="open drawer" onClick={handleDrawerOpen} edge="start" sx={{ mr: 2, ...(open && { display: 'none' }) }}>
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}><strong>FINANCE MANAGEMENT</strong></Typography>
-            <Button color="inherit"><strong>Login</strong></Button>
-          </Toolbar>
-        </AppBar>
+      <BrowserRouter>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+        <Box sx={{ display: 'flex' }}>
+          <CssBaseline />
+          <AppBar position="fixed" open={open}>
+            <Toolbar>
+              <IconButton color="inherit" aria-label="open drawer" onClick={handleDrawerOpen} edge="start" sx={{ mr: 2, ...(open && { display: 'none' }) }}>
+                <MenuIcon />
+              </IconButton>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/"><strong>FINANCE MANAGEMENT</strong></Link>
+              </Typography>
+              <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/login/"><strong>Login</strong></Link>
+            </Toolbar>
+          </AppBar>
 
-        <Drawer sx={{width: drawerWidth, flexShrink: 0, '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundColor: "#609b56",
-            color: "#FFECC9"
-            },}}
-          variant="persistent"
-          anchor="left"
-          open={open}>
-          <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
-              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-          </DrawerHeader>
+          <Drawer sx={{width: drawerWidth, flexShrink: 0, '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+              backgroundColor: "#609b56",
+              color: "#FFECC9"
+              },}}
+            variant="persistent"
+            anchor="left"
+            open={open}>
+            <DrawerHeader>
+              <IconButton onClick={handleDrawerClose}>
+                {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+              </IconButton>
+            </DrawerHeader>
 
-          <Divider />
-          <List>
-              <ListItem key='spending'>
-                  <ListItemButton>
-                      <ListItemIcon><i className="material-icons" style={{ color: '#FFECC9' }}>payments</i></ListItemIcon>
-                      <ListItemText primary='Spendings'/>
-                  </ListItemButton>
+            <Divider />
+            <List>
+              <ListItem key='spending' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                <i className="material-icons" style={{ color: '#FFECC9' }}>payments</i>
+                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/spendings/">Spendings</Link>
               </ListItem>
               <Divider />
-          </List>
-
-          <List>
-              <ListItem key='income'>
-                  <ListItemButton>
-                      <ListItemIcon><i className="material-icons" style={{ color: '#FFECC9' }}>account_balance_wallet</i></ListItemIcon>
-                      <ListItemText primary='Incomes'/>
-                  </ListItemButton>
+              
+              <ListItem key='income' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                <i className="material-icons" style={{ color: '#FFECC9' }}>account_balance_wallet</i>
+                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/incomes/">Incomes</Link>
               </ListItem>
               <Divider />
-          </List>
 
-          <List>
-              <ListItem key='group'>
-                  <ListItemButton>
-                      <ListItemIcon><i className="material-icons" style={{ color: '#FFECC9' }}>diversity_2</i></ListItemIcon>
-                      <ListItemText primary='Groups'/>
-                  </ListItemButton>
+              <ListItem key='group' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                <i className="material-icons" style={{ color: '#FFECC9' }}>diversity_2</i>
+                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/groups/">Groups</Link>
               </ListItem>
               <Divider />
-          </List>
 
-          <List>
-              <ListItem key='project'>
-                  <ListItemButton>
-                      <ListItemIcon><i className="material-icons" style={{ color: '#FFECC9' }}>business_center</i></ListItemIcon>
-                      <ListItemText primary='Projects'/>
-                  </ListItemButton>
+              <ListItem key='project' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                <i className="material-icons" style={{ color: '#FFECC9' }}>business_center</i>
+                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/projects/">Projects</Link>
               </ListItem>
               <Divider />
-          </List>
 
-          <List>
-              <ListItem key='limit_rule'>
-                  <ListItemButton>
-                      <ListItemIcon><i className="material-icons" style={{ color: '#FFECC9' }}>savings</i></ListItemIcon>
-                      <ListItemText primary='Limit Rules'/>
-                  </ListItemButton>
+              <ListItem key='limit_rule' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                <i className="material-icons" style={{ color: '#FFECC9' }}>savings</i>
+                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/limit_rule/">Limit Rules</Link>
               </ListItem>
               <Divider />
-          </List>
 
-          <List>
-              <ListItem key='warning'>
-                  <ListItemButton>
-                      <ListItemIcon><i className="material-icons" style={{ color: '#FFECC9' }}>warning</i></ListItemIcon>
-                      <ListItemText primary='Warning'/>
-                  </ListItemButton>
+              <ListItem key='warning' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                <i className="material-icons" style={{ color: '#FFECC9' }}>warning</i>
+                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/warning/">Warning</Link>
               </ListItem>
               <Divider />
-          </List>
 
-          <List>
-              <ListItem key='role'>
-                <ListItemButton>
-                  <ListItemIcon><i className="material-icons" style={{ color: '#FFECC9' }}>label</i></ListItemIcon>
-                  <ListItemText primary='Role' />
-                </ListItemButton>
+              <ListItem key='role' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                <i className="material-icons" style={{ color: '#FFECC9' }}>label</i>
+                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/role/">Role</Link>
               </ListItem>
-          </List>
-        </Drawer>
+              <Divider />
+            </List>
+          </Drawer>
 
-        <Main open={open}>
-          <DrawerHeader />
-          <Typography>
-            <BrowserRouter>
+          <Main open={open}>
+            <DrawerHeader />
+            <Typography>
               <Routes>
                 <Route path='/' element={<Header />}/>
+                <Route path='/login/' element={<Login />}/>
                 <Route path='/user/' element={<Users />}/>
                 <Route path='/groups/' element={<GroupsUser />}/>
                 <Route path='/projects/' element={<Projects />}/>
@@ -207,10 +182,10 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                 <Route path='/limit_rule/' element={<LimiteRule />}/>
               </Routes>
               <Footer />
-            </BrowserRouter>
-          </Typography>
-        </Main>
-      </Box>
+            </Typography>
+          </Main>
+        </Box>
+      </BrowserRouter>
     </>
   );
 }
