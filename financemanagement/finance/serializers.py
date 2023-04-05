@@ -2,10 +2,10 @@ from rest_framework.serializers import ModelSerializer
 from .models import *
 
 
-class RoleSerializer(ModelSerializer):
-    class Meta:
-        model = Role
-        fields = ['id', 'role_name', 'describe']
+# class RoleSerializer(ModelSerializer):
+#     class Meta:
+#         model = Role
+#         fields = ['id', 'role_name', 'describe']
 
 
 class LimitRuleSerializer(ModelSerializer):
@@ -15,12 +15,12 @@ class LimitRuleSerializer(ModelSerializer):
 
 
 class UserSerializer(ModelSerializer):
-    role = RoleSerializer()
+    # role = RoleSerializer()
     limit_rule = LimitRuleSerializer()
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'sex', 'birthday', 'address', 'phone', 'email', 'is_active', 'role', 'limit_rule']
+        fields = ['id', 'first_name', 'last_name', 'sex', 'birthday', 'address', 'phone', 'email', 'is_active', 'limit_rule']
         extra_kwargs = {
             'avatar': {'write_only': True},
             'password': {'write_only': True}

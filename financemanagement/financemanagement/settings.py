@@ -55,6 +55,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# APPEND_SLASH=False
+# LOGIN_URL = 'login'
+
 AUTH_USER_MODEL = 'finance.User'
 
 REST_FRAMEWORK = {
@@ -97,9 +100,9 @@ pymysql.install_as_MySQLdb()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'financemanagement',
+        'NAME': 'financedb',
         'USER': 'root',
-        'PASSWORD': '09022001',
+        'PASSWORD': '091420',
         'HOST': ''
     }
 }

@@ -10,7 +10,7 @@ class User(AbstractUser):
     address = models.CharField(null=True, max_length=255)
     phone = models.CharField(null=False, max_length=50)
 
-    role = models.ForeignKey('Role', on_delete=models.CASCADE, default=1)
+    # role = models.ForeignKey('Role', on_delete=models.CASCADE, default=1)
     limit_rule = models.ForeignKey('LimitRule', on_delete=models.CASCADE, default=1)
 
     def __str__(self):
@@ -69,13 +69,13 @@ class Project(models.Model):
     def __str__(self):
         return self.name_project
 
-
-class Role(models.Model):
-    role_name = models.CharField(null=False, max_length=100)
-    describe = RichTextField(null=True)
-
-    def __str__(self):
-        return self.role_name
+#
+# class Role(models.Model):
+#     role_name = models.CharField(null=False, max_length=100)
+#     describe = RichTextField(null=True)
+#
+#     def __str__(self):
+#         return self.role_name
 
 
 class MeetingSchedule(models.Model):

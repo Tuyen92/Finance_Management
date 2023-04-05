@@ -8,28 +8,28 @@ from .paginators import *
 
 
 # ROLE
-class RoleViewSet(viewsets.ViewSet, generics.ListAPIView):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
-
-    # Create role
-    @action(methods=['post'], detail=False, url_path='new')
-    def create_role(self, request):
-        try:
-            if request.method.__eq__('POST'):
-                role = request.data
-                r, _ = Role.objects.get_or_create(role_name=role.get('role_name'), describe=role.get('describe'))
-                r.save()
-                return Response(RoleSerializer(r, context={'request': request}).data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        except:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# class RoleViewSet(viewsets.ViewSet, generics.ListAPIView):
+#     queryset = Role.objects.all()
+#     serializer_class = RoleSerializer
+#
+#     def get_permissions(self):
+#         # if self.action in ['create_role']:
+#         return [permissions.IsAuthenticated()]
+#         # return [permissions.AllowAny()]
+#
+#     # Create role
+#     @action(methods=['post'], detail=False, url_path='new')
+#     def create_role(self, request):
+#         try:
+#             if request.method.__eq__('POST'):
+#                 role = request.data
+#                 r, _ = Role.objects.get_or_create(role_name=role.get('role_name'), describe=role.get('describe'))
+#                 r.save()
+#                 return Response(RoleSerializer(r, context={'request': request}).data, status=status.HTTP_201_CREATED)
+#             else:
+#                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+#         except:
+#             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # SPENDING
@@ -412,6 +412,19 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPI
     # authentication_classes = [BasicAuthentication, TokenAuthentication]
     # parser_classes = [parsers.MultiPartParser, ]
 
+    @action(methods=['post'], detail=False, url_path='login')
+    def login(self, request):
+        try:
+            username = self.request.data.get("username")
+            password = self.request.data.get("password")
+            client_id = "hZqRUItZZ7rAW0ShqENtqeswfJPmQ8CEAAre3Lmf"
+            client_secret = "WvAJVz728xVvIEE5e4fnVzv4fAXOr8c8Rm7AnwvUkcIBe9WmzCvMi0j4bVwk2G9mzS1py1TfGIuQ1KydybkcGqdLsIF3EeiP8u0gcpRI48t3PwAnEu8ixYOh7LdNR27i"
+            grant_type = "password"
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
     def get_permissions(self):
         # if self.action in ['current_user', 'choose_limit_rule', 'change_password']:
         return [permissions.IsAuthenticated()]
@@ -759,3 +772,18 @@ class LimitRuleViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
         # if self.action in ['create_role']:
         return [permissions.IsAuthenticated()]
         # return [permissions.AllowAny()]
+
+def get_token(username, password):
+    client_id = 'VQL6YCnUzNsFZtxDg2ew6R05JseOxUxFjQ2vGcSy'
+    client_secret = 'EJtrIWpQvKxFJmv3glZ1VqnG2VYz554q0x75pKiOhbEGc7HI2sOkCP1wBf9deSgWvaSjVPh2OddKBv1mOWElMiKpsGQiMSt9P7h1mgYyLH75sJP1dcH3VtTgAV7jGAUx'
+
+    data = {
+        'grant_type': 'password',
+        'username': username,
+        'password': password,
+        'client_id': client_id,
+        'client_secret': client_secret,
+    }
+
+    response = requests.post('http://localhost:8000/o/token/', data=data)
+    return response.json()
