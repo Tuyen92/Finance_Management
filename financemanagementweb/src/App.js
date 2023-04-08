@@ -25,6 +25,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import Header from './layouts/Header';
 import Login from './components/Login';
+import ProjectDetail from './components/ProjectDetail';
+import GroupDetail from './components/GroupsDetail';
 
 
 function App() {
@@ -175,7 +177,9 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                 <Route path='/login/' element={<Login />}/>
                 <Route path='/user/' element={<Users />}/>
                 <Route path='/groups/' element={<GroupsUser />}/>
+                <Route path='/groups/:groupId/' element={<GroupDetail />}/>
                 <Route path='/projects/' element={<Projects />}/>
+                <Route path='/projects/:projectId/' element={<ProjectDetail />}/>
                 <Route path='/spendings/' element={<Spendings />}/>
                 <Route path='/incomes/' element={<Incomes />}/>
                 <Route path='/meeting_schedule/' element={<Meetings />}/>

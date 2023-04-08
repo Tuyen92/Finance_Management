@@ -2,34 +2,24 @@ import * as React from 'react'
 import { useEffect } from "react"
 import API, { endpoints } from "../configs/API"
 import { useState } from "react"
-import { DataGrid } from '@mui/x-data-grid'
-import Box from '@mui/material/Box';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
+import { Link } from 'react-router-dom'
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
+import Pagination from '@mui/material/Pagination';
+
 
 const Projects = () => {
     const[project, setProject] = useState([])
-    const columns = [
-        { field: 'id', headerName: 'ID', width: 70 },
-        { field: 'name_project', headerName: 'Project name', width: 130 },
-        { field: 'target', headerName: 'Target', type: 'number', width: 130 },
-        { field: 'income_amount', headerName: 'Income', type: 'number', width: 90 },
-        { field: 'spending_amount', headerName: 'Spending', type: 'number', width: 160 }
-        //   valueGetter: (params) =>
-        //     `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-        // },
-    ];
 
     useEffect(() => {
         const loadProjects = async () => {
             let res = await API.get(endpoints['projects'])
-            console.log(res.data.results)
             setProject(res.data.results)
         }
 
@@ -38,57 +28,46 @@ const Projects = () => {
 
     return (
         <>
-            <div style={{ height: 400, width: '100%' }}>
-                <DataGrid
-                    rows={project}
-                    columns={columns}
-                    checkboxSelection />
-            </div>
-            <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-
-            <List>
-                <ListItem key='group' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                    {project.map(p => <h3 key={p.id}>{p.name_project}</h3>)}
-                </ListItem>
-            </List>
-
-      <nav aria-label="main mailbox folders">
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Inbox" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <DraftsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Drafts" />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </nav>
-      <Divider />
-      <nav aria-label="secondary mailbox folders">
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemText primary="Trash" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton component="a" href="#simple-list">
-              <ListItemText primary="Spam" />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </nav>
-    </Box>
-            <ul>{project.map(p => <li key={p.id}>{p.name_project}</li>)}</ul>
+        <div>
+          <h1 style={{ textAlign: 'center', color: '#F1C338' }}>PROJECT LIST</h1>
+        </div>
+        <hr />
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell component="th" scope="row"><strong>ID</strong></TableCell>
+                  <TableCell component="th" scope="row"><strong>Project&nbsp;name</strong></TableCell>
+                  <TableCell align="right"><strong>Target</strong></TableCell>
+                  <TableCell align="right"><strong>Income</strong></TableCell>
+                  <TableCell align="right"><strong>Spending</strong></TableCell>
+                  <TableCell component="th" scope="row"><strong>Action</strong></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {project.map(p => {
+                  let url = `/projects/${p.id}/`
+                  return (
+                  <TableRow key={p.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                    <TableCell component="th" scope="row">{p.id}</TableCell>
+                    <TableCell component="th" scope="row">{p.name_project}</TableCell>
+                    <TableCell align="right" typeof="number">{p.target}</TableCell>
+                    <TableCell align="right">{p.income_amount}</TableCell>
+                    <TableCell align="right">{p.spending_amount}</TableCell>
+                    <TableCell component="th" scope="row"><Link style={{ textDecoration: 'none' }} to={url}><Button style={{ color: '#F46841' }}><strong>Detail</strong></Button></Link></TableCell>
+                  </TableRow>)
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <hr/>
+          <div align="right">
+            <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>Sort</strong></Button></Link>
+            <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>New</strong></Button></Link>
+          </div>
+          <div>
+            <Pagination count={10} />
+          </div>
         </>
     )
 }
