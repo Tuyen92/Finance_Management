@@ -15,16 +15,11 @@ const ProjectDetail = () => {
     useEffect(() => {
         const loadProject = async () => {
             let res = await API.get(endpoints['project'](projectId))
-            let target = Numeral(res.data.target).format('0,0');
-            let spending = Numeral(res.data.spending_amount).format('0,0');
-            let income = Numeral(res.data.income_amount).format('0,0');
-            let start_date = format(new Date(res.data.start_date), 'dd/MM/yyyy HH:mm:ss');
-            let end_date = format(new Date(res.data.end_date), 'dd/MM/yyyy HH:mm:ss');
-            res.data.target = target
-            res.data.spending_amount = spending
-            res.data.income_amount = income
-            res.data.start_date = start_date
-            res.data.end_date = end_date
+            res.data.target = Numeral(res.data.target).format('0,0')
+            res.data.spending_amount = Numeral(res.data.spending_amount).format('0,0')
+            res.data.income_amount = Numeral(res.data.income_amount).format('0,0')
+            res.data.start_date = format(new Date(res.data.start_date), 'dd/MM/yyyy HH:mm:ss')
+            res.data.end_date = format(new Date(res.data.end_date), 'dd/MM/yyyy HH:mm:ss')
             // console.log(res.data)
             setProject(res.data)
         }
@@ -35,7 +30,7 @@ const ProjectDetail = () => {
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>PROJECT&nbsp;{project.id}. {project.name_project}</h1>
-            <div style={{ backgroundColor: "#F46841" }}>
+            <div style={{ backgroundColor: "#609b56" }}>
                 <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }}>Project information: </h3>
             </div>
             <Container>

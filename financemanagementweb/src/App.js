@@ -27,6 +27,15 @@ import Header from './layouts/Header';
 import Login from './components/Login';
 import ProjectDetail from './components/ProjectDetail';
 import GroupDetail from './components/GroupsDetail';
+import MeetingDetail from './components/MeetingsDetail';
+import SpendingDetail from './components/SpendingDetails';
+import IncomeDetail from './components/IncomeDetails';
+import NewSpending from './components/NewSpending';
+import NewIncome from './components/NewIncome';
+import NewGroup from './components/NewGroup';
+import NewProject from './components/NewProject';
+import NewMeeting from './components/NewMeeting';
+import Warning from './components/Warning';
 
 
 function App() {
@@ -151,19 +160,19 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
               <ListItem key='limit_rule' style={{ marginTop: '20px', marginBottom: '20px' }}>
                 <i className="material-icons" style={{ color: '#FFECC9' }}>savings</i>
-                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/limit_rule/">Limit Rules</Link>
+                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/limit_rules/">Limit Rules</Link>
+              </ListItem>
+              <Divider />
+              
+              <ListItem key='meeting' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                <i className="material-icons" style={{ color: '#FFECC9' }}>calendar_month</i>
+                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/meeting_schedule/">Meeting</Link>
               </ListItem>
               <Divider />
 
               <ListItem key='warning' style={{ marginTop: '20px', marginBottom: '20px' }}>
                 <i className="material-icons" style={{ color: '#FFECC9' }}>warning</i>
                 <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/warning/">Warning</Link>
-              </ListItem>
-              <Divider />
-
-              <ListItem key='role' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                <i className="material-icons" style={{ color: '#FFECC9' }}>label</i>
-                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/role/">Role</Link>
               </ListItem>
               <Divider />
             </List>
@@ -178,12 +187,21 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                 <Route path='/user/' element={<Users />}/>
                 <Route path='/groups/' element={<GroupsUser />}/>
                 <Route path='/groups/:groupId/' element={<GroupDetail />}/>
+                <Route path='/group/' element={<NewGroup />}/>
                 <Route path='/projects/' element={<Projects />}/>
                 <Route path='/projects/:projectId/' element={<ProjectDetail />}/>
+                <Route path='/project/' element={<NewProject />}/>
                 <Route path='/spendings/' element={<Spendings />}/>
+                <Route path='/spendings/:spendingId/' element={<SpendingDetail />}/>
+                <Route path='/spending/' element={<NewSpending />}/>
                 <Route path='/incomes/' element={<Incomes />}/>
+                <Route path='/incomes/:incomeId/' element={<IncomeDetail />}/>
+                <Route path='/income/' element={<NewIncome />}/>
                 <Route path='/meeting_schedule/' element={<Meetings />}/>
-                <Route path='/limit_rule/' element={<LimiteRule />}/>
+                <Route path='/meetings/:meetingId/' element={<MeetingDetail />}/>
+                <Route path='/meeting_schedule/' element={<NewMeeting />}/>
+                <Route path='/limit_rules/' element={<LimiteRule />}/>
+                <Route path='/warning/' element={<Warning />}/>
               </Routes>
               <Footer />
             </Typography>

@@ -10,6 +10,8 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
 import { Link } from 'react-router-dom';
+import Numeral from 'numeral';
+import { format } from 'date-fns';
 
 const LimitRules = () => {
     const[limitRule, setLimitRule] = useState([])
@@ -49,10 +51,10 @@ const LimitRules = () => {
                     <TableRow key={l.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
                       <TableCell component="th" scope="row">{l.id}</TableCell>
                       <TableCell component="th" scope="row">{l.type}</TableCell>
-                      <TableCell align="right">{l.spending_limit}</TableCell>
-                      <TableCell align="right">{l.income_limit}</TableCell>
-                      <TableCell align="right">{l.from_date}</TableCell>
-                      <TableCell align="right">{l.to_date}</TableCell>
+                      <TableCell align="right">{Numeral(l.spending_limit).format('0,0')}</TableCell>
+                      <TableCell align="right">{Numeral(l.income_limit).format('0,0')}</TableCell>
+                      <TableCell align="right">{format(new Date(l.from_date), 'dd/MM/yyyy HH:mm:ss')}</TableCell>
+                      <TableCell align="right">{format(new Date(l.to_date), 'dd/MM/yyyy HH:mm:ss')}</TableCell>
                       <TableCell component="th" scope="row"><Link style={{ textDecoration: 'none' }} to={url}><Button style={{ color: '#F46841' }}><strong>Inactive</strong></Button></Link></TableCell>
                     </TableRow>
                 )})}
@@ -61,8 +63,8 @@ const LimitRules = () => {
           </TableContainer>
           <hr/>
           <div align="right">
-            <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841' }}><strong>Sort</strong></Button></Link>
-            <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841' }}><strong>New</strong></Button></Link>
+            <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>Sort</strong></Button></Link>
+            <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>New</strong></Button></Link>
           </div>
           <div>
             <Pagination count={10} />

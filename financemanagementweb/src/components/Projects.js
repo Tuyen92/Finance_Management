@@ -12,6 +12,11 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
+import Numeral from 'numeral';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 
 
 const Projects = () => {
@@ -51,9 +56,9 @@ const Projects = () => {
                   <TableRow key={p.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
                     <TableCell component="th" scope="row">{p.id}</TableCell>
                     <TableCell component="th" scope="row">{p.name_project}</TableCell>
-                    <TableCell align="right" typeof="number">{p.target}</TableCell>
-                    <TableCell align="right">{p.income_amount}</TableCell>
-                    <TableCell align="right">{p.spending_amount}</TableCell>
+                    <TableCell align="right">{Numeral(p.target).format('0,0')}</TableCell>
+                    <TableCell align="right">{Numeral(p.income_amount).format('0,0')}</TableCell>
+                    <TableCell align="right">{Numeral(p.spending_amount).format('0,0')}</TableCell>
                     <TableCell component="th" scope="row"><Link style={{ textDecoration: 'none' }} to={url}><Button style={{ color: '#F46841' }}><strong>Detail</strong></Button></Link></TableCell>
                   </TableRow>)
                 })}
@@ -61,9 +66,17 @@ const Projects = () => {
             </Table>
           </TableContainer>
           <hr/>
-          <div align="right">
-            <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>Sort</strong></Button></Link>
-            <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>New</strong></Button></Link>
+          <div align="right" style={{ display: 'flex', marginLeft: '70%'}}>
+            <h4 style={{ color: '#F1C338', marginRight: '5%', marginTop: '30px' }}>Sort:</h4>
+            <FormControl variant="standard" sx={{ m: 1, minWidth: 150 }}>
+                <InputLabel id="demo-simple-select-standard-label">Target amount</InputLabel>
+                    <Select labelId="demo-simple-select-standard-label" id="demo-simple-select-standard" label="Spending amount" style={{ marginRight: '5%' }}>
+                        <MenuItem value=""></MenuItem>
+                        <MenuItem value={10}>Increase</MenuItem>
+                        <MenuItem value={20}>Decrease</MenuItem>
+                    </Select>
+            </FormControl>
+            <Link style={{ textDecoration: 'none' }} to={`/project/`}><Button style={{ color: '#F1C338', width: '100%', marginTop: '24px' }}><strong>New project</strong></Button></Link>
           </div>
           <div>
             <Pagination count={10} />
