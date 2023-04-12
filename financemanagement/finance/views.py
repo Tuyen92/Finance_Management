@@ -1,3 +1,4 @@
+import requests
 from django.db.models.functions import ExtractQuarter
 from rest_framework import viewsets, permissions, generics, status, parsers
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication
@@ -8,41 +9,14 @@ from .serializers import *
 from .paginators import *
 
 
-# ROLE
-class RoleViewSet(viewsets.ViewSet, generics.ListAPIView):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
-
-    # Create role
-    @action(methods=['post'], detail=False, url_path='new')
-    def create_role(self, request):
-        try:
-            if request.method.__eq__('POST'):
-                role = request.data
-                r, _ = Role.objects.get_or_create(role_name=role.get('role_name'), describe=role.get('describe'))
-                r.save()
-                return Response(RoleSerializer(r, context={'request': request}).data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        except:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 # SPENDING
 class SpendingViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Spending.objects.all()
-    serializer_class = SpendingSerializer
+    serializer_class = SpendingDetailSerializer
     pagination_class = SpendingPaginator
 
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -119,23 +93,20 @@ class SpendingViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrie
 
 class SpendingViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = Spending.objects.all()
-    serializer_class = SpendingSerializer
+    serializer_class = SpendingCreateSerializer
 
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
 
 # PROJECT
 class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    pagination_class = ProjectPaginator
 
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -255,8 +226,8 @@ class ProjectViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
-    def get_permissions(self):
-        return [permissions.IsAuthenticated()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
 
 # GROUP
@@ -264,10 +235,8 @@ class GroupViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveA
     queryset = Group.objects.all()
     serializer_class = GroupDetailSerializer
 
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -409,17 +378,16 @@ class GroupViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
 
 
 # USER
-class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPIView, generics.ListAPIView):
+class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailSerializer
+    pagination_class = UserPaginator
 
     # authentication_classes = [BasicAuthentication, TokenAuthentication]
     # parser_classes = [parsers.MultiPartParser, ]
 
-    def get_permissions(self):
-        # if self.action in ['current_user', 'choose_limit_rule', 'change_password']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -543,15 +511,23 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPI
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+class UserViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
+
+
 # INCOME
 class IncomeViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Income.objects.all()
-    serializer_class = IncomeSerializer
+    serializer_class = IncomeDetailSerializer
+    pagination_class = IncomePaginator
 
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -606,33 +582,28 @@ class IncomeViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrieve
 
 class IncomeViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = Income.objects.all()
-    serializer_class = IncomeSerializer
+    serializer_class = IncomeCreateSerializer
 
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
 
 # MEETING
 class MeetingScheduleViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = MeetingSchedule.objects.all()
-    serializer_class = MeetingScheduleSerializer
+    serializer_class = MeetingScheduleCreateSerializer
 
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
 
 class MeetingScheduleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = MeetingSchedule.objects.all()
     serializer_class = MeetingScheduleSerializer
+    pagination_class = MeetingPaginator
 
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -741,11 +712,10 @@ class MeetingScheduleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics
 class LimitRuleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = LimitRule.objects.all()
     serializer_class = LimitRuleSerializer
+    pagination_class = LimitRulePaginator
 
-    def get_permissions(self):
-        # if self.action in ['create_role']:
-        return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -801,6 +771,4 @@ class LimitRuleViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     serializer_class = LimitRuleSerializer
 
     def get_permissions(self):
-        # if self.action in ['create_role']:
         return [permissions.IsAuthenticated()]
-        # return [permissions.AllowAny()]

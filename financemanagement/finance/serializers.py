@@ -12,12 +12,6 @@ class ImageSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri('/static/%s' % obj.avatar.name) if request else ''
 
 
-class RoleSerializer(ModelSerializer):
-    class Meta:
-        model = Role
-        fields = ['id', 'role_name', 'describe']
-
-
 class LimitRuleSerializer(ModelSerializer):
     class Meta:
         model = LimitRule
@@ -25,12 +19,9 @@ class LimitRuleSerializer(ModelSerializer):
 
 
 class UserSerializer(ImageSerializer):
-    role = RoleSerializer()
-    limit_rule = LimitRuleSerializer()
-
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'sex', 'birthday', 'address', 'phone', 'email', 'is_active', 'avatar', 'role', 'limit_rule']
+        fields = ['id', 'first_name', 'last_name', 'sex', 'birthday', 'address', 'phone', 'email', 'is_active', 'avatar', 'username', 'password']
         extra_kwargs = {
             'avatar': {'write_only': True},
             'password': {'write_only': True}
@@ -38,15 +29,32 @@ class UserSerializer(ImageSerializer):
 
 
 class UserDetailSerializer(UserSerializer):
+    limit_rule = LimitRuleSerializer()
+
     class Meta:
         model = UserSerializer.Meta.model
-        fields = ['username', 'password']
+        fields = UserSerializer.Meta.fields + ['limit_rule']
 
 
 class SpendingSerializer(ModelSerializer):
     class Meta:
         model = Spending
-        fields = ['id', 'content', 'describe', 'spending_amount', 'implementation_date', 'is_accept']
+        fields = ['id', 'content', 'describe', 'spending_amount', 'implementation_date', 'group_id', 'is_accept',
+                  'project_id']
+
+
+class SpendingDetailSerializer(SpendingSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = SpendingSerializer.Meta.model
+        fields = SpendingSerializer.Meta.fields + ['user']
+
+
+class SpendingCreateSerializer(SpendingSerializer):
+    class Meta:
+        model = SpendingSerializer.Meta.model
+        fields = SpendingSerializer.Meta.fields + ['user']
 
 
 class ProjectSerializer(ModelSerializer):
@@ -59,21 +67,37 @@ class ProjectSerializer(ModelSerializer):
 class GroupSerializer(ModelSerializer):
     class Meta:
         model = Group
-        fields = ['id', 'name', 'number', 'is_active', 'leader_id', 'project']
+        fields = ['id', 'name', 'number', 'is_active', 'leader_id']
 
 
 class GroupDetailSerializer(GroupSerializer):
     users = UserSerializer(many=True)
+    project = ProjectSerializer()
 
     class Meta:
         model = GroupSerializer.Meta.model
-        fields = GroupSerializer.Meta.fields + ['users']
+        fields = GroupSerializer.Meta.fields + ['project', 'users']
 
 
 class IncomeSerializer(ModelSerializer):
     class Meta:
         model = Income
-        fields = ['id', 'income_amount', 'implementation_date', 'content', 'describe']
+        fields = ['id', 'income_amount', 'implementation_date', 'content', 'describe', 'group_id', 'is_confirm',
+                  'project_id']
+
+
+class IncomeDetailSerializer(IncomeSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = IncomeSerializer.Meta.model
+        fields = IncomeSerializer.Meta.fields + ['user']
+
+
+class IncomeCreateSerializer(IncomeSerializer):
+    class Meta:
+        model = IncomeSerializer.Meta.model
+        fields = IncomeSerializer.Meta.fields + ['user']
 
 
 class MeetingScheduleSerializer(ModelSerializer):
@@ -81,4 +105,10 @@ class MeetingScheduleSerializer(ModelSerializer):
 
     class Meta:
         model = MeetingSchedule
-        fields = ['id', 'date_time', 'vote', 'content', 'group']
+        fields = ['id', 'date_time', 'vote', 'content', 'is_active', 'group']
+
+
+class MeetingScheduleCreateSerializer(ModelSerializer):
+    class Meta:
+        model = MeetingSchedule
+        fields = ['id', 'date_time', 'vote', 'content', 'is_active', 'group']

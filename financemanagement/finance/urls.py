@@ -4,8 +4,8 @@ from rest_framework import routers
 from . import views
 
 r = routers.DefaultRouter()
-r.register('role', views.RoleViewSet)
 r.register('user', views.UserViewSet)
+r.register('register', views.UserViewSetCreate)
 r.register('income', views.IncomeViewSetCreate)
 r.register('incomes', views.IncomeViewSetGet)
 r.register('spending', views.SpendingViewSetCreate)

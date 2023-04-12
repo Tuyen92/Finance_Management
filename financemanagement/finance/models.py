@@ -9,7 +9,6 @@ class User(AbstractUser):
     birthday = models.DateField(null=True)
     address = models.CharField(null=True, max_length=255)
     phone = models.CharField(null=False, max_length=50)
-    role = models.ForeignKey('Role', on_delete=models.CASCADE, default=1)
     limit_rule = models.ForeignKey('LimitRule', on_delete=models.CASCADE, default=1)
 
     def __str__(self):
@@ -21,7 +20,8 @@ class Income(models.Model):
     income_amount = models.IntegerField(null=False)
     implementation_date = models.DateTimeField(auto_now_add=True)
     describe = RichTextField(null=False)
-    id_user = models.ForeignKey('User', on_delete=models.CASCADE, default=True)
+    is_confirm = models.BooleanField(default=False)
+    user = models.ForeignKey('User', on_delete=models.CASCADE, default=True)
     group_id = models.CharField(null=True, max_length=20)
     project_id = models.CharField(null=True, max_length=20)
 
@@ -35,7 +35,7 @@ class Spending(models.Model):
     implementation_date = models.DateTimeField(auto_now_add=True)
     describe = RichTextField(null=False)
     is_accept = models.BooleanField(default=False)
-    id_user = models.ForeignKey('User', on_delete=models.CASCADE, default=True)
+    user = models.ForeignKey('User', on_delete=models.CASCADE, default=True)
     group_id = models.CharField(null=True, max_length=20)
     project_id = models.CharField(null=True, max_length=20)
 
@@ -46,6 +46,7 @@ class Spending(models.Model):
 class Group(models.Model):
     name = models.CharField(null=False, max_length=100)
     number = models.IntegerField(null=False, default=0)
+    created_date = models.DateField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     leader_id = models.CharField(max_length=10)
     project = models.ForeignKey('Project', on_delete=models.CASCADE, default=True)
@@ -67,14 +68,6 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name_project
-
-
-class Role(models.Model):
-    role_name = models.CharField(null=False, max_length=100)
-    describe = RichTextField(null=True)
-
-    def __str__(self):
-        return self.role_name
 
 
 class MeetingSchedule(models.Model):
