@@ -17,25 +17,46 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
+import { useNavigate, useSearchParams } from "react-router-dom/dist";
 
 
 const Spendings = () => {
     const[spending, setSpending] = useState([])
+    const[kw, setKeyWord] = useState("")
+    const nav = useNavigate()
+    const [c] = useSearchParams()
 
     useEffect(() => {
         const loadSpendings = async () => {
-            let res =  await API.get(endpoints['spendings'])
-            setSpending(res.data.results)
+          let e = `${endpoints['spendings']}?`
+            
+          let content = c.get("content")
+          if (content !== null)
+            e += `content=${content}`
+
+          let res =  await API.get(e)
+          setSpending(res.data.results)
         }
 
         loadSpendings()
-    }, [])
+    }, [c])
+
+    const search = (evt) => {
+      evt.preventDefault()
+      nav(`/spendings/?content=${kw}`)
+    }
 
     return (
         <>
             <div>
                 <h1 style={{ textAlign: 'center', color: '#F1C338' }}>SPENDING LIST</h1>
             </div>
+            <div align="right">
+              <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
+              <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
+            </div>
+            <br />
             <hr />
             <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -65,12 +86,12 @@ const Spendings = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          <hr/>
+          <br />
           <div align="right" style={{ display: 'flex', marginLeft: '70%'}}>
             <h4 style={{ color: '#F1C338', marginRight: '5%', marginTop: '30px' }}>Sort:</h4>
             <FormControl variant="standard" sx={{ m: 1, minWidth: 170 }}>
-                <InputLabel id="demo-simple-select-standard-label">Spending amount</InputLabel>
-                    <Select labelId="demo-simple-select-standard-label" id="demo-simple-select-standard" label="Spending amount" style={{ marginRight: '5%' }}>
+                <InputLabel id="demo-simple-select-label">Spending amount</InputLabel>
+                    <Select labelId="demo-simple-select-label" id="demo-simple-select" label="Spending amount" style={{ marginRight: '5%' }}>
                         <MenuItem value=""></MenuItem>
                         <MenuItem value={10}>Increase</MenuItem>
                         <MenuItem value={20}>Decrease</MenuItem>

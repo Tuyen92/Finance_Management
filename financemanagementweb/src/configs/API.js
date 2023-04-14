@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as cookie from 'react-cookies';
 
 export const endpoints = {
     "user": "/user/",
@@ -17,8 +18,17 @@ export const endpoints = {
     "limit_rules": "/limit_rules/",
     "meetings": "/meetings/",
     "meeting": (meetingId) => `/meetings/${meetingId}`,
-    "meeting": "/meeting/"
+    "new_meeting": "/meeting/",
+    "login": "/o/token/",
+    "current_user": "/user/current_user/"
 }
+
+export const authAPI = () => axios.create({
+    baseURL: "http://127.0.0.1:8000/",
+    headers:{
+        "Authorization":`Bearer ${cookie.load("access-token")}`
+    }
+})
 
 export default axios.create({
     baseURL: "http://127.0.0.1:8000/"

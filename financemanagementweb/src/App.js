@@ -36,6 +36,11 @@ import NewGroup from './components/NewGroup';
 import NewProject from './components/NewProject';
 import NewMeeting from './components/NewMeeting';
 import Warning from './components/Warning';
+import { UseContext } from './configs/UseContext';
+import MyUserReducer from './reducer/MyUserReducer';
+import cookie from 'react-cookies';
+import Avatar from '@mui/material/Avatar';
+import CurrentUser from './components/CurrentUser';
 
 
 function App() {
@@ -99,115 +104,135 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     setOpen(false);
   };
 
+  const [user, dispatch] = React.useReducer(MyUserReducer, cookie.load('current-user') || null)
+  let userLogin = (
+    <>
+      <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/login/"><strong>Login</strong></Link>
+    </>
+  )
+  if (userLogin !== null)
+  {
+    userLogin = 
+    (
+      <>
+        <Link style={{ color: '#FFECC9', textDecoration: 'none', marginRight: '1%' }} to="/user/current_user/"><Avatar alt="Remy Sharp" src={"./user.jpg"} /></Link>
+        <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/logout/"><strong>Logout</strong></Link>
+      </>
+    )
+  }
+
   return (
     <>
-      <BrowserRouter>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
-        <Box sx={{ display: 'flex' }}>
-          <CssBaseline />
-          <AppBar position="fixed" open={open}>
-            <Toolbar>
-              <IconButton color="inherit" aria-label="open drawer" onClick={handleDrawerOpen} edge="start" sx={{ mr: 2, ...(open && { display: 'none' }) }}>
-                <MenuIcon />
-              </IconButton>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/"><strong>FINANCE MANAGEMENT</strong></Link>
+      <UseContext.Provider value={[user, dispatch]}>
+        <BrowserRouter>
+          <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+          <Box sx={{ display: 'flex' }}>
+            <CssBaseline />
+            <AppBar position="fixed" open={open}>
+              <Toolbar>
+                <IconButton color="inherit" aria-label="open drawer" onClick={handleDrawerOpen} edge="start" sx={{ mr: 2, ...(open && { display: 'none' }) }}>
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                  <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/"><strong>FINANCE MANAGEMENT</strong></Link>
+                </Typography>
+                {userLogin}
+              </Toolbar>
+            </AppBar>
+
+            <Drawer sx={{width: drawerWidth, flexShrink: 0, '& .MuiDrawer-paper': {
+                width: drawerWidth,
+                boxSizing: 'border-box',
+                backgroundColor: "#609b56",
+                color: "#FFECC9"
+                },}}
+              variant="persistent"
+              anchor="left"
+              open={open}>
+              <DrawerHeader>
+                <IconButton onClick={handleDrawerClose}>
+                  {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                </IconButton>
+              </DrawerHeader>
+
+              <Divider />
+              <List>
+                <ListItem key='spending' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                  <i className="material-icons" style={{ color: '#FFECC9' }}>payments</i>
+                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/spendings/">Spendings</Link>
+                </ListItem>
+                <Divider />
+                
+                <ListItem key='income' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                  <i className="material-icons" style={{ color: '#FFECC9' }}>account_balance_wallet</i>
+                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/incomes/">Incomes</Link>
+                </ListItem>
+                <Divider />
+
+                <ListItem key='group' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                  <i className="material-icons" style={{ color: '#FFECC9' }}>diversity_2</i>
+                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/groups/">Groups</Link>
+                </ListItem>
+                <Divider />
+
+                <ListItem key='project' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                  <i className="material-icons" style={{ color: '#FFECC9' }}>business_center</i>
+                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/projects/">Projects</Link>
+                </ListItem>
+                <Divider />
+
+                <ListItem key='limit_rule' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                  <i className="material-icons" style={{ color: '#FFECC9' }}>savings</i>
+                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/limit_rules/">Limit Rules</Link>
+                </ListItem>
+                <Divider />
+                
+                <ListItem key='meeting' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                  <i className="material-icons" style={{ color: '#FFECC9' }}>calendar_month</i>
+                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/meeting_schedule/">Meeting</Link>
+                </ListItem>
+                <Divider />
+
+                <ListItem key='warning' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                  <i className="material-icons" style={{ color: '#FFECC9' }}>warning</i>
+                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/warning/">Warning</Link>
+                </ListItem>
+                <Divider />
+              </List>
+            </Drawer>
+
+            <Main open={open}>
+              <DrawerHeader />
+              <Typography>
+                <Routes>
+                  <Route path='/' element={<Header />}/>
+                  <Route path='/login/' element={<Login />}/>
+                  <Route path='/user/' element={<Users />}/>
+                  <Route path='/user/current_user/' element={<CurrentUser />}/>
+                  <Route path='/groups/' element={<GroupsUser />}/>
+                  <Route path='/groups/:groupId/' element={<GroupDetail />}/>
+                  <Route path='/group/' element={<NewGroup />}/>
+                  <Route path='/projects/' element={<Projects />}/>
+                  <Route path='/projects/:projectId/' element={<ProjectDetail />}/>
+                  <Route path='/project/' element={<NewProject />}/>
+                  <Route path='/spendings/' element={<Spendings />}/>
+                  <Route path='/spendings/:spendingId/' element={<SpendingDetail />}/>
+                  <Route path='/spending/' element={<NewSpending />}/>
+                  <Route path='/incomes/' element={<Incomes />}/>
+                  <Route path='/incomes/:incomeId/' element={<IncomeDetail />}/>
+                  <Route path='/income/' element={<NewIncome />}/>
+                  <Route path='/meeting_schedule/' element={<Meetings />}/>
+                  <Route path='/meetings/:meetingId/' element={<MeetingDetail />}/>
+                  <Route path='/meeting_schedule/' element={<NewMeeting />}/>
+                  <Route path='/limit_rules/' element={<LimiteRule />}/>
+                  <Route path='/warning/' element={<Warning />}/>
+                </Routes>
+                <Footer />
               </Typography>
-              <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/login/"><strong>Login</strong></Link>
-            </Toolbar>
-          </AppBar>
-
-          <Drawer sx={{width: drawerWidth, flexShrink: 0, '& .MuiDrawer-paper': {
-              width: drawerWidth,
-              boxSizing: 'border-box',
-              backgroundColor: "#609b56",
-              color: "#FFECC9"
-              },}}
-            variant="persistent"
-            anchor="left"
-            open={open}>
-            <DrawerHeader>
-              <IconButton onClick={handleDrawerClose}>
-                {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-              </IconButton>
-            </DrawerHeader>
-
-            <Divider />
-            <List>
-              <ListItem key='spending' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                <i className="material-icons" style={{ color: '#FFECC9' }}>payments</i>
-                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/spendings/">Spendings</Link>
-              </ListItem>
-              <Divider />
-              
-              <ListItem key='income' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                <i className="material-icons" style={{ color: '#FFECC9' }}>account_balance_wallet</i>
-                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/incomes/">Incomes</Link>
-              </ListItem>
-              <Divider />
-
-              <ListItem key='group' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                <i className="material-icons" style={{ color: '#FFECC9' }}>diversity_2</i>
-                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/groups/">Groups</Link>
-              </ListItem>
-              <Divider />
-
-              <ListItem key='project' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                <i className="material-icons" style={{ color: '#FFECC9' }}>business_center</i>
-                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/projects/">Projects</Link>
-              </ListItem>
-              <Divider />
-
-              <ListItem key='limit_rule' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                <i className="material-icons" style={{ color: '#FFECC9' }}>savings</i>
-                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/limit_rules/">Limit Rules</Link>
-              </ListItem>
-              <Divider />
-              
-              <ListItem key='meeting' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                <i className="material-icons" style={{ color: '#FFECC9' }}>calendar_month</i>
-                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/meeting_schedule/">Meeting</Link>
-              </ListItem>
-              <Divider />
-
-              <ListItem key='warning' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                <i className="material-icons" style={{ color: '#FFECC9' }}>warning</i>
-                <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/warning/">Warning</Link>
-              </ListItem>
-              <Divider />
-            </List>
-          </Drawer>
-
-          <Main open={open}>
-            <DrawerHeader />
-            <Typography>
-              <Routes>
-                <Route path='/' element={<Header />}/>
-                <Route path='/login/' element={<Login />}/>
-                <Route path='/user/' element={<Users />}/>
-                <Route path='/groups/' element={<GroupsUser />}/>
-                <Route path='/groups/:groupId/' element={<GroupDetail />}/>
-                <Route path='/group/' element={<NewGroup />}/>
-                <Route path='/projects/' element={<Projects />}/>
-                <Route path='/projects/:projectId/' element={<ProjectDetail />}/>
-                <Route path='/project/' element={<NewProject />}/>
-                <Route path='/spendings/' element={<Spendings />}/>
-                <Route path='/spendings/:spendingId/' element={<SpendingDetail />}/>
-                <Route path='/spending/' element={<NewSpending />}/>
-                <Route path='/incomes/' element={<Incomes />}/>
-                <Route path='/incomes/:incomeId/' element={<IncomeDetail />}/>
-                <Route path='/income/' element={<NewIncome />}/>
-                <Route path='/meeting_schedule/' element={<Meetings />}/>
-                <Route path='/meetings/:meetingId/' element={<MeetingDetail />}/>
-                <Route path='/meeting_schedule/' element={<NewMeeting />}/>
-                <Route path='/limit_rules/' element={<LimiteRule />}/>
-                <Route path='/warning/' element={<Warning />}/>
-              </Routes>
-              <Footer />
-            </Typography>
-          </Main>
-        </Box>
-      </BrowserRouter>
+            </Main>
+          </Box>
+        </BrowserRouter>
+      </UseContext.Provider>
     </>
   );
 }
