@@ -15,8 +15,8 @@ class SpendingViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrie
     serializer_class = SpendingDetailSerializer
     pagination_class = SpendingPaginator
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -516,8 +516,8 @@ class UserViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def get_permissions(self):
-        return [permissions.IsAuthenticated()]
+    # def get_permissions(self):
+    #     return [permissions.IsAuthenticated()]
 
 
 # INCOME
