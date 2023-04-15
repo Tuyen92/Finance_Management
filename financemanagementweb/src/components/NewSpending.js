@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react"
+// import { useEffect, useState } from "react"
 import { Container, Input } from "@mui/material"
 
 const NewSpending = () => {
-    const[spending, setSpending] = useState([])
+    // const[spending, setSpending] = useState([])
     // useEffect(() => {
 
     // })

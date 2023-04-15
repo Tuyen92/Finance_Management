@@ -33,7 +33,11 @@ const Spendings = () => {
             
           let content = c.get("content")
           if (content !== null)
-            e += `content=${content}`
+            e += `&content=${content}`
+
+          let sort = c.get("sort")
+          if (sort !== null)
+            e += `&sort=${sort}`
 
           let res =  await API.get(e)
           setSpending(res.data.results)

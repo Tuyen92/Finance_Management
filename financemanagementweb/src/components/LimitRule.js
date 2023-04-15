@@ -12,24 +12,45 @@ import Pagination from '@mui/material/Pagination';
 import { Link } from 'react-router-dom';
 import Numeral from 'numeral';
 import { format } from 'date-fns';
+import TextField from '@mui/material/TextField';
+import { useNavigate, useSearchParams } from "react-router-dom/dist";
 
 const LimitRules = () => {
     const[limitRule, setLimitRule] = useState([])
+    const[kw, setKeyWord] = useState("")
+    const nav = useNavigate()
+    const [t] = useSearchParams()
 
     useEffect(() => {
         const loadLimitRules = async () => {
-            let res = await API.get(endpoints['limit_rules'])
-            setLimitRule(res.data.results)
+          let e = `${endpoints['limit_rules']}?`
+            
+          let type = t.get("type")
+          if (type !== null)
+            e += `&content=${type}`
+
+          let res =  await API.get(e)
+          console.log(res.data.results)
+          setLimitRule(res.data.results)
         }
 
         loadLimitRules()
-    }, [])
+    }, [t])
+
+    const search = (evt) => {
+      evt.preventDefault()
+      nav(`/spendings/?content=${kw}`)
+    }
 
     return (
         <>
           <div>
             <h1 style={{ textAlign: 'center', color: '#F1C338' }}>LIMIT RULE LIST</h1>
           </div>
+          <div align="right">
+              <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
+              <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
+            </div>
           <hr />
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">

@@ -17,24 +17,45 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
+import { useNavigate, useSearchParams } from "react-router-dom/dist";
 
 
 const Projects = () => {
     const[project, setProject] = useState([])
+    const[kw, setKeyWord] = useState("")
+    const nav = useNavigate()
+    const [n] = useSearchParams()
 
     useEffect(() => {
         const loadProjects = async () => {
-            let res = await API.get(endpoints['projects'])
-            setProject(res.data.results)
+          let e = `${endpoints['projects']}?`
+            
+          let name = n.get("name")
+          if (name !== null)
+            e += `&name_project=${name}`
+
+          let res =  await API.get(e)
+          console.log(res.data.results)
+          setProject(res.data.results)
         }
 
         loadProjects()
-    }, [])
+    }, [n])
+
+    const search = (evt) => {
+      evt.preventDefault()
+      nav(`/spendings/?content=${kw}`)
+    }
 
     return (
         <>
         <div>
           <h1 style={{ textAlign: 'center', color: '#F1C338' }}>PROJECT LIST</h1>
+        </div>
+        <div align="right">
+          <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
+          <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
         </div>
         <hr />
           <TableContainer component={Paper}>

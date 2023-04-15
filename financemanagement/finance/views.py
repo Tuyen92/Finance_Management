@@ -41,6 +41,12 @@ class SpendingViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrie
             accept = self.request.query_params.get("accept")
             if accept == 1:
                 queryset = queryset.filter(is_accept=True)
+
+            sort = self.request.query_params.get("sort")
+            if sort == 1:
+                queryset = queryset.order_by("spending_amount")
+            if sort == 0:
+                queryset = queryset.order_by("-spending_amount")
             return queryset
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

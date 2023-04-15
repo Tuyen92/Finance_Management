@@ -12,25 +12,45 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
 import { format } from 'date-fns';
+import TextField from '@mui/material/TextField';
+import { useNavigate, useSearchParams } from "react-router-dom/dist";
 
 
 const Meetings = () => {
     const[meeting, setMeeting] = useState([])
+    const[kw, setKeyWord] = useState("")
+    const nav = useNavigate()
+    const [c] = useSearchParams()
 
     useEffect(() => {
         const loadMeetings = async () => {
-            let res = await API.get(endpoints['meetings'])
-            console.log(res.data.results)
-            setMeeting(res.data.results)
+          let e = `${endpoints['meetings']}?`
+            
+          let content = c.get("content")
+          if (content !== null)
+            e += `&content=${content}`
+
+          let res =  await API.get(e)
+          console.log(res.data.results)
+          setMeeting(res.data.results)
         }
 
         loadMeetings()
-    }, [])
+    }, [c])
+    
+    const search = (evt) => {
+      evt.preventDefault()
+      nav(`/spendings/?content=${kw}`)
+    }
 
     return (
         <>
             <div>
                 <h1 style={{ textAlign: 'center', color: '#F1C338' }}>MEETING SCHEDULE LIST</h1>
+            </div>
+            <div align="right">
+              <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
+              <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
             </div>
             <hr />
             <TableContainer component={Paper}>
