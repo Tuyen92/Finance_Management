@@ -14,6 +14,7 @@ import Pagination from '@mui/material/Pagination';
 import { format } from 'date-fns';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
+import cookie from 'react-cookies';
 
 
 const Meetings = () => {
@@ -43,17 +44,23 @@ const Meetings = () => {
       nav(`/spendings/?content=${kw}`)
     }
 
-    return (
+    let meetingLogin = (
+      <>
+        <div align="center">
+          <h3 style={{ color: '#F46841' }}>Please <Link style={{ textDecoration: 'none', color: '#F46841' }} to={`/login/`}>Login</Link></h3>
+        </div>
+      </>
+    )
+    if (cookie !== null)
+    {
+      meetingLogin = (
         <>
-            <div>
-                <h1 style={{ textAlign: 'center', color: '#F1C338' }}>MEETING SCHEDULE LIST</h1>
-            </div>
-            <div align="right">
-              <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
-              <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
-            </div>
-            <hr />
-            <TableContainer component={Paper}>
+          <div align="right">
+            <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
+            <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
+          </div>
+          <hr />
+          <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
               <TableHead>
                 <TableRow>
@@ -89,6 +96,15 @@ const Meetings = () => {
           </div>
           <div>
             <Pagination count={10} />
+          </div>
+        </>
+      )
+    }
+
+    return (
+        <>
+          <div>
+            <h1 style={{ textAlign: 'center', color: '#F1C338' }}>MEETING SCHEDULE LIST</h1>
           </div>
         </>
     )

@@ -13,7 +13,7 @@ from .paginators import *
 class SpendingViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Spending.objects.all()
     serializer_class = SpendingDetailSerializer
-    pagination_class = SpendingPaginator
+    pagination_class = Paginator
 
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
@@ -42,11 +42,12 @@ class SpendingViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrie
             if accept == 1:
                 queryset = queryset.filter(is_accept=True)
 
+            # Sort by spending amount
             sort = self.request.query_params.get("sort")
-            if sort == 1:
-                queryset = queryset.order_by("spending_amount")
-            if sort == 0:
-                queryset = queryset.order_by("-spending_amount")
+            if sort == '1':
+                queryset = queryset.order_by('spending_amount')
+            if sort == '0':
+                queryset = queryset.order_by('-spending_amount')
             return queryset
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -101,15 +102,15 @@ class SpendingViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = Spending.objects.all()
     serializer_class = SpendingCreateSerializer
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
 
 # PROJECT
 class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    pagination_class = ProjectPaginator
+    pagination_class = Paginator
 
     # def get_permissions(self):
     #     return [permissions.IsAuthenticated()]
@@ -143,9 +144,9 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
 
             # Sort by target
             sort = self.request.query_params.get("sort")
-            if sort == 1:
+            if sort == '1':
                 queryset = queryset.order_by('target')
-            if sort == 2:
+            if sort == '0':
                 queryset = queryset.order_by('-target')
 
             # Filter by is ended project
@@ -387,7 +388,7 @@ class GroupViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
 class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserDetailSerializer
-    pagination_class = UserPaginator
+    pagination_class = Paginator
 
     # authentication_classes = [BasicAuthentication, TokenAuthentication]
     # parser_classes = [parsers.MultiPartParser, ]
@@ -530,7 +531,7 @@ class UserViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
 class IncomeViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Income.objects.all()
     serializer_class = IncomeDetailSerializer
-    pagination_class = IncomePaginator
+    pagination_class = Paginator
 
     # def get_permissions(self):
     #     return [permissions.IsAuthenticated()]
@@ -606,7 +607,7 @@ class MeetingScheduleViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
 class MeetingScheduleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = MeetingSchedule.objects.all()
     serializer_class = MeetingScheduleSerializer
-    pagination_class = MeetingPaginator
+    pagination_class = Paginator
 
     # def get_permissions(self):
     #     return [permissions.IsAuthenticated()]
@@ -718,7 +719,7 @@ class MeetingScheduleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics
 class LimitRuleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = LimitRule.objects.all()
     serializer_class = LimitRuleSerializer
-    pagination_class = LimitRulePaginator
+    pagination_class = Paginator
 
     # def get_permissions(self):
     #     return [permissions.IsAuthenticated()]

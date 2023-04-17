@@ -18,6 +18,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
+import cookie from 'react-cookies';
 
 
 const Incomes = () => {
@@ -46,15 +47,21 @@ const Incomes = () => {
       nav(`/spendings/?content=${kw}`)
     }
 
-    return (
+    let incomeLogin = (
+      <>
+        <div align="center">
+          <h3 style={{ color: '#F46841' }}>Please <Link style={{ textDecoration: 'none', color: '#F46841' }} to={`/login/`}>Login</Link></h3>
+        </div>
+      </>
+    )
+    if (cookie !== null)
+    {
+      incomeLogin = (
         <>
-          <div>
-            <h1 style={{ textAlign: 'center', color: '#F1C338' }}>INCOME LIST</h1>
-          </div>
           <div align="right">
-              <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
-              <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
-            </div>
+            <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
+            <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
+          </div>
           <hr />
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -100,6 +107,16 @@ const Incomes = () => {
           <div>
             <Pagination count={10} />
           </div>
+        </>
+      )
+    }
+
+    return (
+        <>
+          <div>
+            <h1 style={{ textAlign: 'center', color: '#F1C338' }}>INCOME LIST</h1>
+          </div>
+          {incomeLogin}
         </>
     )
 }

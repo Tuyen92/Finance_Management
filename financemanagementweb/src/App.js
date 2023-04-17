@@ -110,7 +110,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
       <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/login/"><strong>Login</strong></Link>
     </>
   )
-  if (userLogin !== null)
+  if (cookie !== null)
   {
     userLogin = 
     (
@@ -166,6 +166,12 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                 <ListItem key='income' style={{ marginTop: '20px', marginBottom: '20px' }}>
                   <i className="material-icons" style={{ color: '#FFECC9' }}>account_balance_wallet</i>
                   <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/incomes/">Incomes</Link>
+                </ListItem>
+                <Divider />
+
+                <ListItem key='user' style={{ marginTop: '20px', marginBottom: '20px' }}>
+                  <i className="material-icons" style={{ color: '#FFECC9' }}>face</i>
+                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/user/">User</Link>
                 </ListItem>
                 <Divider />
 
