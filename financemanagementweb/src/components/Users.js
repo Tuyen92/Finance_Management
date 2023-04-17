@@ -14,7 +14,7 @@ import { useNavigate, useSearchParams } from "react-router-dom/dist";
 
 
 const Users = () => {
-    const[user, setUser] = useState([])
+    const[users, setUser] = useState([])
     const[kw, setKeyWord] = useState("")
     const nav = useNavigate()
 
@@ -66,6 +66,7 @@ const Users = () => {
                 </div>
             </>
         )
+        console.log(cookie);
     }
 
     return (

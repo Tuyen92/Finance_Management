@@ -110,7 +110,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
       <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/login/"><strong>Login</strong></Link>
     </>
   )
-  if (cookie !== null)
+  if (user !== null)
   {
     userLogin = 
     (
