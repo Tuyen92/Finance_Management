@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useContext, useEffect } from "react"
 import { useState } from "react"
 import API, { authAPI, endpoints } from "../configs/API"
 import { Link } from 'react-router-dom'
@@ -19,7 +19,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
-import cookie from 'react-cookies';
+import { UseContext } from "../configs/UseContext";
 
 
 const Spendings = () => {
@@ -27,6 +27,7 @@ const Spendings = () => {
     const[kw, setKeyWord] = useState("")
     const nav = useNavigate()
     const [c] = useSearchParams()
+    const[user, dispatch] = useContext(UseContext)
 
     useEffect(() => {
         const loadSpendings = async () => {
@@ -40,8 +41,11 @@ const Spendings = () => {
           if (sort !== null)
             e += `&sort=${sort}`
 
+          console.log(user)
           let res =  await authAPI().get(e)
           setSpending(res.data.results)
+          // console.log(user)
+          // console.log(res.data.results)
         }
 
         loadSpendings()
@@ -55,17 +59,26 @@ const Spendings = () => {
     let spendingLogin = (
       <>
         <div align="center">
-          <h3 style={{ color: '#F1C338' }}>Please<Link style={{ textDecoration: 'none' }} to={`/login/`}>Login</Link></h3>
+          <h3 style={{ color: '#F46841' }}>Please <Link style={{ textDecoration: 'none', color: '#F46841' }} to={`/login/`}>Login</Link></h3>
         </div>
       </>
     )
-    if (cookie !== null)
+    if (user !== null)
     {
       spendingLogin = (
       <>
-        <div align="right">
-          <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
-          <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
+        <div align="left">
+          <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+            <InputLabel id="demo-select-small">Filter</InputLabel>
+            <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
+              <MenuItem value="" />
+              <MenuItem value="">Group</MenuItem>
+              <MenuItem value="">User</MenuItem>
+              <MenuItem value="">Date</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField id="outlined-basic" label="Search" variant="outlined" size="small" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%'}}/>
+          <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
         </div>
         <br />
         <hr />
@@ -98,17 +111,16 @@ const Spendings = () => {
           </Table>
         </TableContainer>
         <br />
-        <div align="right" style={{ display: 'flex', marginLeft: '70%'}}>
-          <h4 style={{ color: '#F1C338', marginRight: '5%', marginTop: '30px' }}>Sort:</h4>
-          <FormControl variant="standard" sx={{ m: 1, minWidth: 170 }}>
-            <InputLabel id="demo-simple-select-label">Spending amount</InputLabel>
-              <Select labelId="demo-simple-select-label" id="demo-simple-select" label="Spending amount" style={{ marginRight: '5%' }}>
-                <MenuItem value=""></MenuItem>
-                <MenuItem >Increase</MenuItem>
-                <MenuItem >Decrease</MenuItem>
-              </Select>
+        <div align="right">
+          <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+            <InputLabel id="demo-select-small">Sort</InputLabel>
+            <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
+              <MenuItem value="" />
+              <MenuItem value="">Increase</MenuItem>
+              <MenuItem value="">Decrease</MenuItem>
+            </Select>
           </FormControl>
-          <Link style={{ textDecoration: 'none' }} to={`/spending/`}><Button style={{ color: '#F1C338', width: '100$', marginTop: '18%' }}><strong>New spending</strong></Button></Link>
+          <Link style={{ textDecoration: 'none' }} to={`/spending/`}><Button style={{ color: '#F1C338' }}><strong>New spending</strong></Button></Link>
         </div>
         <div>
           <Pagination count={10} />

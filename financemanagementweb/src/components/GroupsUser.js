@@ -1,6 +1,6 @@
-import { useEffect } from "react"
+import { useContext, useEffect } from "react"
 import { useState } from "react"
-import API, { endpoints } from "../configs/API"
+import API, { authAPI, endpoints } from "../configs/API"
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -17,13 +17,15 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
+import { UseContext } from "../configs/UseContext";
 
 
 const GroupsUser = () => {
     const[group, setGroup] = useState([])
     const[kw, setKeyWord] = useState("")
     const nav = useNavigate()
-    const [n] = useSearchParams()
+    const[n] = useSearchParams()
+    const[user, dispatch] = useContext(UseContext)
     
     useEffect(() => {
         const loadGroups = async () => {
@@ -33,8 +35,8 @@ const GroupsUser = () => {
             if (name !== null)
                 e += `&name=${name}`
 
-            let res =  await API.get(e)
-            console.log(res.data)
+            let res =  await authAPI().get(e)
+            // console.log(res.data)
             setGroup(res.data.results)
         }
         
@@ -46,15 +48,30 @@ const GroupsUser = () => {
         nav(`/spendings/?content=${kw}`)
     }
 
-    return (
+    let groupLogin = (
         <>
-            <div>
-                <h1 style={{ textAlign: 'center', color: '#F1C338' }}>GROUP LIST</h1>
+            <div align="center">
+            <h3 style={{ color: '#F46841' }}>Please <Link style={{ textDecoration: 'none', color: '#F46841' }} to={`/login/`}>Login</Link></h3>
             </div>
-            <div align="right">
-                <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
-                <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
+        </>
+    )
+    if (user !== null)
+    {
+        groupLogin = (
+        <>
+            <div align="left">
+                <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+                    <InputLabel id="demo-select-small">Filter</InputLabel>
+                    <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
+                        <MenuItem value="" />
+                        <MenuItem value="">Number of Member</MenuItem>
+                        <MenuItem value="">Ceated Date</MenuItem>
+                    </Select>
+                </FormControl>
+                <TextField id="outlined-basic" label="Search" variant="outlined" size="small" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
+                <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
             </div>
+            <br />
             <hr />
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -80,7 +97,7 @@ const GroupsUser = () => {
                                 <TableCell component="th" scope="row">{g.leader_id}</TableCell>
                                 <TableCell component="th" scope="row">{g.project.name_project}</TableCell>
                                 {g.is_active === true?
-                                    <TableCell component="th" scope="row" style={{ color: '#609b56'}}><strong>Active</strong></TableCell>:
+                                    <TableCell component="th" scope="row" style={{ color: '#609b56' }}><strong>Active</strong></TableCell>:
                                     <TableCell component="th" scope="row" style={{ color: 'red'}}><strong>Inactive</strong></TableCell>
                                 }
                                 <TableCell component="th" scope="row"><Link style={{ textDecoration: 'none' }} to={url}><Button style={{ color: '#F46841' }}><strong>Detail</strong></Button></Link></TableCell>
@@ -90,22 +107,29 @@ const GroupsUser = () => {
                 </Table>
             </TableContainer>
             <br/>
-            <div align="right" style={{ display: 'flex', marginLeft: '75%'}}>
-                <h4 style={{ color: '#F1C338', marginRight: '5%', marginTop: '30px' }}>Sort:</h4>
-                <FormControl variant="standard" sx={{ m: 1, minWidth: 170 }}>
-                    <InputLabel id="demo-simple-select-standard-label">Spending amount</InputLabel>
-                        <Select labelId="demo-simple-select-standard-label" id="demo-simple-select-standard" label="Spending amount" style={{ marginRight: '5%' }}>
-                            <MenuItem value=""></MenuItem>
-                            <MenuItem value={10}>Increase</MenuItem>
-                            <MenuItem value={20}>Decrease</MenuItem>
-                        </Select>
+            <div align="right">
+                <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+                    <InputLabel id="demo-select-small">Sort</InputLabel>
+                    <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
+                        <MenuItem value="" />
+                        <MenuItem value="">Increase</MenuItem>
+                        <MenuItem value="">Decrease</MenuItem>
+                    </Select>
                 </FormControl>
-                {/* <Link style={{ textDecoration: 'none' }}><Button><strong>Sort</strong></Button></Link> */}
-                <Link style={{ textDecoration: 'none' }} to={`/group/`}><Button style={{ color: '#F1C338', marginTop: '20px' }}><strong>New group</strong></Button></Link>
+                <Link style={{ textDecoration: 'none' }} to={`/group/`}><Button style={{ color: '#F1C338' }}><strong>New group</strong></Button></Link>
             </div>
             <div>
                 <Pagination count={10} />
             </div>
+        </>)
+    }
+
+    return (
+        <>
+            <div>
+                <h1 style={{ textAlign: 'center', color: '#F1C338' }}>GROUP LIST</h1>
+            </div>
+            {groupLogin}
         </>
     )
 }

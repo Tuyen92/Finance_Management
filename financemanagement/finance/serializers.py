@@ -21,7 +21,8 @@ class LimitRuleSerializer(ModelSerializer):
 class UserSerializer(ImageSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'sex', 'birthday', 'address', 'phone', 'email', 'is_active', 'avatar', 'username', 'password']
+        fields = ['id', 'first_name', 'last_name', 'sex', 'birthday', 'address', 'phone', 'email', 'is_superuser',
+                  'is_staff', 'is_active', 'avatar', 'username', 'password']
         extra_kwargs = {
             'avatar': {'write_only': True},
             'password': {'write_only': True}
@@ -105,10 +106,10 @@ class MeetingScheduleSerializer(ModelSerializer):
 
     class Meta:
         model = MeetingSchedule
-        fields = ['id', 'date_time', 'vote', 'content', 'is_active', 'group']
+        fields = ['id', 'date_time', 'vote', 'content', 'description', 'is_active', 'group']
 
 
 class MeetingScheduleCreateSerializer(ModelSerializer):
     class Meta:
         model = MeetingSchedule
-        fields = ['id', 'date_time', 'vote', 'content', 'is_active', 'group']
+        fields = ['id', 'date_time', 'vote', 'content', 'description', 'is_active', 'group']

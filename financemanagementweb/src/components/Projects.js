@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { useEffect } from "react"
-import API, { endpoints } from "../configs/API"
+import { useContext, useEffect } from "react"
+import API, { authAPI, endpoints } from "../configs/API"
 import { useState } from "react"
 import { Link } from 'react-router-dom'
 import Table from '@mui/material/Table';
@@ -19,7 +19,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
-import cookie from 'react-cookies';
+import { UseContext } from "../configs/UseContext";
 
 
 
@@ -27,7 +27,8 @@ const Projects = () => {
     const[project, setProject] = useState([])
     const[kw, setKeyWord] = useState("")
     const nav = useNavigate()
-    const [n] = useSearchParams()
+    const[n] = useSearchParams()
+    const[user, dispatch] = useContext(UseContext)
 
     useEffect(() => {
         const loadProjects = async () => {
@@ -38,7 +39,7 @@ const Projects = () => {
             e += `&name_project=${name}`
 
           let res =  await API.get(e)
-          console.log(res.data.results)
+          // console.log(res.data.results)
           setProject(res.data.results)
         }
 
@@ -57,14 +58,24 @@ const Projects = () => {
         </div>
       </>
     )
-    if (cookie !== null)
+    if (user !== null)
     {
       projectLogin = (
         <>
-          <div align="right">
-            <TextField id="outlined-basic" label="Search" variant="outlined" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
-            <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56", marginTop: "0.5%" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
+          <div align="left">
+            <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+              <InputLabel id="demo-select-small">Filter</InputLabel>
+              <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
+                <MenuItem value="" />
+                <MenuItem value=""></MenuItem>
+                <MenuItem value=""></MenuItem>
+                <MenuItem value=""></MenuItem>
+              </Select>
+            </FormControl>
+            <TextField id="outlined-basic" label="Search" variant="outlined" size="small" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
+            <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
           </div>
+          <br />
           <hr />
             <TableContainer component={Paper}>
               <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -94,18 +105,17 @@ const Projects = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <hr/>
-            <div align="right" style={{ display: 'flex', marginLeft: '70%'}}>
-              <h4 style={{ color: '#F1C338', marginRight: '5%', marginTop: '30px' }}>Sort:</h4>
-              <FormControl variant="standard" sx={{ m: 1, minWidth: 150 }}>
-                <InputLabel id="demo-simple-select-standard-label">Target amount</InputLabel>
-                  <Select labelId="demo-simple-select-standard-label" id="demo-simple-select-standard" label="Spending amount" style={{ marginRight: '5%' }}>
-                    <MenuItem value=""></MenuItem>
-                    <MenuItem value={10}>Increase</MenuItem>
-                    <MenuItem value={20}>Decrease</MenuItem>
-                  </Select>
+            <br/>
+            <div align="right">
+              <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+                <InputLabel id="demo-select-small">Sort</InputLabel>
+                <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
+                  <MenuItem value="" />
+                  <MenuItem value="">Increase</MenuItem>
+                  <MenuItem value="">Decrease</MenuItem>
+                </Select>
               </FormControl>
-              <Link style={{ textDecoration: 'none' }} to={`/project/`}><Button style={{ color: '#F1C338', width: '100%', marginTop: '24px' }}><strong>New project</strong></Button></Link>
+              <Link style={{ textDecoration: 'none' }} to={`/project/`}><Button style={{ color: '#F1C338' }}><strong>New project</strong></Button></Link>
             </div>
           <div>
             <Pagination count={10} />

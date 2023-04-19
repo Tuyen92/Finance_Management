@@ -112,8 +112,8 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
     serializer_class = ProjectSerializer
     pagination_class = Paginator
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -233,8 +233,8 @@ class ProjectViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
 
 # GROUP
@@ -242,8 +242,8 @@ class GroupViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveA
     queryset = Group.objects.all()
     serializer_class = GroupDetailSerializer
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -393,8 +393,8 @@ class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIVi
     # authentication_classes = [BasicAuthentication, TokenAuthentication]
     # parser_classes = [parsers.MultiPartParser, ]
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -523,8 +523,8 @@ class UserViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
 
 # INCOME
@@ -533,8 +533,8 @@ class IncomeViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrieve
     serializer_class = IncomeDetailSerializer
     pagination_class = Paginator
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -591,8 +591,8 @@ class IncomeViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = Income.objects.all()
     serializer_class = IncomeCreateSerializer
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
 
 # MEETING
@@ -600,8 +600,8 @@ class MeetingScheduleViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = MeetingSchedule.objects.all()
     serializer_class = MeetingScheduleCreateSerializer
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
 
 class MeetingScheduleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
@@ -609,8 +609,8 @@ class MeetingScheduleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics
     serializer_class = MeetingScheduleSerializer
     pagination_class = Paginator
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:
@@ -721,8 +721,8 @@ class LimitRuleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retri
     serializer_class = LimitRuleSerializer
     pagination_class = Paginator
 
-    # def get_permissions(self):
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
 
     def filter_queryset(self, queryset):
         try:

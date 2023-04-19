@@ -41,6 +41,8 @@ import MyUserReducer from './reducer/MyUserReducer';
 import cookie from 'react-cookies';
 import Avatar from '@mui/material/Avatar';
 import CurrentUser from './components/CurrentUser';
+import Button from '@mui/material/Button';
+import { useContext } from "react"
 
 
 function App() {
@@ -104,10 +106,17 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     setOpen(false);
   };
 
-  const [user, dispatch] = React.useReducer(MyUserReducer, cookie.load('current-user') || null)
+  const [user, dispatch] = React.useReducer(MyUserReducer, cookie.load('current_user') || null)
+
+  const logout = () => {
+    dispatch({
+        "type": "logout"
+    })
+}
+
   let userLogin = (
     <>
-      <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/login/"><strong>Login</strong></Link>
+      <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/login/"><strong>LOGIN</strong></Link>
     </>
   )
   if (user !== null)
@@ -116,10 +125,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     (
       <>
         <Link style={{ color: '#FFECC9', textDecoration: 'none', marginRight: '1%' }} to="/user/current_user/"><Avatar alt="Remy Sharp" src={"./user.jpg"} /></Link>
-        <Link style={{ color: '#FFECC9', textDecoration: 'none' }} to="/logout/"><strong>Logout</strong></Link>
+        <Button style={{ color: '#FFECC9', textDecoration: 'none' }} onClick={logout}><strong>Logout</strong></Button>
       </>
     )
   }
+  // console.log(user);
 
   return (
     <>
