@@ -20,7 +20,9 @@ export const endpoints = {
     "meeting": (meetingId) => `/meetings/${meetingId}`,
     "new_meeting": "/meeting/",
     "login": "/o/token/",
-    "current_user": "/user/current_user/"
+    "current_user": "/user/current_user/",
+    "register": "/user/",
+    "change_password": "/user/change_password/"
 }
 
 export const authAPI = () => axios.create({

@@ -43,6 +43,7 @@ import Avatar from '@mui/material/Avatar';
 import CurrentUser from './components/CurrentUser';
 import Button from '@mui/material/Button';
 import { useContext } from "react"
+import RegisterUser from './components/RegisterUser';
 
 
 function App() {
@@ -223,6 +224,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                 <Routes>
                   <Route path='/' element={<Header />}/>
                   <Route path='/login/' element={<Login />}/>
+                  <Route path='/register/' element={<RegisterUser /> }/>
                   <Route path='/user/' element={<Users />}/>
                   <Route path='/user/current_user/' element={<CurrentUser />}/>
                   <Route path='/groups/' element={<GroupsUser />}/>

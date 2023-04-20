@@ -27,6 +27,11 @@ const LimitRules = () => {
     const nav = useNavigate()
     const[t] = useSearchParams()
     const[user, dispatch] = useContext(UseContext)
+    const[page, setPage] = useState(1)
+    const[pageSize, setPageSize] = useState(2)
+    const[total, setTotal] = useState(0)
+    const[next, setNext] = useState(null)
+    const[previous, setPrevious] = useState(null)
 
     useEffect(() => {
         const loadLimitRules = async () => {
@@ -37,17 +42,23 @@ const LimitRules = () => {
             e += `&content=${type}`
 
           let res =  await API.get(e)
+          setNext(res.data.next)
+          setPrevious(res.data.previous)
           // console.log(res.data.results)
           setLimitRule(res.data.results)
         }
 
         loadLimitRules()
-    }, [t])
+    }, [t, page, pageSize])
 
     const search = (evt) => {
       evt.preventDefault()
       nav(`/spendings/?content=${kw}`)
     }
+
+    const nextPage = () => setPage(current => current + 1)
+    const prevPage = () => setPage(current => current - 1)
+    const changePageSize = (evt) => setPageSize(evt.target.value)
 
     let limitRulLogin = (
       <>
@@ -117,9 +128,23 @@ const LimitRules = () => {
             </FormControl>
             <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>New Limit Rule</strong></Button></Link>
           </div>
-          <div>
-            <Pagination count={10} />
-          </div>
+          
+          <div style={{ display: "flex" }}>
+            <Select labelId="demo-select-small" size="small" id="demo-simple-select" style={{ marginRight: '1%' }} value={pageSize} onChange={changePageSize}>
+              <MenuItem value="2" >2</MenuItem>
+              <MenuItem value="3" >3</MenuItem>
+              <MenuItem value="5" >5</MenuItem>
+            </Select>
+            <h5 style={{ marginRight: '1%' }}>Page {page}</h5>
+            {previous !== null?
+              <Button onClick={prevPage} variant="outline-primary" style={{ backgroundColor: '#609b56', marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_left</i></Button>:
+              <span/>
+            }
+            {next !== null?
+            <Button onClick={nextPage} variant="outline-primary" style={{ backgroundColor: '#609b56' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_right</i></Button>:
+            <span/>
+            }
+          </div>  
         </>
       )
     }

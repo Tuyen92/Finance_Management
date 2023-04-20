@@ -9,7 +9,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
-import Pagination from '@mui/material/Pagination';
 import { Link } from 'react-router-dom';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -26,6 +25,11 @@ const GroupsUser = () => {
     const nav = useNavigate()
     const[n] = useSearchParams()
     const[user, dispatch] = useContext(UseContext)
+    const[page, setPage] = useState(1)
+    const[pageSize, setPageSize] = useState(2)
+    const[total, setTotal] = useState(0)
+    const[next, setNext] = useState(null)
+    const[previous, setPrevious] = useState(null)
     
     useEffect(() => {
         const loadGroups = async () => {
@@ -36,6 +40,8 @@ const GroupsUser = () => {
                 e += `&name=${name}`
 
             let res =  await authAPI().get(e)
+            setNext(res.data.next)
+            setPrevious(res.data.previous)
             // console.log(res.data)
             setGroup(res.data.results)
         }
@@ -47,6 +53,10 @@ const GroupsUser = () => {
         evt.preventDefault()
         nav(`/spendings/?content=${kw}`)
     }
+
+    const nextPage = () => setPage(current => current + 1)
+    const prevPage = () => setPage(current => current - 1)
+    const changePageSize = (evt) => setPageSize(evt.target.value)
 
     let groupLogin = (
         <>
@@ -118,8 +128,22 @@ const GroupsUser = () => {
                 </FormControl>
                 <Link style={{ textDecoration: 'none' }} to={`/group/`}><Button style={{ color: '#F1C338' }}><strong>New group</strong></Button></Link>
             </div>
-            <div>
-                <Pagination count={10} />
+            
+            <div style={{ display: "flex" }}>
+                <Select labelId="demo-select-small" size="small" id="demo-simple-select" style={{ marginRight: '1%' }} value={pageSize} onChange={changePageSize}>
+                    <MenuItem value="2" >2</MenuItem>
+                    <MenuItem value="3" >3</MenuItem>
+                    <MenuItem value="5" >5</MenuItem>
+                </Select>
+                <h5 style={{ marginRight: '1%' }}>Page {page}</h5>
+                {previous !== null?
+                    <Button onClick={prevPage} variant="outline-primary" style={{ backgroundColor: '#609b56', marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_left</i></Button>:
+                    <span/>
+                }
+                {next !== null?
+                <Button onClick={nextPage} variant="outline-primary" style={{ backgroundColor: '#609b56' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_right</i></Button>:
+                <span/>
+                }
             </div>
         </>)
     }

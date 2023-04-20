@@ -109,7 +109,7 @@ const Users = () => {
                 </TableContainer>
                 <br />
                 <div align="right" >
-                    <Link style={{ textDecoration: 'none' }} to={`/spending/`}><Button style={{ color: '#F1C338' }}><strong>Register</strong></Button></Link>
+                    <Link style={{ textDecoration: 'none' }} to={`/register/`}><Button style={{ color: '#F1C338' }}><strong>Register</strong></Button></Link>
                 </div>
                 <div>
                     <Pagination count={10} />

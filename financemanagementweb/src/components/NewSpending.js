@@ -30,7 +30,7 @@ const NewSpending = () => {
                 form.append("user", user.id)
                 form.append("group", spending.group)
                 form.append("project", spending.project)
-                console.log(form)
+                // console.log(form)
                 let res = await authAPI().post(endpoints['new_spending'], form)
                 if (res.status === 201)
                     nav("/spendings/")

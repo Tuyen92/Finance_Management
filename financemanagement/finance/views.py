@@ -554,6 +554,13 @@ class IncomeViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrieve
             date_to = self.request.query_params.get("date_to")
             if date_from and date_to:
                 queryset = queryset.filter(implementation_date__range=(date_from, date_to))
+
+            # Sort by income amount
+            sort = self.request.query_params.get("sort")
+            if sort == '1':
+                queryset = queryset.order_by('income_amount')
+            if sort == '0':
+                queryset = queryset.order_by('-income_amount')
             return queryset
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
