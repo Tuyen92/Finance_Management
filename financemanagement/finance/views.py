@@ -27,12 +27,13 @@ class SpendingViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrie
 
             # Filter from amount to amount
             amount_from = self.request.query_params.get("amount_from")
-            amount_to = self.request.query_params.get("amount_to")
-            if amount_from and amount_to:
-                queryset = queryset.filter(spending_amount__range=(amount_from, amount_to))
-            elif amount_from:
+            # if amount_from and amount_to:
+            #     queryset = queryset.filter(spending_amount__range=(amount_from, amount_to))
+            if amount_from:
                 queryset = queryset.filter(spending_amount__gte=amount_from)
-            elif amount_to:
+
+            amount_to = self.request.query_params.get("amount_to")
+            if amount_to:
                 queryset = queryset.filter(spending_amount__lte=amount_to)
 
 
