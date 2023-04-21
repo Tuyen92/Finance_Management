@@ -33,11 +33,10 @@ class SpendingViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrie
             if amount_to:
                 queryset = queryset.filter(spending_amount__lte=amount_to)
 
-
             # Filter from day to day
             date_from = self.request.query_params.get("date_from")
             date_to = self.request.query_params.get("date_to")
-            if amount_from and amount_to:
+            if date_from and date_to:
                 queryset = queryset.filter(implementation_date__range=(date_from, date_to))
 
             # Filter by is accept
