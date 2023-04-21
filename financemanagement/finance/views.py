@@ -31,7 +31,7 @@ class SpendingViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrie
             if amount_from:
                 queryset = queryset.filter(spending_amount__gte=amount_from)
             if amount_to:
-                queryset = queryset.filter(spending_amount__gte=amount_to)
+                queryset = queryset.filter(spending_amount__lte=amount_to)
             # if amount_from and amount_to:
             #     queryset = queryset.filter(spending_amount__range=(amount_from, amount_to))
 
