@@ -60,6 +60,15 @@ const LimitRules = () => {
     const prevPage = () => setPage(current => current - 1)
     const changePageSize = (evt) => setPageSize(evt.target.value)
 
+    let userCreateLimitRule = (<></>)
+    if (user.is_superuser === true )
+    {
+      userCreateLimitRule = (
+        <>
+          <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>New Limit Rule</strong></Button></Link>
+        </>)
+    }
+
     let limitRulLogin = (
       <>
         <div align="center">
@@ -126,7 +135,7 @@ const LimitRules = () => {
                 <MenuItem value="">Decrease</MenuItem>
               </Select>
             </FormControl>
-            <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>New Limit Rule</strong></Button></Link>
+            {userCreateLimitRule}
           </div>
           
           <div style={{ display: "flex" }}>

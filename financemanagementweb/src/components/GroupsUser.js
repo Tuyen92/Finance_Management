@@ -58,10 +58,13 @@ const GroupsUser = () => {
     const prevPage = () => setPage(current => current - 1)
     const changePageSize = (evt) => setPageSize(evt.target.value)
 
+    let userCreateGroup = (<></>)
+    
+
     let groupLogin = (
         <>
             <div align="center">
-            <h3 style={{ color: '#F46841' }}>Please <Link style={{ textDecoration: 'none', color: '#F46841' }} to={`/login/`}>Login</Link></h3>
+                <h3 style={{ color: '#F46841' }}>Please <Link style={{ textDecoration: 'none', color: '#F46841' }} to={`/login/`}>Login</Link></h3>
             </div>
         </>
     )
@@ -126,7 +129,7 @@ const GroupsUser = () => {
                         <MenuItem value="">Decrease</MenuItem>
                     </Select>
                 </FormControl>
-                <Link style={{ textDecoration: 'none' }} to={`/group/`}><Button style={{ color: '#F1C338' }}><strong>New group</strong></Button></Link>
+                {userCreateGroup}
             </div>
             
             <div style={{ display: "flex" }}>
@@ -146,6 +149,15 @@ const GroupsUser = () => {
                 }
             </div>
         </>)
+
+        if (user.is_superuser === true || user.is_staff === true)
+        {
+            userCreateGroup = (
+                <>
+                    <Link style={{ textDecoration: 'none' }} to={`/group/`}><Button style={{ color: '#F1C338' }}><strong>New group</strong></Button></Link>
+                </>)
+        }
+        
     }
 
     return (

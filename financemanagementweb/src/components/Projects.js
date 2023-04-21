@@ -61,6 +61,7 @@ const Projects = () => {
     const prevPage = () => setPage(current => current - 1)
     const changePageSize = (evt) => setPageSize(evt.target.value)
 
+    let userCreateProject = (<></>)
     let projectLogin = (
       <>
         <div align="center">
@@ -128,7 +129,7 @@ const Projects = () => {
                   <MenuItem value="0">Decrease</MenuItem>
                 </Select>
               </FormControl>
-              <Link style={{ textDecoration: 'none' }} to={`/project/`}><Button style={{ color: '#F1C338' }}><strong>New project</strong></Button></Link>
+              {userCreateProject}
             </div>
           
           <div style={{ display: "flex" }}>
@@ -147,8 +148,15 @@ const Projects = () => {
             <span/>
             }
           </div>
-        </>
-      )
+        </>)
+
+      if (user.is_staff === true || user.is_superuser === true)
+        {
+          userCreateProject = (
+            <>
+              <Link style={{ textDecoration: 'none' }} to={`/project/`}><Button style={{ color: '#F1C338' }}><strong>New project</strong></Button></Link>
+            </>)
+        }
     }
 
     return (

@@ -130,6 +130,19 @@ const DrawerHeader = styled('div')(({ theme }) => ({
       </>
     )
   }
+
+  let userSuperuser = (<></>)
+  if (user !== null && user.is_superuser === true)
+  {
+    userSuperuser = (
+      <>
+        <ListItem key='user' style={{ marginTop: '20px', marginBottom: '20px' }}>
+          <i className="material-icons" style={{ color: '#FFECC9' }}>face</i>
+          <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/user/">User</Link>
+        </ListItem>
+        <Divider />
+      </>)
+  }
   // console.log(user);
 
   return (
@@ -179,12 +192,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                   <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/incomes/">Incomes</Link>
                 </ListItem>
                 <Divider />
-
-                <ListItem key='user' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                  <i className="material-icons" style={{ color: '#FFECC9' }}>face</i>
-                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/user/">User</Link>
-                </ListItem>
-                <Divider />
+                {userSuperuser}
 
                 <ListItem key='group' style={{ marginTop: '20px', marginBottom: '20px' }}>
                   <i className="material-icons" style={{ color: '#FFECC9' }}>diversity_2</i>

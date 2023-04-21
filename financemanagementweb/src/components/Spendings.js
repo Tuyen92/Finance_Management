@@ -33,6 +33,7 @@ const Spendings = () => {
     const[total, setTotal] = useState(0)
     const[next, setNext] = useState(null)
     const[previous, setPrevious] = useState(null)
+    const[filter, setFilter] = useState(null)
 
     useEffect(() => {
         const loadSpendings = async () => {
@@ -68,6 +69,10 @@ const Spendings = () => {
     const prevPage = () => setPage(current => current - 1)
     const changePageSize = (evt) => setPageSize(evt.target.value)
 
+    const changeFilter = (evt) => {
+      setFilter(evt.target.value)
+    }
+
     let spendingLogin = (
       <>
         <div align="center">
@@ -82,13 +87,39 @@ const Spendings = () => {
         <div align="left">
           <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
             <InputLabel id="demo-select-small">Filter</InputLabel>
-            <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
-              <MenuItem value="" />
-              <MenuItem value="">Group</MenuItem>
-              <MenuItem value="">User</MenuItem>
-              <MenuItem value="">Date</MenuItem>
+            <Select labelId="demo-select-small" id="demo-select-small" label="Filter" value={filter} onChange={changeFilter}>
+              <MenuItem value="spending_amount">Spending amount</MenuItem>
+              <MenuItem value="is_accept">Accepted</MenuItem>
+              <MenuItem value="date">Date</MenuItem>
             </Select>
           </FormControl>
+          {filter === 'spending_amount'?
+          <>
+            <TextField id="outlined-basic" label="From amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}}/>
+            <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}}/>
+            <Button variant="contained" style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          filter === 'is_accept'?
+          <>
+            <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+              <InputLabel id="demo-select-small">Accept</InputLabel>
+              <Select labelId="demo-select-small" id="demo-select-small">
+                <MenuItem value="1">Accepted</MenuItem>
+                <MenuItem value="0">Not Accepted</MenuItem>
+              </Select>
+            </FormControl>
+            <Button variant="contained" style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          filter === 'date'?
+          <>
+            <label>From: </label>
+            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }}/>
+            <label>To: </label>
+            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }}/>
+            <Button variant="contained" style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          <span />}
+
           <TextField id="outlined-basic" label="Search" variant="outlined" size="small" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%'}}/>
           <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
         </div>
@@ -139,19 +170,19 @@ const Spendings = () => {
           <Link style={{ textDecoration: 'none' }} to={`/spending/`}><Button style={{ color: '#F1C338' }}><strong>New spending</strong></Button></Link>
         </div>
 
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", height: "30px" }} >
           <Select labelId="demo-select-small" size="small" id="demo-simple-select" style={{ marginRight: '1%' }} value={pageSize} onChange={changePageSize}>
             <MenuItem value="2" >2</MenuItem>
             <MenuItem value="3" >3</MenuItem>
             <MenuItem value="5" >5</MenuItem>
           </Select>
-          <h5 style={{ marginRight: '1%' }}>Page {page}</h5>
+          <h5 style={{ marginRight: '1%', marginTop: '0.5%' }}>Page {page}</h5>
           {previous !== null?
-            <Button onClick={prevPage} variant="outline-primary" style={{ backgroundColor: '#609b56', marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_left</i></Button>:
+            <Button onClick={prevPage} size="small" variant="outline-primary" style={{ backgroundColor: '#609b56', marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_left</i></Button>:
             <span/>
           }
           {next !== null?
-          <Button onClick={nextPage} variant="outline-primary" style={{ backgroundColor: '#609b56' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_right</i></Button>:
+          <Button onClick={nextPage} size="small" variant="outline-primary" style={{ backgroundColor: '#609b56' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_right</i></Button>:
           <span/>
           }
         </div>
