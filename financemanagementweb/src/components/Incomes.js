@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import API, { authAPI, endpoints } from "../configs/API"
+import { authAPI, endpoints } from "../configs/API"
 import { Link } from 'react-router-dom'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -31,6 +31,14 @@ const Incomes = () => {
   const[pageSize, setPageSize] = useState(2)
   const[next, setNext] = useState(null)
   const[previous, setPrevious] = useState(null)
+  const[typeFilter, setTypeFilter] = useState(null)
+  const[filter, setFilter] = useState({
+    "amount_from": "",
+    "amount_to": "",
+    "is_confirm": "",
+    "date_from": "",
+    "date_to": ""
+  })
 
   useEffect(() => {
       const loadIncomes = async () => {
@@ -40,8 +48,28 @@ const Incomes = () => {
         if (content !== null)
           e += `&content=${content}`
 
+        let amount_from = c.get("amount_from")
+        if (amount_from !== null)
+          e += `&amount_from=${filter.amount_from}`
+
+        let amount_to = c.get("amount_to")
+        if (amount_to !== null)
+          e += `&amount_to=${filter.amount_to}`
+
+        let is_confirm = c.get("is_confirm")
+        if (is_confirm !== null)
+          e += `&confirm=${filter.is_confirm}`
+
+        let date_from = c.get("date_from")
+        if (date_from != null)
+          e += `&date_from=${filter.date_from}`
+
+        let date_to = c.get("date_to")
+        if (date_to != null)
+          e += `&date_to=${filter.date_to}`
+
         let res =  await authAPI().get(e)
-        console.log(res.data.results)
+        // console.log(res.data.results)
         setNext(res.data.next)
         setPrevious(res.data.previous)
         setIncome(res.data.results)
@@ -55,9 +83,34 @@ const Incomes = () => {
     nav(`/incomes/?content=${kw}`)
   }
 
+  const filtAmount = (evt) => {
+    evt.preventDefault()
+    nav(`/incomes/?amount_from=${filter.amount_from}&amount_to=${filter.amount_to}`)
+  }
+
+  const filtConfirm = (evt) => {
+    evt.preventDefault()
+    nav(`/incomes/?confirm=${filter.is_confirm}`)
+  }
+
+  const filtDate = (evt) => {
+    evt.preventDefault()
+    nav(`/incomes/?date_from=${filter.date_from}&date_to=${filter.date_to}`)
+  }
+
+  const setValue = e => {
+    const { name, value } = e.target
+    setFilter(current => ({...current, [name]:value}))
+  }
+
   const nextPage = () => setPage(current => current + 1)
   const prevPage = () => setPage(current => current - 1)
   const changePageSize = (evt) => setPageSize(evt.target.value)
+
+  const changeFilter = (evt) => {
+    evt.preventDefault()
+    setTypeFilter(evt.target.value)
+  }
 
   let incomeLogin = (
     <>
@@ -71,15 +124,40 @@ const Incomes = () => {
     incomeLogin = (
       <>
         <div align="left">
-          <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+        <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
             <InputLabel id="demo-select-small">Filter</InputLabel>
-            <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
-              <MenuItem value="" />
-              <MenuItem value="">Group</MenuItem>
-              <MenuItem value="">User</MenuItem>
-              <MenuItem value="">Date</MenuItem>
+            <Select labelId="demo-select-small" id="demo-select-small" label="Filter" value={typeFilter} onChange={changeFilter}>
+              <MenuItem value="spending_amount">Spending amount</MenuItem>
+              <MenuItem value="is_accept">Accepted</MenuItem>
+              <MenuItem value="date">Date</MenuItem>
             </Select>
           </FormControl>
+          {typeFilter === 'spending_amount'?
+          <>
+              <TextField id="outlined-basic" label="From amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="amount_from" value={filter.amount_from} onChange={setValue}/>
+              <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="amount_to" value={filter.amount_to} onChange={setValue}/>
+              <Button variant="contained" onClick={filtAmount} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          typeFilter === 'is_accept'?
+          <>
+            <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+              <InputLabel id="demo-select-small">Accept</InputLabel>
+              <Select labelId="demo-select-small" id="demo-select-small" name="is_confirm" value={filter.is_confirm} onChange={setValue}>
+                <MenuItem value="1">Confirm</MenuItem>
+                <MenuItem value="0">Not Confirm</MenuItem>
+              </Select>
+            </FormControl>
+            <Button variant="contained" onClick={filtConfirm} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          typeFilter === 'date'?
+          <>
+            <label style={{ color: '#609b56' }}><strong>From: </strong></label>
+            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.date_from} onChange={setValue}/>
+            <label style={{ color: '#609b56' }}><strong>To: </strong></label>
+            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_to" value={filter.date_to} onChange={setValue}/>
+            <Button variant="contained" onClick={filtDate} style={{  backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          <span />}
           <TextField id="outlined-basic" label="Search" variant="outlined" size="small" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
           <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
         </div>
@@ -128,13 +206,13 @@ const Incomes = () => {
           </FormControl>
           <Link style={{ textDecoration: 'none' }} to={`/income/`}><Button style={{ color: '#F1C338' }}><strong>New income</strong></Button></Link>
         </div>
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", height: "30px" }}>
           <Select labelId="demo-select-small" size="small" id="demo-simple-select" style={{ marginRight: '1%' }} value={pageSize} onChange={changePageSize}>
             <MenuItem value="2" >2</MenuItem>
             <MenuItem value="3" >3</MenuItem>
             <MenuItem value="5" >5</MenuItem>
           </Select>
-          <h5 style={{ marginRight: '1%' }}>Page {page}</h5>
+          <h5 style={{ marginRight: '1%', marginTop: '0.5%' }}>Page {page}</h5>
           {previous !== null?
             <Button onClick={prevPage} variant="outline-primary" style={{ backgroundColor: '#609b56', marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_left</i></Button>:
             <span/>

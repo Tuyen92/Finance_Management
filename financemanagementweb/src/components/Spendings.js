@@ -33,7 +33,14 @@ const Spendings = () => {
     const[total, setTotal] = useState(0)
     const[next, setNext] = useState(null)
     const[previous, setPrevious] = useState(null)
-    const[filter, setFilter] = useState(null)
+    const[typeFilter, setTypeFilter] = useState(null)
+    const[filter, setFilter] = useState({
+      "amount_from": "",
+      "amount_to": "",
+      "is_accept": "",
+      "date_from": "",
+      "date_to": ""
+    })
 
     useEffect(() => {
         const loadSpendings = async () => {
@@ -47,7 +54,27 @@ const Spendings = () => {
           if (sort !== null)
             e += `&sort=${s}`
 
-          console.log(user)
+          let amount_from = c.get("amount_from")
+          if (amount_from !== null)
+            e += `&amount_from=${filter.amount_from}`
+
+          let amount_to = c.get("amount_to")
+          if (amount_to !== null)
+            e += `&amount_to=${filter.amount_to}`
+
+          let is_accept = c.get("is_accept")
+          if (is_accept !== null)
+            e += `&is_accept=${filter.is_accept}`
+
+          let date_from = c.get("date_from")
+          if (date_from != null)
+            e += `&date_from=${filter.date_from}`
+  
+          let date_to = c.get("date_to")
+          if (date_to != null)
+            e += `&date_to=${filter.date_to}`
+
+          // console.log(user)
           let res =  await authAPI().get(e)
           setTotal(res.data.count)
           setNext(res.data.next)
@@ -65,12 +92,33 @@ const Spendings = () => {
       nav(`/spendings/?content=${kw}`)
     }
 
+    const filtAmount = (evt) => {
+      evt.preventDefault()
+      nav(`/spendings/?amount_from=${filter.amount_from}&amount_to=${filter.amount_to}`)
+    }
+
+    const filtAccept = (evt) => {
+      evt.preventDefault()
+      nav(`/spendings/?accept=${filter.is_accept}`)
+    }
+
+    const filtDate = (evt) => {
+      evt.preventDefault()
+      nav(`/spendings/?date_from=${filter.date_from}&date_to=${filter.date_to}`)
+    }
+
+    const setValue = e => {
+      const { name, value } = e.target
+      setFilter(current => ({...current, [name]:value}))
+    }
+
     const nextPage = () => setPage(current => current + 1)
     const prevPage = () => setPage(current => current - 1)
     const changePageSize = (evt) => setPageSize(evt.target.value)
 
     const changeFilter = (evt) => {
-      setFilter(evt.target.value)
+      evt.preventDefault()
+      setTypeFilter(evt.target.value)
     }
 
     let spendingLogin = (
@@ -87,36 +135,36 @@ const Spendings = () => {
         <div align="left">
           <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
             <InputLabel id="demo-select-small">Filter</InputLabel>
-            <Select labelId="demo-select-small" id="demo-select-small" label="Filter" value={filter} onChange={changeFilter}>
+            <Select labelId="demo-select-small" id="demo-select-small" label="Filter" value={typeFilter} onChange={changeFilter}>
               <MenuItem value="spending_amount">Spending amount</MenuItem>
               <MenuItem value="is_accept">Accepted</MenuItem>
               <MenuItem value="date">Date</MenuItem>
             </Select>
           </FormControl>
-          {filter === 'spending_amount'?
+          {typeFilter === 'spending_amount'?
           <>
-            <TextField id="outlined-basic" label="From amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}}/>
-            <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}}/>
-            <Button variant="contained" style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+              <TextField id="outlined-basic" label="From amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="amount_from" value={filter.amount_from} onChange={setValue}/>
+              <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="amount_to" value={filter.amount_to} onChange={setValue}/>
+              <Button variant="contained" onClick={filtAmount} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
           </>:
-          filter === 'is_accept'?
+          typeFilter === 'is_accept'?
           <>
             <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
               <InputLabel id="demo-select-small">Accept</InputLabel>
-              <Select labelId="demo-select-small" id="demo-select-small">
+              <Select labelId="demo-select-small" id="demo-select-small" name="is_accept" value={filter.is_accept} onChange={setValue}>
                 <MenuItem value="1">Accepted</MenuItem>
                 <MenuItem value="0">Not Accepted</MenuItem>
               </Select>
             </FormControl>
-            <Button variant="contained" style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+            <Button variant="contained" onClick={filtAccept} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
           </>:
-          filter === 'date'?
+          typeFilter === 'date'?
           <>
-            <label>From: </label>
-            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }}/>
-            <label>To: </label>
-            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }}/>
-            <Button variant="contained" style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+            <label style={{ color: '#609b56' }}><strong>From: </strong></label>
+            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.date_from} onChange={setValue}/>
+            <label style={{ color: '#609b56' }}><strong>To: </strong></label>
+            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_to" value={filter.date_to} onChange={setValue}/>
+            <Button variant="contained" onClick={filtDate} style={{  backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
           </>:
           <span />}
 

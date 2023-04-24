@@ -26,8 +26,8 @@ const Login = () => {
                 let res = await API.post(endpoints['login'], {
                     "username": username,
                     "password": password,
-                    "client_id": "btisilCXocogb3EoZxbq3eEP3DIVdxSXYkvkShtz",
-                    "client_secret": "Fjjk2etc6utKUtODPKaXZsWqqjaz8zPGK4HVD0kQCBUwlGdDQnYCEisFLE3rlk0ClsGUQApHUJNmDroCI0luKQzAVUbh6L090gSUN2BOZEsZnN5TUabPWy9ElyQzyEXD",
+                    "client_id": "mPAsfV5iqzfkRwBj9oLxirEia3IaRZlGDudIlIda",
+                    "client_secret": "ZgFP6mYHpd9X5ivV0r5Uk4baQgrKPZJdPQ0HNc9FqCqsUIHHsEPHPVOcEYpugxSOQmgoKHwV4dx9fUDH9qOOOXnRMtK6CZUtxEdNkuUoEqxf8XAc3w5uYvoiuV920Am8",
                     "grant_type": "password"
                 }, headers)
                 console.log(res)

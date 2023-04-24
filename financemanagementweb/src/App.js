@@ -44,6 +44,7 @@ import CurrentUser from './components/CurrentUser';
 import Button from '@mui/material/Button';
 import { useContext } from "react"
 import RegisterUser from './components/RegisterUser';
+import NewLimitRule from './components/NewLimitRule';
 
 
 function App() {
@@ -251,6 +252,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                   <Route path='/meetings/:meetingId/' element={<MeetingDetail />}/>
                   <Route path='/meeting_schedule/' element={<NewMeeting />}/>
                   <Route path='/limit_rules/' element={<LimiteRule />}/>
+                  <Route path='/limit_rule/' element={<NewLimitRule />}/>
                   <Route path='/warning/' element={<Warning />}/>
                 </Routes>
                 <Footer />

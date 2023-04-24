@@ -1,27 +1,49 @@
-import { useEffect, useState } from "react"
-import API, { endpoints } from "../configs/API"
+import { useContext, useEffect, useState } from "react"
+import API, { authAPI, endpoints } from "../configs/API"
 import { Container, Input } from "@mui/material"
-import { useParams, Link } from "react-router-dom"
+import { useParams, Link, useNavigate } from "react-router-dom"
 import Numeral from 'numeral';
 import { format } from 'date-fns';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
+import { UseContext } from "../configs/UseContext";
 
 const SpendingDetail = () => {
     const[spending, setSpending] = useState([])
     const {spendingId} = useParams()
+    const[user, dispatch] = useContext(UseContext)
+    const nav = useNavigate()
+    const[idAccept, setAccept] = useState("")
 
     useEffect(() => {
         const loadSpending = async () => {
-            let res = await API.get(endpoints['spending'](spendingId))
+            // let e = `${endpoints['spendings'](spendingId)}`
+            // let res = await authAPI().get(e)
+
+            let res = await authAPI().get(endpoints['spending'](spendingId))
             res.data.spending_amount = Numeral(res.data.spending_amount).format('0,0')
             res.data.implementation_date = format(new Date(res.data.implementation_date), 'dd/MM/yyyy HH:mm:ss')
             // console.log(res.data)
             setSpending(res.data)
+
+            if (idAccept !== null)
+            {
+                let eAccept = `${endpoints['spending'](spendingId)}/accept/`
+                let resAccept = await authAPI().put(eAccept)
+            }
         }
 
         loadSpending()
     }, [spendingId])
+
+    const accept1 = async () => {
+        setAccept(spending.id)
+    }
+
+    const accept = async () => {
+        let eAccept = `${endpoints['spending'](spendingId)}/accept/`
+        let resAccept = await authAPI().put(eAccept)
+    }
 
     return (
         <>
@@ -51,9 +73,20 @@ const SpendingDetail = () => {
                     <h4 style={{ color: "#F1C338", marginRight: '1%' }}>Accept: </h4>
                     <span></span>
                     {spending.is_accept === true?
-                        <Checkbox checked={true} style={{ color: "#F1C338", marginRight: '1%' }} />:
-                        <Checkbox checked={false} style={{ color: "#F1C338", marginRight: '1%' }} />
+                        <>
+                            <Checkbox checked={true} style={{ color: "#F1C338", marginRight: '1%' }} />
+                        </>:
+                        <>
+                            <Checkbox checked={false} style={{ color: "#F1C338", marginRight: '1%' }} />
+                            {user.is_supperuser === true || user.is_staff === true?
+                            <Button variant="contained" onClick={accept} style={{ backgroundColor: "#609b56", color: '#FFECC9', height: '10%', marginTop: '1%' }}>Accept</Button>:
+                            <span />}
+                        </>
                     }
+                </div>
+                <br />
+                <div align='center'>
+                    
                 </div>
             </Container>
             <div style={{ backgroundColor: "#609b56" }}>

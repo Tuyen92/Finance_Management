@@ -33,6 +33,17 @@ const Projects = () => {
     const[pageSize, setPageSize] = useState(2)
     const[next, setNext] = useState(null)
     const[previous, setPrevious] = useState(null)
+    const[typeFilter, setTypeFilter] = useState(null)
+    const[filter, setFilter] = useState({
+      "target_from": "",
+      "target_to": "",
+      "type": "",
+      "date_from": "",
+      "date_to": "",
+      "month": "",
+      "year": "",
+      "ended": ""
+    })
 
     useEffect(() => {
         const loadProjects = async () => {
@@ -57,9 +68,53 @@ const Projects = () => {
       nav(`/spendings/?content=${kw}`)
     }
 
+    const setValue = e => {
+      const { name, value } = e.target
+      setFilter(current => ({...current, [name]:value}))
+    }
+
     const nextPage = () => setPage(current => current + 1)
     const prevPage = () => setPage(current => current - 1)
     const changePageSize = (evt) => setPageSize(evt.target.value)
+
+    const filtTarget = (evt) => {
+      evt.preventDefault()
+      nav(`/projects/?target_from=${filter.target_from}&target_to=${filter.target_to}`)
+    }
+
+    const filtDate = (evt) => {
+      evt.preventDefault()
+      if (filter.type == 'start_date')
+        nav(`/projects/?type=start_date&date_from=${filter.date_from}&date_to=${filter.date_to}`)
+      if (filter.type == 'end_date')
+        nav(`/projects/?type=end_date&date_from=${filter.date_from}&date_to=${filter.date_to}`)
+    }
+
+    const filtMonth = (evt) => {
+      evt.preventDefault()
+      if (filter.type == 'start_date')
+        nav(`/projects/?type=start_date&month=${filter.month}`)
+      if (filter.type == 'end_date')
+        nav(`/projects/?type=end_date&month=${filter.month}`)
+    }
+
+    const filtYear = (evt) => {
+      evt.preventDefault()
+      if (filter.type == 'start_date')
+        nav(`/projects/?type=start_date&year=${filter.year}`)
+      if (filter.type == 'end_date')
+        nav(`/projects/?type=end_date&year=${filter.year}`)
+    }
+
+    const filtWorking = (evt) => {
+      evt.preventDefault()
+      nav(`/projects/?ended=${filter.ended}`)
+    }
+
+    const changeFilter = (evt) => {
+      evt.preventDefault()
+      setTypeFilter(evt.target.value)
+    }
 
     let userCreateProject = (<></>)
     let projectLogin = (
@@ -76,13 +131,96 @@ const Projects = () => {
           <div align="left">
             <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
               <InputLabel id="demo-select-small">Filter</InputLabel>
-              <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
-                <MenuItem value="" />
-                <MenuItem value=""></MenuItem>
-                <MenuItem value=""></MenuItem>
-                <MenuItem value=""></MenuItem>
+              <Select labelId="demo-select-small" id="demo-select-small" label="Filter" value={typeFilter} onChange={changeFilter}>
+                <MenuItem value="target">Target</MenuItem>
+                <MenuItem value="working">Working</MenuItem>
+                <MenuItem value="start_date">Start date</MenuItem>
+                <MenuItem value="end_date">End date</MenuItem>
               </Select>
             </FormControl>
+            {typeFilter === 'target'?
+          <>
+            <label style={{ color: '#609b56' }}><strong>From: </strong></label>
+            <TextField id="outlined-basic" label="From amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="target_from" value={filter.target_from} onChange={setValue}/>
+            <label style={{ color: '#609b56' }}><strong>To: </strong></label>
+            <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="target_to" value={filter.target_to} onChange={setValue}/>
+            <Button variant="contained" onClick={filtTarget} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          typeFilter === 'working'?
+          <>
+            <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+              <InputLabel id="demo-select-small">Working</InputLabel>
+              <Select labelId="demo-select-small" id="demo-select-small" name="ended" value={filter.ended} onChange={setValue}>
+                <MenuItem value="0">Ended</MenuItem>
+                <MenuItem value="1">Not Ended</MenuItem>
+              </Select>
+            </FormControl>
+            <Button variant="contained" onClick={filtWorking} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          typeFilter === 'start_date'?
+          <>
+            <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+              <InputLabel id="demo-select-small">Time</InputLabel>
+              <Select labelId="demo-select-small" id="demo-select-small" name="type" value={filter.type} onChange={setValue}>
+                <MenuItem value="date">Date</MenuItem>
+                <MenuItem value="month">Month</MenuItem>
+                <MenuItem value="year">Year</MenuItem>
+              </Select>
+            </FormControl>
+            {filter.type === 'date'?
+            <>
+              <label style={{ color: '#609b56' }}><strong>From: </strong></label>
+              <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.date_from} onChange={setValue}/>
+              <label style={{ color: '#609b56' }}><strong>To: </strong></label>
+              <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_to" value={filter.date_to} onChange={setValue}/>
+              <Button variant="contained" onClick={filtDate} style={{ backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+            </>:
+            filter.type === 'month'?
+            <>
+              <label style={{ color: '#609b56' }}><strong>Month: </strong></label>
+            <TextField id="outlined-basic" onClick={filtMonth} type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.month} onChange={setValue}/>
+            </>:
+            filter.type === 'year'?
+            <>
+              <label style={{ color: '#609b56' }}><strong>Year: </strong></label>
+            <TextField id="outlined-basic" onClick={filtYear} type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.year} onChange={setValue}/>
+            </>:
+            <span />
+            }
+          </>:
+          typeFilter === 'end_date'?
+          <>
+            <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+              <InputLabel id="demo-select-small">Time</InputLabel>
+              <Select labelId="demo-select-small" id="demo-select-small" name="type" value={filter.type} onChange={setValue}>
+                <MenuItem value="date">Date</MenuItem>
+                <MenuItem value="month">Month</MenuItem>
+                <MenuItem value="year">Year</MenuItem>
+              </Select>
+            </FormControl>
+            {filter.type === 'date'?
+            <>
+              <label style={{ color: '#609b56' }}><strong>From: </strong></label>
+              <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.date_from} onChange={setValue}/>
+              <label style={{ color: '#609b56' }}><strong>To: </strong></label>
+              <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_to" value={filter.date_to} onChange={setValue}/>
+              <Button variant="contained" style={{  backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+            </>:
+            filter.type === 'month'?
+            <>
+              <label style={{ color: '#609b56' }}><strong>Month: </strong></label>
+            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.month} onChange={setValue}/>
+            </>:
+            filter.type === 'year'?
+            <>
+              <label style={{ color: '#609b56' }}><strong>Year: </strong></label>
+            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.year} onChange={setValue}/>
+            </>:
+            <span />
+            }
+            </>:
+          <span />}
+
             <TextField id="outlined-basic" label="Search" variant="outlined" size="small" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
             <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
           </div>
@@ -132,13 +270,13 @@ const Projects = () => {
               {userCreateProject}
             </div>
           
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", height: "30px" }}>
             <Select labelId="demo-select-small" size="small" id="demo-simple-select" style={{ marginRight: '1%' }} value={pageSize} onChange={changePageSize}>
               <MenuItem value="2" >2</MenuItem>
               <MenuItem value="3" >3</MenuItem>
               <MenuItem value="5" >5</MenuItem>
             </Select>
-            <h5 style={{ marginRight: '1%' }}>Page {page}</h5>
+            <h5 style={{ marginRight: '1%', marginTop: '0.5%' }}>Page {page}</h5>
             {previous !== null?
               <Button onClick={prevPage} variant="outline-primary" style={{ backgroundColor: '#609b56', marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_left</i></Button>:
               <span/>

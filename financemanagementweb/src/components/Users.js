@@ -33,6 +33,11 @@ const Users = () => {
     const[total, setTotal] = useState(0)
     const[next, setNext] = useState(null)
     const[previous, setPrevious] = useState(null)
+    const[typeFilter, setTypeFilter] = useState(null)
+    const[filter, setFilter] = useState({
+      "group": "",
+      "role": ""
+    })
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -51,9 +56,29 @@ const Users = () => {
         nav(`/user/?content=${kw}`)
     }
 
+    const filtGroup = (evt) => {
+        evt.preventDefault()
+        nav(`/user/?group=${filter.group}`)
+      }
+  
+      const filtRole = (evt) => {
+        evt.preventDefault()
+        nav(`/user/?role=${filter.role}`)
+      }
+
+    const setValue = e => {
+        const { name, value } = e.target
+        setFilter(current => ({...current, [name]:value}))
+      }
+
     const nextPage = () => setPage(current => current + 1)
     const prevPage = () => setPage(current => current - 1)
     const changePageSize = (evt) => setPageSize(evt.target.value)
+
+    const changeFilter = (evt) => {
+        evt.preventDefault()
+        setTypeFilter(evt.target.value)
+    }
 
     let userLogin = (
         <>
@@ -69,12 +94,29 @@ const Users = () => {
                 <div align="left">
                     <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
                         <InputLabel id="demo-select-small">Filter</InputLabel>
-                        <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
-                            <MenuItem value="" />
-                            <MenuItem value="">Group</MenuItem>
-                            <MenuItem value="">Role</MenuItem>
+                        <Select labelId="demo-select-small" id="demo-select-small" label="Filter" value={typeFilter} onChange={changeFilter}>
+                            <MenuItem value="group">Group</MenuItem>
+                            <MenuItem value="role">Role</MenuItem>
                         </Select>
                     </FormControl>
+                    {typeFilter === 'group'?
+                    <>
+                        <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="spending_limit_to" value={filter.group} onChange={setValue}/>
+                        <Button variant="contained" onClick={filtGroup} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+                    </>:
+                    typeFilter === 'role'?
+                    <>
+                        <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+                        <InputLabel id="demo-select-small">Accept</InputLabel>
+                        <Select labelId="demo-select-small" id="demo-select-small" name="is_accept" value={filter.role} onChange={setValue}>
+                            <MenuItem value="user">User</MenuItem>
+                            <MenuItem value="leader">Leader</MenuItem>
+                            <MenuItem value="superuser">Superuser</MenuItem>
+                        </Select>
+                        </FormControl>
+                        <Button variant="contained" onClick={filtRole} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+                    </>:
+                    <span />}
                     <TextField id="outlined-basic" label="Search" variant="outlined" size="small" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
                     <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
                 </div>

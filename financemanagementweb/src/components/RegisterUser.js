@@ -16,15 +16,22 @@ const RegisterUser = () => {
     const[user, setUser] = useState({
         "username": "",
         "password": "",
-        "firstName": "",
-        "lastName": "",
+        "confirm_password": "",
+        "first_name": "",
+        "last_name": "",
         "email": "",
         "birthday": "",
         "sex": "",
         "address": "",
         "phone": "",
-        "avatar": ""
+        "avatar": "",
+        "role": ""
     })
+    const headers = {
+        headers: {
+            "Accept": "*/*",
+            "Content-Type": "multipart/form-data"}
+    }
 
     // LONG
     // const [firstName, setFirstName] = useState('')
@@ -61,7 +68,6 @@ const RegisterUser = () => {
         //     "is_active": true
         // })
     
-
     const register = (evt) => {
         evt.preventDefault()
 
@@ -69,17 +75,28 @@ const RegisterUser = () => {
             try {
                 let form = new FormData()
                 form.append("username", user.username)
-                form.append("password", user.password)
-                form.append("firstName", user.firstName)
-                form.append("lastName", user.lastName)
+                form.append("firstName", user.first_name)
+                form.append("lastName", user.last_name)
                 form.append("email", user.email)
                 form.append("birthday", user.birthday)
                 form.append("sex", user.sex)
                 form.append("address", user.address)
                 form.append("phone", user.phone)
                 form.append("avatar", user.avatar)
-
-                let res = await authAPI().post(endpoints['user'], form)
+                if (user.role === 3)
+                {
+                    form.append("is_superuser", 1)
+                    form.append("is_staff", 1)
+                }
+                if (user.role === 2)
+                {
+                    form.append("is_staff", 1)
+                }
+                if (user.password === user.con)
+                {
+                    form.append("password", user.password)
+                }
+                let res = await authAPI().post(endpoints['register'], form, headers)
                 if (res.status === 201)
                     nav("/user/")
             } catch (ex) {
@@ -104,15 +121,15 @@ const RegisterUser = () => {
                     <h3  style={{ textAlign: 'center', backgroundColor: '#609b56', color: "#FFECC9", marginLeft: "20px" }}>User's information: </h3>
                     <form onSubmit={register} action={<Link to="/" />}>
                         <Stack spacing={2} direction="row" style={{ marginBottom: '2%' }}>
-                            <TextField type="text" variant='outlined' label="First Name" name="firstName" onChange={setValue} value={user.firstName} 
+                            <TextField type="text" variant='outlined' label="First Name" name="first_name" onChange={setValue} value={user.first_name} 
                                 required style={{ width: '100%' }}/>
-                            <TextField type="text" variant='outlined' label="Last Name" name="lastName" onChange={setValue} value={user.lastName} 
+                            <TextField type="text" variant='outlined' label="Last Name" name="last_name" onChange={setValue} value={user.last_name} 
                                 style={{ width: '100%' }} required />
                         </Stack>
 
                         <Stack spacing={2} direction="row" style={{ marginBottom: '0.3%' }}>
                             <FormLabel id="demo-radio-buttons-group-label" style={{ marginTop: '0.7%' }}>Gender: </FormLabel>
-                            <RadioGroup aria-labelledby="demo-radio-buttons-group-label" defaultValue="female" name="radio-buttons-group">
+                            <RadioGroup aria-labelledby="demo-radio-buttons-group-label" defaultValue="female" name="sex" onChange={setValue} value={user.sex}>
                                 <Stack direction="row">
                                     <FormControlLabel value="female" control={<Radio />} label="Female" />
                                     <FormControlLabel value="male" control={<Radio />} label="Male" />
@@ -132,17 +149,17 @@ const RegisterUser = () => {
 
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Role</InputLabel>
-                                <Select labelId="demo-simple-select-label" id="demo-simple-select" label="Role" name="role">
+                                <Select labelId="demo-simple-select-label" id="demo-simple-select" label="Role" name="role" onChange={setValue} value={user.role}>
                                     <MenuItem value="1">User</MenuItem>
-                                    <MenuItem value="1">Leader</MenuItem>
-                                    <MenuItem value="1">Superuser</MenuItem>
+                                    <MenuItem value="2">Leader</MenuItem>
+                                    <MenuItem value="3">Superuser</MenuItem>
                                 </Select>
                             </FormControl>
                         </Stack>
                         
                         <Stack spacing={2} direction="row" style={{ marginBottom: '0.3%' }}>
                             <TextField type="file" variant='outlined' name="avatar" onChange={setValue} value={user.avatar} 
-                                required style={{ width: '100%', marginBottom: '2%' }} />
+                                style={{ width: '100%', marginBottom: '2%' }} />
                                 
                             <TextField type="email" variant='outlined' label="Email" name="email" onChange={setValue} value={user.email} 
                                 style={{ width: '100%', marginBottom: '2%' }}  required />
@@ -156,7 +173,7 @@ const RegisterUser = () => {
                             <TextField type="password" variant='outlined' name="password" label="Password" onChange={setValue} value={user.password} 
                                 required style={{ width: '100%', marginBottom: '2%' }} />
 
-                            <TextField type="password" variant='outlined' name="confirm_password" label="Re-enter Password" onChange={setValue} value={user.password} 
+                            <TextField type="password" variant='outlined' name="confirm_password" label="Re-enter Password" onChange={setValue} value={user.confirm_password} 
                                 required style={{ width: '100%', marginBottom: '2%' }} />
                         </Stack>
                         <div align="center">

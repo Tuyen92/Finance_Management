@@ -128,13 +128,13 @@ const Meetings = () => {
           <Link style={{ textDecoration: 'none' }} to={`/meeting_schedule/`}><Button style={{ color: '#F1C338' }}><strong>New meetings</strong></Button></Link>
         </div>
         
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", height: "30px"  }}>
           <Select labelId="demo-select-small" size="small" id="demo-simple-select" style={{ marginRight: '1%' }} value={pageSize} onChange={changePageSize}>
             <MenuItem value="2" >2</MenuItem>
             <MenuItem value="3" >3</MenuItem>
             <MenuItem value="5" >5</MenuItem>
           </Select>
-          <h5 style={{ marginRight: '1%' }}>Page {page}</h5>
+          <h5 style={{ marginRight: '1%', marginTop: '0.5%' }}>Page {page}</h5>
           {previous !== null?
             <Button onClick={prevPage} variant="outline-primary" style={{ backgroundColor: '#609b56', marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>chevron_left</i></Button>:
             <span/>

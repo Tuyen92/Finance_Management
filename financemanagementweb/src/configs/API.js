@@ -16,12 +16,13 @@ export const endpoints = {
     "spending": (spendingId) => `/spendings/${spendingId}`,
     "new_spending": "/spending/",
     "limit_rules": "/limit_rules/",
+    "new_limit_rule": "/limit_rule/",
     "meetings": "/meetings/",
     "meeting": (meetingId) => `/meetings/${meetingId}`,
     "new_meeting": "/meeting/",
     "login": "/o/token/",
     "current_user": "/user/current_user/",
-    "register": "/user/",
+    "register": "/register/",
     "change_password": "/user/change_password/"
 }
 

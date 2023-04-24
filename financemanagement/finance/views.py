@@ -7,6 +7,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.views import Response
 from .serializers import *
 from .paginators import *
+from django.contrib.auth.hashers import make_password
 
 
 # SPENDING
@@ -36,13 +37,17 @@ class SpendingViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrie
             # Filter from day to day
             date_from = self.request.query_params.get("date_from")
             date_to = self.request.query_params.get("date_to")
-            if date_from and date_to:
-                queryset = queryset.filter(implementation_date__range=(date_from, date_to))
+            if date_from:
+                queryset = queryset.filter(implementation_date__gte=date_from)
+            if date_to:
+                queryset = queryset.filter(implementation_date__lte=date_to)
 
             # Filter by is accept
             accept = self.request.query_params.get("accept")
-            if accept == 1:
+            if accept == '1':
                 queryset = queryset.filter(is_accept=True)
+            if accept == '0':
+                queryset = queryset.filter(is_accept=False)
 
             # Sort by spending amount
             sort = self.request.query_params.get("sort")
@@ -127,22 +132,35 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
             # Filter by from target to target
             target_from = self.request.query_params.get("target_from")
             target_to = self.request.query_params.get("target_to")
-            if target_from and target_to:
-                queryset = queryset.filter(target__range=(target_from, target_to))
+            if target_from:
+                queryset = queryset.filter(target__gte=target_from)
+            if target_to:
+                queryset = queryset.filter(target__lte=target_to)
 
             # Filter by from day to day
-            day_from = self.request.query_params.get("day_from")
-            day_to = self.request.query_params.get("day_to")
-            if day_from and day_to:
-                queryset = queryset.filter(start_date__range=(day_from, day_to))
+            type = self.request.query_params.get("type")
+            date_from = self.request.query_params.get("date_from")
+            date_to = self.request.query_params.get("date_to")
+            if type == 'start_date':
+                if date_from:
+                    queryset = queryset.filter(start_date__gte=date_from)
+                if date_to:
+                    queryset = queryset.filter(start_date_lte=date_to)
+            if type == 'end_date':
+                if date_from:
+                    queryset = queryset.filter(end_date__gte=date_from)
+                if date_to:
+                    queryset = queryset.filter(end_date_lte=date_to)
 
             # Search by project month, year
             month = self.request.query_params.get("month")
             year = self.request.query_params.get("year")
-            if month:
-                queryset = queryset.dates('start_date', month, order='ASC')
-            if year:
-                queryset = queryset.dates('start_date', year)
+            if type == 'start_date':
+                if month:
+                    queryset = queryset.filter(start_date__month=month)
+            if type == 'end_date':
+                if year:
+                    queryset = queryset.dates(start_date__year=year)
 
             # Sort by target
             sort = self.request.query_params.get("sort")
@@ -153,10 +171,10 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
 
             # Filter by is ended project
             ended = self.request.query_params.get("ended")
-            if ended == 1:
-                queryset = queryset.filter(is_ended=False)
-            if ended == 2:
+            if ended == '0':
                 queryset = queryset.filter(is_ended=True)
+            if ended == '1':
+                queryset = queryset.filter(is_ended=False)
             return queryset
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -256,10 +274,20 @@ class GroupViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveA
 
             # Filter by actived group
             active = self.request.query_params.get("active")
-            if active == 1:
+            if active == '1':
                 queryset = queryset.filter(is_active=True)
-            elif active == 2:
+            elif active == '0':
                 queryset = queryset.filter(is_active=False)
+
+            # Filter by number of member
+            number = self.request.query_params.get("number")
+            if number:
+                queryset = queryset.filter(number=number)
+
+            # Filter by created date
+            created_date = self.request.query_params.get("created_date")
+            if created_date:
+                queryset = queryset.filter(created_date=created_date)
 
             # Search by leader id
             leader = self.request.query_params.get("leader")
@@ -384,6 +412,9 @@ class GroupViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
 
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
+
+    def perform_create(self, serializer):
+        password = serializer.validate_data()
 
 
 # USER
@@ -528,6 +559,11 @@ class UserViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
 
+    def perform_create(self, serializer):
+        password = serializer.validated_data.get('password')
+        hash_password = make_password(password)
+        serializer.save(password=hash_password)
+
 
 # INCOME
 class IncomeViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
@@ -548,14 +584,25 @@ class IncomeViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrieve
             # Filter from amount to amount
             income_from = self.request.query_params.get("amount_from")
             income_to = self.request.query_params.get("amount_to")
-            if income_from and income_to:
-                queryset = queryset.filter(spending_amount__range=(income_from, income_to))
+            if income_from:
+                queryset = queryset.filter(income_amount__gte=income_from)
+            if income_to:
+                queryset = queryset.filter(income_amount__lte=income_from)
 
             # Filter from day to day
             date_from = self.request.query_params.get("date_from")
             date_to = self.request.query_params.get("date_to")
-            if date_from and date_to:
-                queryset = queryset.filter(implementation_date__range=(date_from, date_to))
+            if date_from:
+                queryset = queryset.filter(implementation_date__gte=date_from)
+            if date_to:
+                queryset = queryset.filter(implementation_date__lte=date_to)
+
+            # Filter by confirm
+            confirm = self.request.query_params.get("confirm")
+            if confirm == '1':
+                queryset = queryset.filter(is_confirm=True)
+            if confirm == '0':
+                queryset = queryset.filter(is_confirm=False)
 
             # Sort by income amount
             sort = self.request.query_params.get("sort")
@@ -740,15 +787,21 @@ class LimitRuleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retri
             if limit_type:
                 queryset = queryset.filter(type__icontains=limit_type)
 
-            # Filter limit spending
-            limit_spending = self.request.query_params.get("limit_spending")
-            if limit_spending:
-                queryset = queryset.filter(spending_limit__gte=limit_spending)
+            # Filter from limit spending to limit spending
+            limit_spending_from = self.request.query_params.get("limit_spending_from")
+            limit_spending_to = self.request.query_params.get("limit_spending_to")
+            if limit_spending_from:
+                queryset = queryset.filter(spending_limit__gte=limit_spending_from)
+            if limit_spending_to:
+                queryset = queryset.filter(spending_limit__lte=limit_spending_to)
 
-            # Filter limit income
-            limit_income = self.request.query_params.get("limit_income")
-            if limit_income:
-                queryset = queryset.filter(income_limit__gte=limit_income)
+            # Filter from limit income to limit income
+            limit_income_from = self.request.query_params.get("limit_income_from")
+            limit_income_to = self.request.query_params.get("limit_income_to")
+            if limit_income_from:
+                queryset = queryset.filter(income_limit__gte=limit_income_from)
+            if limit_spending_to:
+                queryset = queryset.filter(income_limit__lte=limit_income_to)
             return queryset
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
