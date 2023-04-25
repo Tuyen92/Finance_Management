@@ -13,7 +13,7 @@ const SpendingDetail = () => {
     const {spendingId} = useParams()
     const[user, dispatch] = useContext(UseContext)
     const nav = useNavigate()
-    const[idAccept, setAccept] = useState("")
+    const[isAccept, setAccept] = useState("")
 
     useEffect(() => {
         const loadSpending = async () => {
@@ -26,7 +26,7 @@ const SpendingDetail = () => {
             // console.log(res.data)
             setSpending(res.data)
 
-            if (idAccept !== null)
+            if (isAccept !== null)
             {
                 let eAccept = `${endpoints['spending'](spendingId)}/accept/`
                 let resAccept = await authAPI().put(eAccept)
@@ -34,15 +34,12 @@ const SpendingDetail = () => {
         }
 
         loadSpending()
-    }, [spendingId])
-
-    const accept1 = async () => {
-        setAccept(spending.id)
-    }
+    }, [spendingId, isAccept])
 
     const accept = async () => {
         let eAccept = `${endpoints['spending'](spendingId)}/accept/`
         let resAccept = await authAPI().put(eAccept)
+        setAccept(1)
     }
 
     return (

@@ -215,7 +215,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                 
                 <ListItem key='meeting' style={{ marginTop: '20px', marginBottom: '20px' }}>
                   <i className="material-icons" style={{ color: '#FFECC9' }}>calendar_month</i>
-                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/meeting_schedule/">Meeting</Link>
+                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/meeting_schedules/">Meeting</Link>
                 </ListItem>
                 <Divider />
 
@@ -248,7 +248,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                   <Route path='/incomes/' element={<Incomes />}/>
                   <Route path='/incomes/:incomeId/' element={<IncomeDetail />}/>
                   <Route path='/income/' element={<NewIncome />}/>
-                  <Route path='/meeting_schedule/' element={<Meetings />}/>
+                  <Route path='/meeting_schedules/' element={<Meetings />}/>
                   <Route path='/meetings/:meetingId/' element={<MeetingDetail />}/>
                   <Route path='/meeting_schedule/' element={<NewMeeting />}/>
                   <Route path='/limit_rules/' element={<LimiteRule />}/>

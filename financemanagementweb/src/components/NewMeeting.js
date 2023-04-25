@@ -1,4 +1,4 @@
-import { Container, FormGroup, Input } from "@mui/material"
+import { Container, FormGroup, Input, TextField } from "@mui/material"
 import { useContext, useState } from "react"
 import { UseContext } from "../configs/UseContext"
 import { useNavigate } from "react-router-dom"
@@ -11,7 +11,8 @@ const NewMeeting = () => {
     const[meeting, setMeeting] = useState({
         "content": "",
         "description": "",
-        "datetime": "",
+        "date": "",
+        "time": "",
         "group": ""
     })
 
@@ -28,7 +29,7 @@ const NewMeeting = () => {
 
                 let res = await authAPI().get(endpoints['new_meeting'], form)
                 if (res.status === 201)
-                    nav("/groups/")
+                    nav("/meetings/")
             } catch (ex) {
                 console.log(ex)
             }
@@ -47,23 +48,29 @@ const NewMeeting = () => {
             <div style={{ backgroundColor: '#609b56'}}>
                 <br />
             </div>
+            <br />
             <Container>
                 <FormGroup  style={{ width: '100%' }}>
                     <form onSubmit={create}>
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Content: </h4>
-                            <Input id="content" type="text" style={{ width: '100%', marginRight: '2%' }} name="content" value={meeting.content} onChange={setValue}/>
+                            <TextField id="content" type="text" style={{ width: '100%', marginRight: '2%' }} name="content" value={meeting.content} onChange={setValue}/>
                         </div>
-
-                        <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Describe: </h4>
-                        <Input id="id" type="text" multiline fullWidth rows={4} style={{ width: '100%' }} name="describe" value={meeting.description} onChange={setValue}/>
-
+                        <br />
                         <div style={{ display: 'flex' }}>
-                            <h4 style={{ width: '20%', color: "#F1C338", marginRight: '2%' }}>Date time: </h4>
-                            <Input id="id" type="text" rows={4} style={{ width: '100%', marginRight: '2%' }} name="datetime" value={meeting.datetime} onChange={setValue}/>
+                            <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Describe: </h4>
+                            <TextField id="id" type="text" multiline fullWidth rows={4} style={{ width: '100%' }} name="description" value={meeting.description} onChange={setValue}/>
+                        </div>
+                        <br />
+                        <div style={{ display: 'flex' }}>
+                            <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Date: </h4>
+                            <TextField id="id" type="date" rows={4} style={{ marginRight: '2%' }} name="date" value={meeting.date} onChange={setValue}/>
+
+                            <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Time: </h4>
+                            <TextField id="id" type="time" rows={4} style={{ marginRight: '2%' }} name="time" value={meeting.time} onChange={setValue}/>
 
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Group: </h4>
-                            <Input id="id" type="text" rows={4} style={{ width: '20%' }} name="group" value={meeting.group} onChange={setValue}/>
+                            <TextField id="id" type="text" rows={4} style={{ width: '20%' }} name="group" value={meeting.group} onChange={setValue}/>
                         </div>
                         <br />
                         <div align='center'>

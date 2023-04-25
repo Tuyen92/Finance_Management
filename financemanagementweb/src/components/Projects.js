@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useContext, useEffect } from "react"
-import API, { authAPI, endpoints } from "../configs/API"
+import { authAPI, endpoints } from "../configs/API"
 import { useState } from "react"
 import { Link } from 'react-router-dom'
 import Table from '@mui/material/Table';
@@ -53,10 +53,11 @@ const Projects = () => {
           if (name !== null)
             e += `&name_project=${name}`
 
-          let res =  await API.get(e)
+          let res =  await authAPI().get(e)
           setNext(res.data.next)
           setPrevious(res.data.previous)
           // console.log(res.data.results)
+          console.log(user)
           setProject(res.data.results)
         }
 
@@ -115,8 +116,7 @@ const Projects = () => {
       evt.preventDefault()
       setTypeFilter(evt.target.value)
     }
-
-    let userCreateProject = (<></>)
+    
     let projectLogin = (
       <>
         <div align="center">
@@ -126,6 +126,14 @@ const Projects = () => {
     )
     if (user !== null)
     {
+      let userCreateProject = (<></>)
+      if (user.is_staff === true || user.is_superuser === true)
+      {
+        userCreateProject = (
+          <>
+            <Link style={{ textDecoration: 'none' }} to={`/project/`}><Button style={{ color: '#F1C338' }}><strong>New project</strong></Button></Link>
+          </>)
+      }
       projectLogin = (
         <>
           <div align="left">
@@ -287,14 +295,6 @@ const Projects = () => {
             }
           </div>
         </>)
-
-      if (user.is_staff === true || user.is_superuser === true)
-        {
-          userCreateProject = (
-            <>
-              <Link style={{ textDecoration: 'none' }} to={`/project/`}><Button style={{ color: '#F1C338' }}><strong>New project</strong></Button></Link>
-            </>)
-        }
     }
 
     return (

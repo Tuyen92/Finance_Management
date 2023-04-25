@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import API, { endpoints } from "../configs/API"
+import API, { authAPI, endpoints } from "../configs/API"
 import { useParams, Link } from "react-router-dom"
 import { Container, Input } from "@mui/material"
 import Button from '@mui/material/Button';
@@ -23,7 +23,7 @@ const GroupDetail = () => {
 
     useEffect(() => {
         const loadGroup = async () => {
-            let res = await API.get(endpoints['group'](groupId))
+            let res = await authAPI().get(endpoints['group'](groupId))
             res.data.project.target = Numeral(res.data.project?.target).format(0,0)
             res.data.project.spending_amount = Numeral(res.data.project?.spending_amount).format(0,0)
             res.data.project.income_amount = Numeral(res.data.project?.income_amount).format(0,0)

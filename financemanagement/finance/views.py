@@ -247,6 +247,22 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    # End project
+    @action(methods=['put'], detail=True, url_path="ended")
+    def ended(self, request, pk):
+        try:
+            if request.method.__eq__('PUT'):
+                p = self.get_object()
+                if p.is_ended == False:
+                    p.is_ended = True
+                elif p.is_ended == True:
+                    p.is_ended = False
+                p.save()
+            else:
+                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # Create project
 class ProjectViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
@@ -261,6 +277,7 @@ class ProjectViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
 class GroupViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Group.objects.all()
     serializer_class = GroupDetailSerializer
+    pagination_class = Paginator
 
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
@@ -412,9 +429,6 @@ class GroupViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
 
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
-
-    def perform_create(self, serializer):
-        password = serializer.validate_data()
 
 
 # USER
@@ -774,7 +788,7 @@ class MeetingScheduleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics
 # LIMIT RULE
 class LimitRuleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = LimitRule.objects.all()
-    serializer_class = LimitRuleSerializer
+    serializer_class = LimitRuleSerializerGet
     pagination_class = Paginator
 
     def get_permissions(self):
@@ -829,6 +843,22 @@ class LimitRuleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retri
                 lr = self.get_object()
                 lr.delete()
                 return Response(status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Inactive/active limit rule
+    @action(methods=['put'], detail=True, url_path='inactive')
+    def inactive(self, request, pk):
+        try:
+            if request.method.__eq__('PUT'):
+                lr = self.get_object()
+                if lr.active == True:
+                    lr.active = False
+                elif lr.active == False:
+                    lr.active = True
+                lr.save()
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except:

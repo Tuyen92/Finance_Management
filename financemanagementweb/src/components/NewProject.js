@@ -1,5 +1,5 @@
 import Button from '@mui/material/Button';
-import { Container, FormGroup, Input } from "@mui/material";
+import { Container, FormGroup, Input, TextField } from "@mui/material";
 import { useContext, useState } from "react";
 import { UseContext } from "../configs/UseContext";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,7 @@ const NewProject = () => {
     })
 
     const create = (evt) => {
-        evt.PreventDefault()
+        evt.preventDefault()
 
         const process = async () => {
             try {
@@ -53,28 +53,30 @@ const NewProject = () => {
             <div style={{ backgroundColor: '#609b56'}}>
                 <br />
             </div>
+            <br />
             <Container>
                 <FormGroup  style={{ width: '100%' }}>
                     <form onSubmit={create}>
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Name: </h4>
-                            <Input id="content" type="text" style={{ width: '70%', marginRight: '2%' }} name="name_project" value={project.name_project} onChange={setValue}/>
+                            <TextField id="content" type="text" style={{ width: '70%', marginRight: '2%' }} label="Name of project..." name="name_project" value={project.name_project} onChange={setValue}/>
 
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Target: </h4>
-                            <Input id="id" type="text" rows={4} style={{ width: '20%' }} name="target" value={project.target} onChange={setValue}/>
+                            <TextField id="id" type="number" rows={4} style={{ width: '20%' }} label="Target of project..." name="target" value={project.target} onChange={setValue}/>
                         </div>
-
-                        <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Describe: </h4>
-                        <Input id="id" type="text" multiline fullWidth rows={4} style={{ width: '100%' }} name="describe" value={project.describe} onChange={setValue}/>
-
+                        <br />
+                        <div style={{ display: 'flex' }}>
+                            <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Describe: </h4>
+                            <TextField id="id" type="text" multiline fullWidth rows={4} style={{ width: '100%' }} label="Describe about of project..." name="describe" value={project.describe} onChange={setValue}/>
+                        </div>
+                        <br />
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ width: '20%', color: "#F1C338", marginRight: '2%' }}>Start date: </h4>
-                            <Input id="id" type="text" rows={4} style={{ width: '100%', marginRight: '2%' }} name="start_date" value={project.start_date} onChange={setValue}/>
+                            <TextField id="id" type="date" rows={4} style={{ width: '100%', marginRight: '2%' }} name="start_date" value={project.start_date} onChange={setValue}/>
 
                             <h4 style={{ width: '20%', color: "#F1C338", marginRight: '2%' }}>End date: </h4>
-                            <Input id="id" type="text" rows={4} style={{ width: '100%', marginRight: '2%' }} name="end_date" value={project.end_date} onChange={setValue}/>
+                            <TextField id="id" type="date" rows={4} style={{ width: '100%' }} name="end_date" value={project.end_date} onChange={setValue}/>
                         </div>
-                        
                         <br />
                         <div align='center'>
                             <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}>Create</Button>

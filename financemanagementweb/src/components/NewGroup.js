@@ -1,4 +1,4 @@
-import { Container, FormGroup, Input } from "@mui/material"
+import { Container, FormGroup, Input, TextField } from "@mui/material"
 import { useContext, useState } from "react"
 import { UseContext } from "../configs/UseContext"
 import { useNavigate } from "react-router-dom"
@@ -12,11 +12,11 @@ const NewGroup = () => {
         "name": "",
         "leader_id": "",
         "project": "",
-        "members": ""
+        "users": []
     })
 
     const create = (evt) => {
-        evt.PreventDefault()
+        evt.preventDefault()
 
         const process = async () => {
             try {
@@ -24,6 +24,7 @@ const NewGroup = () => {
                 form.append("name", group.name)
                 form.append("leader_id", group.leader_id)
                 form.append("project", group.project)
+                form.append("users", group.users)
                 console.log(form)
                 let res = await authAPI().post(endpoints['new_group'], form)
                 if (res.status === 201)
@@ -46,23 +47,24 @@ const NewGroup = () => {
             <div style={{ backgroundColor: '#609b56'}}>
                 <br />
             </div>
+            <br />
             <Container>
                 <FormGroup  style={{ width: '100%' }}>
                     <form onSubmit={create}>
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Name: </h4>
-                            <Input id="content" type="text" style={{ width: '70%', marginRight: '2%' }} name="name" value={group.name} onChange={setValue} />
+                            <TextField id="content" type="text" style={{ width: '60%', marginRight: '2%' }} name="name" value={group.name} onChange={setValue} />
 
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Leader ID: </h4>
-                            <Input id="id" type="text" style={{ width: '10%', marginRight: '2%' }} name="leader_id" value={group.leader_id} onChange={setValue} />
+                            <TextField id="id" type="text" name="leader_id" value={group.leader_id} onChange={setValue} />
                         </div>
-
+                        <br />
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Members: </h4>
-                            <Input id="id" type="text" rows={4} style={{ width: '100%', marginRight: '2%' }} name="members" value={group.members} onChange={setValue} />
+                            <TextField id="id" type="text" rows={4} style={{ width: '100%', marginRight: '2%' }} name="users" value={group.users} onChange={setValue} />
 
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Project: </h4>
-                            <Input id="id" type="text" rows={4} style={{ width: '100%' }} name="project" value={group.project} onChange={setValue} />
+                            <TextField id="id" type="text" rows={4} style={{ width: '100%' }} name="project" value={group.project} onChange={setValue} />
                         </div>
                         
                         <br />

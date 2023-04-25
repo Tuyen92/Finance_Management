@@ -45,7 +45,7 @@ class Spending(models.Model):
 
 class Group(models.Model):
     name = models.CharField(null=False, max_length=100)
-    number = models.IntegerField(null=False, default=0)
+    number = models.IntegerField(null=False, default=1)
     created_date = models.DateField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     leader_id = models.CharField(max_length=10)
@@ -85,9 +85,10 @@ class MeetingSchedule(models.Model):
 class LimitRule(models.Model):
     spending_limit = models.IntegerField(null=True, default=0)
     income_limit = models.IntegerField(null=True, default=0)
-    from_date = models.DateTimeField(null=True)
-    to_date = models.DateTimeField(null=True)
+    from_date = models.DateTimeField(auto_now_add=True)
+    to_date = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=100)
+    active = models.BooleanField(default=1)
 
     def __str__(self):
         return self.type

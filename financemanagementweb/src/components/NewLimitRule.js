@@ -1,7 +1,7 @@
 import { useContext, useState } from "react"
 import { UseContext } from "../configs/UseContext"
 import { useNavigate } from "react-router-dom"
-import { Container, FormGroup, Input } from "@mui/material"
+import { Container, FormGroup, Input, TextField } from "@mui/material"
 import Button from '@mui/material/Button';
 import { authAPI, endpoints } from "../configs/API"
 
@@ -49,29 +49,29 @@ const NewLimitRule = () => {
             <div style={{ backgroundColor: '#609b56'}}>
                 <br />
             </div>
+            <br />
             <Container>
                 <FormGroup  style={{ width: '100%' }}>
                     <form onSubmit={create}>
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Type: </h4>
-                            <Input id="content" type="text" style={{ width: '100%', marginRight: '2%' }} name="type" value={limitRule.type} onChange={setValue}/>
+                            <TextField id="content" type="text" style={{ width: '100%', marginRight: '2%' }} name="type" value={limitRule.type} onChange={setValue}/>
                         </div>
-                        
-                        
+                        <br />
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Spending: </h4>
-                            <Input id="content" type="number" style={{ width: '50%', marginRight: '2%' }} name="spending_limit" value={limitRule.spending_limit} onChange={setValue}/>
+                            <TextField id="content" type="number" style={{ width: '50%', marginRight: '2%' }} name="spending_limit" value={limitRule.spending_limit} onChange={setValue}/>
 
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Income: </h4>
-                            <Input id="id" type="number" style={{ width: '50%', marginRight: '2%' }} name="income_limit" value={limitRule.income_limit} onChange={setValue}/>
+                            <TextField id="id" type="number" style={{ width: '50%', marginRight: '2%' }} name="income_limit" value={limitRule.income_limit} onChange={setValue}/>
                         </div>
-
+                        <br />
                         <div style={{ display: 'flex' }}>
-                            <h4 style={{ color: "#F1C338", marginRight: '2%', width: '10%' }}>From date: </h4>
-                            <Input id="content" type="date" style={{ width: '50%', marginRight: '2%' }} name="spending_limit" value={limitRule.spending_limit} onChange={setValue}/>
+                            <h4 style={{ color: "#F1C338", marginRight: '2%' }}>From date: </h4>
+                            <TextField id="content" type="date" style={{ marginRight: '2%' }} name="spending_limit" value={limitRule.spending_limit} onChange={setValue}/>
 
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>To date: </h4>
-                            <Input id="id" type="date" style={{ width: '50%', marginRight: '2%' }} name="income_limit" value={limitRule.income_limit} onChange={setValue}/>
+                            <TextField id="id" type="date" style={{ marginRight: '2%' }} name="income_limit" value={limitRule.income_limit} onChange={setValue}/>
                         </div>
                         <br />
                         <div align='center'>

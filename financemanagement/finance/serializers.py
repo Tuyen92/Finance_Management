@@ -18,6 +18,12 @@ class LimitRuleSerializer(ModelSerializer):
         fields = ['id', 'spending_limit', 'income_limit', 'from_date', 'to_date', 'type']
 
 
+class LimitRuleSerializerGet(LimitRuleSerializer):
+    class Meta:
+        model = LimitRuleSerializer.Meta.model
+        fields = LimitRuleSerializer.Meta.fields + ['active']
+
+
 class UserSerializer(ImageSerializer):
     class Meta:
         model = User
@@ -68,7 +74,7 @@ class ProjectSerializer(ModelSerializer):
 class GroupSerializer(ModelSerializer):
     class Meta:
         model = Group
-        fields = ['id', 'name', 'number', 'is_active', 'leader_id']
+        fields = ['id', 'name', 'number', 'is_active', 'leader_id', 'users']
 
 
 class GroupDetailSerializer(GroupSerializer):

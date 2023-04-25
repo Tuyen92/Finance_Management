@@ -97,7 +97,7 @@ const GroupsUser = () => {
         setTypeFilter(evt.target.value)
       }
 
-    let userCreateGroup = (<></>)
+    
     
 
     let groupLogin = (
@@ -109,6 +109,14 @@ const GroupsUser = () => {
     )
     if (user !== null)
     {
+        let userCreateGroup = (<></>)
+        if (user.is_superuser === true || user.is_staff === true)
+        {
+            userCreateGroup = (
+                <>
+                    <Link style={{ textDecoration: 'none' }} to={`/group/`}><Button style={{ color: '#F1C338' }}><strong>New group</strong></Button></Link>
+                </>)
+        }
         groupLogin = (
         <>
             <div align="left">
@@ -210,15 +218,6 @@ const GroupsUser = () => {
                 }
             </div>
         </>)
-
-        if (user.is_superuser === true || user.is_staff === true)
-        {
-            userCreateGroup = (
-                <>
-                    <Link style={{ textDecoration: 'none' }} to={`/group/`}><Button style={{ color: '#F1C338' }}><strong>New group</strong></Button></Link>
-                </>)
-        }
-        
     }
 
     return (

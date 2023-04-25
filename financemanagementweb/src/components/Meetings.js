@@ -70,6 +70,15 @@ const Meetings = () => {
   )
   if (user !== null)
   {
+    let userCreateMeeting = (<></>)
+    if (user.is_staff === true || user.is_superuser === true)
+    {
+      userCreateMeeting = (
+        <>
+          <Link style={{ textDecoration: 'none' }} to={`/meeting_schedule/`}><Button style={{ color: '#F1C338' }}><strong>New meetings</strong></Button></Link>
+        </>
+      )
+    }
     meetingLogin = (
       <>
         <div align="leaf">
@@ -125,7 +134,7 @@ const Meetings = () => {
               <MenuItem value="">Decrease</MenuItem>
             </Select>
           </FormControl>
-          <Link style={{ textDecoration: 'none' }} to={`/meeting_schedule/`}><Button style={{ color: '#F1C338' }}><strong>New meetings</strong></Button></Link>
+          {userCreateMeeting}
         </div>
         
         <div style={{ display: "flex", height: "30px"  }}>

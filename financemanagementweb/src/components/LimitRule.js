@@ -17,7 +17,6 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import Pagination from '@mui/material/Pagination';
 import { UseContext } from "../configs/UseContext";
 
 
@@ -41,6 +40,7 @@ const LimitRules = () => {
       "date_from": "",
       "to_date": ""
     })
+    const[inactive, setInactive] = useState("")
 
     useEffect(() => {
         const loadLimitRules = async () => {
@@ -74,11 +74,17 @@ const LimitRules = () => {
           if (date_to !== null)
             e += `&date_to=${filter.date_to}`
 
-          let res =  await API.get(e)
+          let res =  await authAPI().get(e)
           setNext(res.data.next)
           setPrevious(res.data.previous)
           // console.log(res.data.results)
           setLimitRule(res.data.results)
+
+          if (inactive != 1)
+          {
+            let eInactive = `${endpoints['limit_rules']}active`
+            let resInactive = await authAPI().put(eInactive)
+          }
         }
 
         loadLimitRules()
@@ -86,27 +92,33 @@ const LimitRules = () => {
 
     const search = (evt) => {
       evt.preventDefault()
-      nav(`/spendings/?content=${kw}`)
+      nav(`/limit_rule/?content=${kw}`)
     }
 
     const filtSpending = (evt) => {
       evt.preventDefault()
-      nav(`/spendings/?spending_limit_from=${filter.spending_limit_from}&spending_limit_to=${filter.spending_limit_to}`)
+      nav(`/limit_rule/?spending_limit_from=${filter.spending_limit_from}&spending_limit_to=${filter.spending_limit_to}`)
     }
 
     const filtIncome = (evt) => {
       evt.preventDefault()
-      nav(`/spendings/?income_limit_from=${filter.income_limit_from}&income_limit_to=${filter.income_limit_to}`)
+      nav(`/limit_rule/?income_limit_from=${filter.income_limit_from}&income_limit_to=${filter.income_limit_to}`)
     }
 
     const filtDate = (evt) => {
       evt.preventDefault()
-      nav(`/spendings/?from_date=${filter.from_date}&to_date=${filter.to_date}`)
+      nav(`/limit_rule/?from_date=${filter.from_date}&to_date=${filter.to_date}`)
     }
 
     const setValue = e => {
       const { name, value } = e.target
       setFilter(current => ({...current, [name]:value}))
+    }
+
+    const inactiveLimitRule = async () => {
+      let eInactive = `${endpoints['limit_rules']}active`
+      let resInactive = await authAPI().put(eInactive)
+      setInactive(1)
     }
 
     const nextPage = () => setPage(current => current + 1)
@@ -192,7 +204,6 @@ const LimitRules = () => {
               </TableHead>
               <TableBody>
                 {limitRule.map(l => {
-                  let url = `/limit_rule/${l.id}`
                   return (
                     <TableRow key={l.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
                       <TableCell component="th" scope="row">{l.id}</TableCell>
@@ -201,8 +212,14 @@ const LimitRules = () => {
                       <TableCell align="right">{Numeral(l.income_limit).format('0,0')}</TableCell>
                       <TableCell align="right">{format(new Date(l.from_date), 'dd/MM/yyyy HH:mm:ss')}</TableCell>
                       <TableCell align="right">{format(new Date(l.to_date), 'dd/MM/yyyy HH:mm:ss')}</TableCell>
-                      <TableCell component="th" scope="row"><Link style={{ textDecoration: 'none' }} to={url}><Button style={{ color: '#F46841' }}><strong>Inactive</strong></Button></Link></TableCell>
-                    </TableRow>
+                      {l.type === '0'?
+                      <TableCell component="th" scope="row" style={{ color: '#F46841' }}><strong>-</strong></TableCell>:
+                      l.active === true?
+                      <TableCell component="th" scope="row"><Button onClick={inactiveLimitRule} style={{ color: '#609b56' }}><strong>Active</strong></Button></TableCell>:
+                      l.active !== true?
+                      <TableCell component="th" scope="row"><Button onClick={inactiveLimitRule} style={{ color: '#F46841' }}><strong>Inacctive</strong></Button></TableCell>:
+                      <span />}
+                      </TableRow>
                 )})}
               </TableBody>
             </Table>
