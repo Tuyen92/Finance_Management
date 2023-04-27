@@ -45,6 +45,7 @@ import Button from '@mui/material/Button';
 import { useContext } from "react"
 import RegisterUser from './components/RegisterUser';
 import NewLimitRule from './components/NewLimitRule';
+import UserDetail from './components/UserDetail';
 
 
 function App() {
@@ -109,7 +110,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   };
 
   const [user, dispatch] = React.useReducer(MyUserReducer, cookie.load('current_user') || null)
-
+  console.log(user)
   const logout = () => {
     dispatch({
         "type": "logout"
@@ -126,7 +127,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     userLogin = 
     (
       <>
-        <Link style={{ color: '#FFECC9', textDecoration: 'none', marginRight: '1%' }} to="/user/current_user/"><Avatar alt="Remy Sharp" src={"./user.jpg"} /></Link>
+        <Link style={{ color: '#FFECC9', textDecoration: 'none', marginRight: '1%' }} to="/user/current_user/"><Avatar alt={"./user.jpg"} src={user.avatar} /></Link>
         <Button style={{ color: '#FFECC9', textDecoration: 'none' }} onClick={logout}><strong>Logout</strong></Button>
       </>
     )
@@ -235,6 +236,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                   <Route path='/login/' element={<Login />}/>
                   <Route path='/register/' element={<RegisterUser /> }/>
                   <Route path='/user/' element={<Users />}/>
+                  <Route path='/user/:userId/' element={<UserDetail />}/>
                   <Route path='/user/current_user/' element={<CurrentUser />}/>
                   <Route path='/groups/' element={<GroupsUser />}/>
                   <Route path='/groups/:groupId/' element={<GroupDetail />}/>

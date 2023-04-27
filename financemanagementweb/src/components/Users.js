@@ -41,7 +41,7 @@ const Users = () => {
 
     useEffect(() => {
         const loadUsers = async () => {
-            let res = await authAPI().get(endpoints['user'])
+            let res = await authAPI().get(endpoints['users'])
             setUsers(res.data.results)
             setNext(res.data.next)
             setPrevious(res.data.previous)
@@ -137,7 +137,7 @@ const Users = () => {
                         </TableHead>
                         <TableBody>
                             {users.map(u => {
-                                let url = `/spendings/${u.id}/`
+                                let url = `/user/${u.id}/`
                                 return (
                                 <TableRow key={u.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
                                 <TableCell component="th" scope="row">{u.id}</TableCell>

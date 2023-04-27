@@ -22,8 +22,8 @@ const NewGroup = () => {
             try {
                 let form = new FormData
                 form.append("name", group.name)
-                form.append("leader_id", group.leader_id)
-                form.append("project", group.project)
+                form.append("leader_id", parseInt(group.leader_id))
+                form.append("project", parseInt(group.project))
                 form.append("users", group.users)
                 console.log(form)
                 let res = await authAPI().post(endpoints['new_group'], form)

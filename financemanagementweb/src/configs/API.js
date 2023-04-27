@@ -1,8 +1,9 @@
 import axios from "axios";
+import { useId } from "react";
 import * as cookie from 'react-cookies';
 
 export const endpoints = {
-    "user": "/user/",
+    "users": "/user/",
     "groups": "/groups/",
     "group": (groupId) => `/groups/${groupId}`,
     "new_group": "/group/",
@@ -20,8 +21,10 @@ export const endpoints = {
     "meetings": "/meetings/",
     "meeting": (meetingId) => `/meetings/${meetingId}`,
     "new_meeting": "/meeting/",
+    "vote": "/vote/",
     "login": "/o/token/",
     "current_user": "/user/current_user/",
+    "user": (userId) => `/user/${userId}`, 
     "register": "/register/",
     "change_password": "/user/change_password/"
 }

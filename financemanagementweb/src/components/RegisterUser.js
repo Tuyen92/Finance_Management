@@ -9,6 +9,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
+import InputItem from '../layouts/InputItem';
+import { useRef } from 'react';
 
 
 const RegisterUser = () => {
@@ -24,7 +26,6 @@ const RegisterUser = () => {
         "sex": "",
         "address": "",
         "phone": "",
-        "avatar": "",
         "role": ""
     })
     const headers = {
@@ -32,42 +33,9 @@ const RegisterUser = () => {
             "Accept": "*/*",
             "Content-Type": "multipart/form-data"}
     }
-
-    // LONG
-    // const [firstName, setFirstName] = useState('')
-    // const [lastName, setLastName] = useState('')
-    // const [email, setEmail] = useState('')
-    // const [username, setUsername] = useState('')
-    // const [password, setPassword] = useState('')
-    // const [birthday, setDateOfBirth] = useState('')
-
-    // function handleSubmit(event) {
-    //     event.preventDefault();
-    //     axios.post("http://127.0.0.1:8000/register/",{
-    //         "username": username,
-    //         "password": password,
-    //         "firstName": firstName,
-    //         "lastName": lastName,
-    //         "email": email,
-    //         "birthday": birthday,
-    //         "address": "aaaaa",
-    //         "phone": "0123456",
-    //         "is_active": true
-    //     })
-    // }
-
-        // let res = API.post(endpoints['register'], {
-        //     "username": username,
-        //     "password": password,
-        //     "firstName": firstName,
-        //     "lastName": lastName,
-        //     "email": email,
-        //     "birthday": birthday,
-        //     "address": "aaaaa",
-        //     "phone": "0123456",
-        //     "is_active": true
-        // })
+    const avatar = useRef()
     
+        
     const register = (evt) => {
         evt.preventDefault()
 
@@ -75,14 +43,18 @@ const RegisterUser = () => {
             try {
                 let form = new FormData()
                 form.append("username", user.username)
-                form.append("firstName", user.first_name)
-                form.append("lastName", user.last_name)
+                form.append("first_name", user.first_name)
+                form.append("last_name", user.last_name)
                 form.append("email", user.email)
                 form.append("birthday", user.birthday)
                 form.append("sex", user.sex)
                 form.append("address", user.address)
                 form.append("phone", user.phone)
-                form.append("avatar", user.avatar)
+
+                // console.log(avatar)
+                if (avatar.current.files.length > 0)
+                    form.append("avatar", avatar.current.files[0])
+
                 if (user.role === 3)
                 {
                     form.append("is_superuser", 1)
@@ -92,11 +64,12 @@ const RegisterUser = () => {
                 {
                     form.append("is_staff", 1)
                 }
-                if (user.password === user.con)
+                if (user.password === user.confirm_password)
                 {
                     form.append("password", user.password)
                 }
                 let res = await authAPI().post(endpoints['register'], form, headers)
+
                 if (res.status === 201)
                     nav("/user/")
             } catch (ex) {
@@ -158,9 +131,9 @@ const RegisterUser = () => {
                         </Stack>
                         
                         <Stack spacing={2} direction="row" style={{ marginBottom: '0.3%' }}>
-                            <TextField type="file" variant='outlined' name="avatar" onChange={setValue} value={user.avatar} 
-                                style={{ width: '100%', marginBottom: '2%' }} />
-                                
+                        <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Avatar: </h4>
+                            <InputItem type="file" ref={avatar} name="avatar" />
+                            
                             <TextField type="email" variant='outlined' label="Email" name="email" onChange={setValue} value={user.email} 
                                 style={{ width: '100%', marginBottom: '2%' }}  required />
                         </Stack>
@@ -181,7 +154,7 @@ const RegisterUser = () => {
                         </div>
                         <br />
                     </form>
-                    <small style={{ color: '#F46841' }}>Already have an account? <Link style={{ textDecoration: 'none', color: '#F46841' }} to="/login">Login Here</Link></small>
+                    {/* <small style={{ color: '#F46841' }}>Already have an account? <Link style={{ textDecoration: 'none', color: '#F46841' }} to="/login">Login Here</Link></small> */}
                 </FormGroup>
             </Container>
             <br />

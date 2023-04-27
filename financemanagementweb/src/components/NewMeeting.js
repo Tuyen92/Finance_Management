@@ -17,17 +17,17 @@ const NewMeeting = () => {
     })
 
     const create = (evt) => {
-        evt.PreventDefault()
+        evt.preventDefault()
 
         const process = async () => {
             try {
                 let form = new FormData()
                 form.append("content", meeting.content)
-                form.append("datetime", meeting.datetime)
+                form.append("date_time", meeting.date + " " + meeting.time)
                 form.append("description", meeting.description)
                 form.append("group", meeting.group)
 
-                let res = await authAPI().get(endpoints['new_meeting'], form)
+                let res = await authAPI().post(endpoints['new_meeting'], form)
                 if (res.status === 201)
                     nav("/meetings/")
             } catch (ex) {

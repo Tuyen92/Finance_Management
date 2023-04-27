@@ -258,6 +258,7 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
                 elif p.is_ended == True:
                     p.is_ended = False
                 p.save()
+                return Response(status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except:
@@ -656,6 +657,23 @@ class IncomeViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retrieve
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    # Confirm income
+    @action(methods=['put'], detail=True, url_path="confirm")
+    def confirm(self, request, pk):
+        try:
+            if request.method.__eq__('PUT'):
+                i = self.get_object()
+                if i.is_confirm == True:
+                    i.is_confirm = False
+                elif i.is_confirm == False:
+                    i.is_confirm = True
+                i.save()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class IncomeViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = Income.objects.all()
@@ -759,6 +777,8 @@ class MeetingScheduleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics
         try:
             if request.method.__eq__('PUT'):
                 m = self.get_object()
+                v, created = Voting.objects.get_or_create(meeting_schedule=m, user=request.user)
+                v.save()
                 m.vote = m.vote + 1
                 m.save()
                 return Response(MeetingScheduleSerializer(m, context={'request': request}).data, status=status.HTTP_200_OK)
@@ -871,3 +891,28 @@ class LimitRuleViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
 
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
+
+
+# VOTE
+class VoteViewSet(viewsets.ViewSet, generics.ListAPIView):
+    queryset = Voting.objects.all()
+    serializer_class = VotingSerializer
+
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
+
+    def filter_queryset(self, queryset):
+        queryset = queryset.filter(user=self.request.user)
+        return queryset
+
+    # @action(methods=['get'], detail=True)
+    # def vote(self, request, pk):
+    #     try:
+    #         if request.method.__eq__('GET'):
+    #             queryset = Voting.objects.all()
+    #             queryset = queryset.filter(user=request.user)
+    #             return queryset
+    #         else:
+    #             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    #     except:
+    #         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

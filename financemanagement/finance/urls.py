@@ -18,6 +18,7 @@ r.register('project', views.ProjectViewSetCreate)
 r.register('projects', views.ProjectViewSetGet)
 r.register('meeting', views.MeetingScheduleViewSetCreate)
 r.register('meetings', views.MeetingScheduleViewSetGet)
+r.register('vote', views.VoteViewSet)
 
 urlpatterns = [
     path('', include(r.urls))

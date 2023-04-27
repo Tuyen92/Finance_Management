@@ -42,7 +42,7 @@ const Meetings = () => {
           e += `&content=${content}`
 
         
-        let res =  await API.get(e)
+        let res =  await authAPI().get(e)
         setNext(res.data.next)
         setPrevious(res.data.previous)
         // console.log(res.data.results)

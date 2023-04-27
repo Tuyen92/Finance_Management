@@ -30,7 +30,6 @@ class UserSerializer(ImageSerializer):
         fields = ['id', 'first_name', 'last_name', 'sex', 'birthday', 'address', 'phone', 'email', 'is_superuser',
                   'is_staff', 'is_active', 'avatar', 'username', 'password']
         extra_kwargs = {
-            'avatar': {'write_only': True},
             'password': {'write_only': True}
         }
 
@@ -119,3 +118,12 @@ class MeetingScheduleCreateSerializer(ModelSerializer):
     class Meta:
         model = MeetingSchedule
         fields = ['id', 'date_time', 'vote', 'content', 'description', 'is_active', 'group']
+
+
+class VotingSerializer(ModelSerializer):
+    user = UserSerializer()
+    meeting_schedule = MeetingScheduleSerializer()
+
+    class Meta:
+        model = Voting
+        fields = ['voting_time', 'user', 'meeting_schedule', 'vote']

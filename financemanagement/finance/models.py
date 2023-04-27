@@ -10,6 +10,7 @@ class User(AbstractUser):
     address = models.CharField(null=True, max_length=255)
     phone = models.CharField(null=False, max_length=50)
     limit_rule = models.ForeignKey('LimitRule', on_delete=models.CASCADE, default=1)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.username
@@ -92,3 +93,13 @@ class LimitRule(models.Model):
 
     def __str__(self):
         return self.type
+
+
+class Voting(models.Model):
+    voting_time = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    meeting_schedule = models.ForeignKey(MeetingSchedule, on_delete=models.CASCADE)
+    vote = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('user', 'meeting_schedule')

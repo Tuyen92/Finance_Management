@@ -26,14 +26,8 @@ const ProjectDetail = () => {
             res.data.target = Numeral(res.data.target).format('0,0')
             res.data.spending_amount = Numeral(res.data.spending_amount).format('0,0')
             res.data.income_amount = Numeral(res.data.income_amount).format('0,0')
-            res.data.start_date = format(new Date(res.data.start_date), 'dd/MM/yyyy HH:mm:ss')
-            res.data.end_date = format(new Date(res.data.end_date), 'dd/MM/yyyy HH:mm:ss')
-
-            if (ended !== null)
-            {
-                let eEnded = `${endpoints['project'](projectId)}ended/`
-                let resEnded = await authAPI().put(eEnded)
-            }
+            res.data.start_date = format(new Date(res.data.start_date), 'dd/MM/yyyy')
+            res.data.end_date = format(new Date(res.data.end_date), 'dd/MM/yyyy')
             // console.log(res.data)
             setProject(res.data)
         }
@@ -42,7 +36,7 @@ const ProjectDetail = () => {
     }, [projectId, ended])
 
     const endedProject = async () => {
-        let eEnded = `${endpoints['project'](projectId)}/ended/`
+        let eEnded = `${endpoints['project'](projectId)}ended/`
         let resEnded = await authAPI().put(eEnded)
         setEnded(1)
     }
@@ -78,15 +72,8 @@ const ProjectDetail = () => {
                     <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Working: </h4>
                     <span></span>
                     {project.is_ended === true?
-                        <>
-                            <Checkbox checked={false} style={{ color: "#F1C338", marginRight: '1%' }} />
-                        </>:
-                        <>
-                            <Checkbox checked={true} style={{ color: "#F1C338", marginRight: '1%' }} />
-                            {/* {user.is_supperuser === true || user.is_staff === true?
-                            <Button variant="contained" onClick={accept} style={{ backgroundColor: "#609b56", color: '#FFECC9', height: '10%', marginTop: '1%' }}>Accept</Button>:
-                            <span />} */}
-                        </>
+                        <Checkbox checked={false} style={{ color: "#F1C338", marginRight: '1%' }} />:
+                        <Checkbox checked={true} style={{ color: "#F1C338", marginRight: '1%' }} />
                     }
                 </div>
                 <br />
@@ -124,9 +111,11 @@ const ProjectDetail = () => {
             <div align="right">
             {user.is_supperuser === true || user.is_staff === true?
             <>
-                <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>Delete</strong></Button></Link>
-                <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F1C338' }}><strong>Update</strong></Button></Link>
-                <Button style={{ color: '#F1C338' }} onClick={endedProject}><strong>End Project</strong></Button>
+                <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841' }}><strong>Delete</strong></Button></Link>
+                <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841' }}><strong>Update</strong></Button></Link>
+                {project.is_ended === true?
+                <Button style={{ color: '#F46841' }} onClick={endedProject}><strong>End Project</strong></Button>:
+                <></>}
             </>:
             <></>}
             </div>
