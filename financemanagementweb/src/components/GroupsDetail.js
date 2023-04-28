@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { authAPI, endpoints } from "../configs/API"
 import { useParams, Link } from "react-router-dom"
 import { Container, Input, TextField } from "@mui/material"
@@ -17,12 +17,18 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
+import { UseContext } from "../configs/UseContext";
 
 
 const GroupDetail = () => {
+    const[currentUser, setCurrentUser] = useContext(UseContext)
     const[group, setGroup] = useState([])
     const {groupId} = useParams()
     const[users, setUser] = useState([])
+    const[updatedGroup, setUpdatedGroup] = useState({
+        "name": "",
+        "project_id": "",
+    })
 
     useEffect(() => {
         const loadGroup = async () => {
@@ -39,6 +45,18 @@ const GroupDetail = () => {
 
         loadGroup()
     }, [groupId])
+
+    const updateGroup = async () => {
+        let form = new FormData()
+        form.append("name", updatedGroup.name)
+        let update = `${endpoints['group'](groupId)}edit/`
+        let resUpdate = await authAPI().put(update, form)
+    }
+
+    const setValue = e => {
+        const { name, value } = e.target
+        setUpdatedGroup(current => ({...current, [name]:value}))
+    }
 
     return (
         <>
@@ -108,7 +126,9 @@ const GroupDetail = () => {
                 <br />
                 <div align='right'>
                     <TextField style={{ marginRight: '2%'}} label="ID of member" />
-                    <Link style={{ textDecoration: 'none' }} to={`/projects/${group.project?.id}/`}><Button style={{ color: '#F46841', marginTop: '1%'  }}><strong>Add member</strong></Button></Link>
+                    {currentUser.is_staff === true?
+                    <Link style={{ textDecoration: 'none' }} to={`/projects/${group.project?.id}/`}><Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9', marginTop: '1%' }}><strong>Add member</strong></Button></Link>:
+                    <span />}
                 </div>
             </Container>
             <div style={{ backgroundColor: "#609b56" }}>
@@ -147,18 +167,46 @@ const GroupDetail = () => {
                     <TextField id="name_project" type="text" value={group.project?.start_date} style={{ marginRight: '2%' }} />
                     <h4 style={{ color: "#F1C338", marginRight: '2%' }}>End date: </h4>
                     <TextField id="name_project" type="text" value={group.project?.end_date} style={{ marginRight: '2%' }} />
-                    <Link style={{ textDecoration: 'none', marginTop: '1%' }} to={`/projects/${group.project?.id}/`}><Button style={{ color: '#F46841' }}><strong>Project detail</strong></Button></Link>
+                    <Link style={{ textDecoration: 'none', marginTop: '1%' }} to={`/projects/${group.project?.id}/`}><Button variant="outline-primary" style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Project detail</strong></Button></Link>
                 </div>
                 <br />
             </Container>
+            {currentUser.is_staff?
+            <>
+                <div style={{ backgroundColor: "#609b56" }}>
+                    <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }}>Update group: </h3>
+                </div>
+                <br />
+                <Container>
+                    <form>
+                        <div style={{ display: 'flex' }}>
+                            <h4 style={{ color: "#F1C338", marginRight: '1%' }}>Name: </h4>
+                            <TextField id="name_project" label="New name of group..." type="text" name="name" value={updatedGroup.name} style={{ width: '100%' }} onChange={updateGroup} />
+                        </div>
+                        <br />
+                        <div style={{ display: 'flex' }}>
+                            <h4 style={{ color: "#F1C338", marginRight: '1%' }}>Project ID: </h4>
+                            <TextField id="name_project" label="New project's Id..." type="text" name="project_id" value={updatedGroup.project_id} onChange={updateGroup} />
+                        </div>
+
+                        <div  align="center">
+                            <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}>Update</Button>
+                        </div>
+                    </form>
+                    <br />
+                </Container>
+            </>:<span />}
             <div style={{ backgroundColor: "#609b56" }}>
                 <br />
             </div>
             <br />
             <div align="right">
                 <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841' }}><strong>Delete</strong></Button></Link>
-                <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841' }}><strong>Update</strong></Button></Link>
-                <Button style={{ color: '#F46841' }}><strong>End group</strong></Button>
+                {currentUser.is_superuser === true?
+                    group.is_active === true?
+                    <Button style={{ color: '#F46841' }}><strong>End group</strong></Button>:
+                    <Button style={{ color: '#F46841' }}><strong>Active group</strong></Button>:
+                    <span />}
             </div>
         </>
     )

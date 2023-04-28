@@ -34,6 +34,7 @@ const Login = () => {
                 cookie.save('access-token', res.data.access_token)
 
                 let user = await authAPI().get(endpoints['current_user'])
+                console.log(user)
                 cookie.save('current_user', user.data)
 
                 dispatch({

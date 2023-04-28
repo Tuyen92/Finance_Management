@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { authAPI, endpoints } from "../configs/API"
 import { Container, FormGroup, Input, TextField, Button } from "@mui/material"
+import { format } from 'date-fns';
 
 
 const CurrentUser = () => {
@@ -9,10 +10,17 @@ const CurrentUser = () => {
         "old_password": "",
         "new_password": ""
     })
-    
+    const[updatedUser, setUpdateUser] = useState({
+        "address": "",
+        "email": "",
+        "phone": ""
+    })
+    let e = `${endpoints['current_user']}`
+
     useEffect(() => {
         const loadCurrentUser = async () => {
-            let res = await authAPI().get(endpoints['current_user'])
+            let res = await authAPI().get(e)
+            res.data.birthday = format(new Date(res.data.birthday), 'dd/MM/yyyy')
             // console.log(res)
             setCurrentUser(res.data)
         }
@@ -36,17 +44,44 @@ const CurrentUser = () => {
         process()
     }
 
-    const setValue = e => {
+    const setValuePassword = e => {
         const { name, value } = e.target
         setPassword(current => ({...current, [name]:value}))
+    }
+
+    const setValueUser = e => {
+        const { name, value} = e.target
+        setUpdateUser(current => ({...current, [name]:value}))
+    }
+
+    const updateUser = (evt) => {
+        evt.preventDefault()
+
+        const process = async () => {
+            try {
+                let form = new FormData()
+                form.append("address", updatedUser.address)
+                form.append("email", updatedUser.email)
+                form.append("phone", updatedUser.phone)
+
+                let res = await authAPI().put(e, form)
+            } catch (ex) {
+
+            }
+        }
+        process()
     }
 
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>USER INFORMATION</h1>
+            <div style={{ backgroundColor: '#609b56'}}>
+                <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }} >Your information</h3> 
+            </div>
+            <br />
             <Container>
                 <div style={{ display: 'flex' }}>
-                    <img style={{ marginRight: '4%', marginTop: '3%', width: '15%', height: '15%'}} src={currentUser.avatar} alt={"../../user.jpg"} />
+                    <img style={{ marginRight: '4%', marginTop: '3%', width: '15%', height: '15%'}} src={currentUser.avatar?currentUser.avatar:"../../user.jpg"} />
                     <div style={{ width: '100%'}}>
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>ID: </h4>
@@ -73,44 +108,75 @@ const CurrentUser = () => {
 
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Phone: </h4>
                             <TextField id="name_group" type="text" value={currentUser.phone} style={{ marginRight: '2%' }} />
-
+                            
+                            <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Role: </h4>
+                            {currentUser.is_superuser === true?
+                            <TextField id="name_group" type="text" value="Superuser" />:
+                            currentUser.is_staff === false?
+                            <TextField id="name_group" type="text" value="User" />:
+                            <TextField id="name_group" type="text" value="Leader" />}
+                        </div>
+                        <br />
+                        <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Limit Rule: </h4>
                             <TextField id="name_group" type="text" value={currentUser.limit_rule} />
                         </div>
                     </div>
-                    
                 </div>
+                <br />
                 <div  align="center">
                     <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}>Update</Button>
                 </div>
             </Container>
-            <br />
             <div style={{ backgroundColor: '#609b56'}}>
-                <br />
+                <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }} >Update your password</h3> 
             </div>
-            <h1 style={{ textAlign: "center", color: "#F1C338" }}>UPDATE PASSWORD</h1>
+            <br />
             <Container>
-                <FormGroup  style={{ width: '100%' }}>
                     <form onSubmit={updatePassword}>
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }} >Old Password:</h4>
-                            <TextField className='col form-control' type="password" label="Old password" name='old_password' value={password.old_password}  onChange={setValue} />
+                            <TextField className='col form-control' type="password" label="Old password" name='old_password' value={password.old_password}  onChange={setValuePassword} />
                         </div>
                         <br />
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>New Password:</h4>
-                            <TextField style={{ marginRight: '2%' }} type="password" label="New password" name='new_password' value={password.new_password}  onChange={setValue} />
+                            <TextField style={{ marginRight: '2%' }} type="password" label="New password" name='new_password' value={password.new_password}  onChange={setValuePassword} />
 
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Re-enter new password:</h4>
                             <TextField className='col form-control' type="password" label="Re-enter password" name='confirmPass' />
                         </div>
-
                         <br />
                         <div  align="center">
                             <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}>Change password</Button>
                         </div>
                     </form>
-                </FormGroup>
+            </Container>
+            <div style={{ backgroundColor: '#609b56'}}>
+                <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }} >Update your information</h3> 
+            </div>
+            <br />
+            <Container>
+                <form onSubmit={updateUser}>
+                    <div style={{ display: 'flex' }}>
+                        <h4 style={{ color: "#F1C338", marginRight: '2%' }} >Address:</h4>
+                        <TextField className='col form-control' type="text" label="New address..." name='old_password' value={updatedUser.address}  onChange={setValueUser} 
+                        style={{ width: '100%' }}/>
+                    </div>
+                    <br />
+                    <div style={{ display: 'flex' }}>
+                        <h4 style={{ color: "#F1C338", marginRight: '2%' }} >Email:</h4>
+                        <TextField className='col form-control' type="text" label="New email..." name='old_password' value={updatedUser.email}  onChange={setValueUser}
+                            style={{ marginRight: '2%'}} />
+                    
+                        <h4 style={{ color: "#F1C338", marginRight: '2%' }} >Phone:</h4>
+                        <TextField className='col form-control' type="text" label="New phone..." name='old_password' value={updatedUser.phone} onChange={setValueUser} />
+                    </div>
+                    <br />
+                    <div  align="center">
+                        <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}>Update</Button>
+                    </div>
+                </form>
             </Container>
         </>
     )

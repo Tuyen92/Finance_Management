@@ -42,10 +42,10 @@ import cookie from 'react-cookies';
 import Avatar from '@mui/material/Avatar';
 import CurrentUser from './components/CurrentUser';
 import Button from '@mui/material/Button';
-import { useContext } from "react"
 import RegisterUser from './components/RegisterUser';
 import NewLimitRule from './components/NewLimitRule';
 import UserDetail from './components/UserDetail';
+import { Navigate } from 'react-router-dom';
 
 
 function App() {
@@ -127,7 +127,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     userLogin = 
     (
       <>
-        <Link style={{ color: '#FFECC9', textDecoration: 'none', marginRight: '1%' }} to="/user/current_user/"><Avatar alt={"./user.jpg"} src={user.avatar} /></Link>
+        <Link style={{ color: '#FFECC9', textDecoration: 'none', marginRight: '1%' }} to="/user/current_user/"><Avatar src={user.avatar?user.avatat:"./user.jpg"} /></Link>
         <Button style={{ color: '#FFECC9', textDecoration: 'none' }} onClick={logout}><strong>Logout</strong></Button>
       </>
     )

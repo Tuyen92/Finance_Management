@@ -26,7 +26,7 @@ const SpendingDetail = () => {
             let res = await authAPI().get(endpoints['spending'](spendingId))
             res.data.spending_amount = Numeral(res.data.spending_amount).format('0,0')
             res.data.implementation_date = format(new Date(res.data.implementation_date), 'dd/MM/yyyy HH:mm:ss')
-            // console.log(res.data)
+            console.log(res.data)
             setSpending(res.data)
         }
 

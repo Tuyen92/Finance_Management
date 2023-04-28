@@ -9,7 +9,7 @@ class ImageSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         if obj.avatar:
             request = self.context.get('request')
-            return request.build_absolute_uri('/static/%s' % obj.avatar.name) if request else ''
+            return request.build_absolute_uri(obj.avatar.name) if request else ''
 
 
 class LimitRuleSerializer(ModelSerializer):
