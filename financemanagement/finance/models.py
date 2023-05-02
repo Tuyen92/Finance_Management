@@ -103,3 +103,31 @@ class Voting(models.Model):
 
     class Meta:
         unique_together = ('user', 'meeting_schedule')
+
+
+class Warning(models.Model):
+    total_income = models.IntegerField()
+    total_spending = models.IntegerField()
+    status = models.CharField(max_length=255)
+    month = models.CharField(max_length=255)
+    quarter = models.IntegerField()
+    group = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class Statistic(models.Model):
+    total_income = models.IntegerField()
+    total_spending = models.IntegerField()
+    status = models.CharField(max_length=255)
+
+    class Meta:
+        abstract = True
+
+
+class GroupStatistic(Statistic):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+
+
+class ProjectStatistic(Statistic):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)

@@ -11,11 +11,12 @@ import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { UseContext } from "../configs/UseContext";
+import Loading from "../layouts/Loading";
 
 
 const IncomeDetail = () => {
     const[user, dispatch] = useContext(UseContext)
-    const[income, setIncome] = useState([])
+    const[income, setIncome] = useState(null)
     const {incomeId} = useParams()
     const[isConfirm, setConfirm] = useState("")
 
@@ -29,13 +30,21 @@ const IncomeDetail = () => {
         }
 
         loadIncome()
-    }, [incomeId])
+    }, [incomeId, isConfirm])
 
     const confirm = async () => {
         let eConfirm = `${endpoints['income'](incomeId)}/confirm/`
         let resConfirm = await authAPI().put(eConfirm)
         setConfirm(1)
     }
+
+    if (income == null)
+    {return(
+    <>
+        <h1 style={{ textAlign: "center", color: "#F1C338" }}>INCOME</h1>
+        <Loading />
+    </>
+    )}
 
     return (
         <>

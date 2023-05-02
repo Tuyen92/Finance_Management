@@ -46,6 +46,7 @@ import RegisterUser from './components/RegisterUser';
 import NewLimitRule from './components/NewLimitRule';
 import UserDetail from './components/UserDetail';
 import { Navigate } from 'react-router-dom';
+import Statistic from './components/Statistic';
 
 
 function App() {
@@ -256,6 +257,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                   <Route path='/limit_rules/' element={<LimiteRule />}/>
                   <Route path='/limit_rule/' element={<NewLimitRule />}/>
                   <Route path='/warning/' element={<Warning />}/>
+                  <Route path='/statistic/:type/:id/' element={<Statistic />}/>
                 </Routes>
                 <Footer />
               </Typography>

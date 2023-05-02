@@ -26,7 +26,9 @@ export const endpoints = {
     "current_user": "/user/current_user/",
     "user": (userId) => `/user/${userId}/`, 
     "register": "/register/",
-    "change_password": "/user/change_password/"
+    "change_password": "/user/change_password/",
+    // "project_statistic": (id) => `/project/${id}/report/`,
+    // "group_statistic": (id) => `/group/${id}/statistic/`
 }
 
 export const authAPI = () => axios.create({

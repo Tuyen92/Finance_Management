@@ -5,7 +5,7 @@ import { Container, Input, TextField } from "@mui/material"
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import Numeral from 'numeral';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -18,6 +18,7 @@ import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
 import { UseContext } from "../configs/UseContext";
+import Loading from "../layouts/Loading";
 
 
 const GroupDetail = () => {
@@ -29,6 +30,8 @@ const GroupDetail = () => {
         "name": "",
         "project_id": "",
     })
+    const[memberId, setMemberId] = useState("") 
+    const[isActive, setActive] = useState("")
 
     useEffect(() => {
         const loadGroup = async () => {
@@ -44,7 +47,7 @@ const GroupDetail = () => {
         }
 
         loadGroup()
-    }, [groupId])
+    }, [groupId, isActive])
 
     const updateGroup = async () => {
         let form = new FormData()
@@ -53,10 +56,44 @@ const GroupDetail = () => {
         let resUpdate = await authAPI().put(update, form)
     }
 
+    const addMember = async () => {
+        let idMember = []
+        idMember.push(memberId)
+        // console.log(memberId)
+        try {
+            let form = new FormData()
+            form.append("users", memberId)
+            let add = `${endpoints['group'](groupId)}add_member/`
+            let resAdd = await authAPI().put(add, form)
+        } catch (ex) {
+            console.log(ex)
+        }
+        
+    }
+
     const setValue = e => {
         const { name, value } = e.target
         setUpdatedGroup(current => ({...current, [name]:value}))
     }
+
+    const setValueMember = e => {
+        const { name, value } = e.target
+        setMemberId(current => ({...current, [name]:value}))
+    }
+
+    const active = async () => {
+        let eActive = `${endpoints['group'](groupId)}active/`
+        let resActive = await authAPI().put(eActive)
+        setActive(1)
+    }
+
+    if (group.length == 0)
+    {return(
+        <>
+            <h1 style={{ textAlign: "center", color: "#F1C338" }}>GROUP</h1>
+            <Loading />
+        </>
+    )}
 
     return (
         <>
@@ -67,25 +104,31 @@ const GroupDetail = () => {
             <br />
             <Container>
                 <div style={{ display: 'flex' }}>
-                    <h4 style={{ color: "#F1C338", marginRight: '1%' }}>ID: </h4>
-                    <TextField id="id" type="text" value={group.id} style={{ width: '10%', marginRight: '1%' }} />
+                    <h4 style={{ color: "#F1C338", marginRight: '2%' }}>ID: </h4>
+                    <TextField id="id" type="text" value={group.id} style={{ width: '10%', marginRight: '2%' }} />
 
-                    <h4 style={{ color: "#F1C338", marginRight: '1%' }}>Name: </h4>
+                    <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Name: </h4>
                     <TextField id="name_group" type="text" value={group.name} style={{ width: '100%' }} />
                 </div>
                 <br />
                 <div style={{ display: 'flex' }}>
-                    <h4 style={{ color: "#F1C338", marginRight: '1%' }}>Number of members: </h4>
-                    <TextField id="number" type="number" value={group.number} style={{ width: '10%', marginRight: '1%' }} />
+                    <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Number of members: </h4>
+                    <TextField id="number" type="number" value={group.number} style={{ width: '10%', marginRight: '2%' }} />
 
-                    <h4 style={{ color: "#F1C338", marginRight: '1%' }}>Leader ID: </h4>
-                    <TextField id="leader" type="text" value={group.leader_id} style={{ width: '10%', marginRight: '1%' }} />
+                    <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Leader ID: </h4>
+                    <TextField id="leader" type="text" value={group.leader_id} style={{ width: '10%', marginRight: '2%' }} />
 
-                    <h4 style={{ color: "#F1C338", marginRight: '1%' }}>Active: </h4>
+                    <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Active: </h4>
                     <span></span>
                     {group.is_active === true?
-                        <Checkbox checked={true} style={{ color: "#F1C338", marginRight: '1%' }} />:
-                        <Checkbox checked={false} style={{ color: "#F1C338", marginRight: '1%' }} />
+                    <>
+                        <Checkbox checked={true} style={{ color: "#F1C338", marginRight: '2%' }} />
+                        <Button size="small" variant="outline-primary" onClick={active} style={{ backgroundColor: '#609b56', color: '#FFECC9', height: '10%', marginTop: '1%' }}><strong>Deactive group</strong></Button>
+                    </>:
+                    <>
+                        <Checkbox checked={false} style={{ color: "#F1C338", marginRight: '2%' }} />
+                        <Button size="small" variant="outline-primary" onClick={active} style={{ backgroundColor: '#609b56', color: '#FFECC9', height: '10%', marginTop: '1%' }}><strong>Active group</strong></Button>
+                    </>                        
                     }
                 </div>
             </Container>
@@ -125,9 +168,13 @@ const GroupDetail = () => {
                 </TableContainer>
                 <br />
                 <div align='right'>
-                    <TextField style={{ marginRight: '2%'}} label="ID of member" />
                     {currentUser.is_staff === true?
-                    <Link style={{ textDecoration: 'none' }} to={`/projects/${group.project?.id}/`}><Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9', marginTop: '1%' }}><strong>Add member</strong></Button></Link>:
+                    <>
+                        <form onSubmit={addMember}>
+                            <TextField style={{ marginRight: '2%'}} label="ID of member" name="users" value={memberId} onChange={(evt) => {setMemberId(evt.target.value)}}/>
+                            <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9', marginTop: '1%' }}><strong>Add member</strong></Button>
+                        </form>
+                    </>:
                     <span />}
                 </div>
             </Container>
@@ -201,12 +248,13 @@ const GroupDetail = () => {
             </div>
             <br />
             <div align="right">
-                <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841' }}><strong>Delete</strong></Button></Link>
+                <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841', marginRight: '2%' }}><strong>Delete</strong></Button></Link>
                 {currentUser.is_superuser === true?
                     group.is_active === true?
-                    <Button style={{ color: '#F46841' }}><strong>End group</strong></Button>:
-                    <Button style={{ color: '#F46841' }}><strong>Active group</strong></Button>:
+                    <Button style={{ color: '#F46841', marginRight: '2%' }}><strong>End group</strong></Button>:
+                    <Button style={{ color: '#F46841', marginRight: '2%' }}><strong>Active group</strong></Button>:
                     <span />}
+                <Link style={{ textDecoration: 'none' }} to={`/statistic/group/${groupId}`}><Button style={{ color: '#F46841', marginRight: '2%' }}><strong>Statistic</strong></Button></Link> 
             </div>
         </>
     )

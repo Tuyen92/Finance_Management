@@ -10,7 +10,7 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 import Numeral from 'numeral';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
 import Select from '@mui/material/Select';
@@ -18,6 +18,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import { UseContext } from "../configs/UseContext";
+import Loading from "../layouts/Loading";
 
 
 const LimitRules = () => {
@@ -28,7 +29,6 @@ const LimitRules = () => {
     const[user, dispatch] = useContext(UseContext)
     const[page, setPage] = useState(1)
     const[pageSize, setPageSize] = useState(2)
-    const[total, setTotal] = useState(0)
     const[next, setNext] = useState(null)
     const[previous, setPrevious] = useState(null)
     const[typeFilter, setTypeFilter] = useState(null)
@@ -44,7 +44,7 @@ const LimitRules = () => {
 
     useEffect(() => {
         const loadLimitRules = async () => {
-          let e = `${endpoints['limit_rules']}?`
+          let e = `${endpoints['limit_rules']}?page_size=${pageSize}&page=${page}`
             
           let type = t.get("type")
           if (type !== null)
@@ -79,16 +79,10 @@ const LimitRules = () => {
           setPrevious(res.data.previous)
           // console.log(res.data.results)
           setLimitRule(res.data.results)
-
-          if (inactive != 1)
-          {
-            let eInactive = `${endpoints['limit_rules']}active`
-            let resInactive = await authAPI().put(eInactive)
-          }
         }
 
         loadLimitRules()
-    }, [t, page, pageSize])
+    }, [t, page, pageSize, inactive])
 
     const search = (evt) => {
       evt.preventDefault()
@@ -115,12 +109,6 @@ const LimitRules = () => {
       setFilter(current => ({...current, [name]:value}))
     }
 
-    const inactiveLimitRule = async () => {
-      let eInactive = `${endpoints['limit_rules']}active`
-      let resInactive = await authAPI().put(eInactive)
-      setInactive(1)
-    }
-
     const nextPage = () => setPage(current => current + 1)
     const prevPage = () => setPage(current => current - 1)
     const changePageSize = (evt) => setPageSize(evt.target.value)
@@ -129,6 +117,15 @@ const LimitRules = () => {
       evt.preventDefault()
       setTypeFilter(evt.target.value)
     }
+
+    if (limitRule.length == 0)
+    {return(
+    <>
+      <div>
+        <h1 style={{ textAlign: 'center', color: '#F1C338' }}>LIMIT RULE LIST</h1>
+      </div>
+      <Loading />
+    </>)}
 
     let userCreateLimitRule = (<></>)
     if (user.is_superuser === true )
@@ -204,6 +201,7 @@ const LimitRules = () => {
               </TableHead>
               <TableBody>
                 {limitRule.map(l => {
+                  let e = `/limit_rules/${l.id}/inactive/`
                   return (
                     <TableRow key={l.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
                       <TableCell component="th" scope="row">{l.id}</TableCell>
@@ -215,9 +213,9 @@ const LimitRules = () => {
                       {l.type === '0'?
                       <TableCell component="th" scope="row" style={{ color: '#F46841' }}><strong>-</strong></TableCell>:
                       l.active === true?
-                      <TableCell component="th" scope="row"><Button onClick={inactiveLimitRule} style={{ color: '#609b56' }}><strong>Active</strong></Button></TableCell>:
+                      <TableCell component="th" scope="row"><Button onClick={() => {authAPI().put(e); setInactive(1)}} style={{ color: '#609b56' }}><strong>Active</strong></Button></TableCell>:
                       l.active !== true?
-                      <TableCell component="th" scope="row"><Button onClick={inactiveLimitRule} style={{ color: '#F46841' }}><strong>Inacctive</strong></Button></TableCell>:
+                      <TableCell component="th" scope="row"><Button onClick={() => {authAPI().put(e); setInactive(1)}} style={{ color: '#F46841' }}><strong>Inactive</strong></Button></TableCell>:
                       <span />}
                       </TableRow>
                 )})}

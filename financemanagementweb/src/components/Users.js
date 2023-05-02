@@ -21,6 +21,7 @@ import Paper from '@mui/material/Paper';
 import Numeral from 'numeral';
 import { format } from 'date-fns';
 import { UseContext } from "../configs/UseContext";
+import Loading from "../layouts/Loading";
 
 
 const Users = () => {
@@ -41,7 +42,8 @@ const Users = () => {
 
     useEffect(() => {
         const loadUsers = async () => {
-            let res = await authAPI().get(endpoints['users'])
+            let e = `${endpoints['users']}?page_size=${pageSize}&page=${page}`
+            let res = await authAPI().get(e)
             setUsers(res.data.results)
             setNext(res.data.next)
             setPrevious(res.data.previous)
@@ -78,6 +80,16 @@ const Users = () => {
     const changeFilter = (evt) => {
         evt.preventDefault()
         setTypeFilter(evt.target.value)
+    }
+
+    if (users.length == 0)
+    {
+        return(<>
+            <div>
+                <h1 style={{ textAlign: 'center', color: '#F1C338' }}>USER LIST</h1>
+            </div>
+            <Loading />
+        </>)
     }
 
     let userLogin = (

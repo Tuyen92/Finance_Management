@@ -11,6 +11,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Checkbox from '@mui/material/Checkbox';
 import { UseContext } from "../configs/UseContext";
+import Loading from "../layouts/Loading";
 
 
 const ProjectDetail = () => {
@@ -63,6 +64,13 @@ const ProjectDetail = () => {
         const { name, value } = e.target
         setUpdateProject(current => ({...current, [name]:value}))
     }
+
+    if (project == null)
+    {return(
+    <>
+        <h1 style={{ textAlign: "center", color: "#F1C338" }}>PROJECT</h1>
+        <Loading />
+    </>)}
 
     return (
         <>
@@ -164,12 +172,13 @@ const ProjectDetail = () => {
             <div align="right">
                 {user.is_supperuser === true || user.is_staff === true?
                 <>
-                    <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841' }}><strong>Delete</strong></Button></Link>
+                    <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841', marginRight: '2%' }}><strong>Delete</strong></Button></Link>
                     {project.is_ended === true?
-                    <Button style={{ color: '#F46841' }} onClick={endedProject}><strong>End Project</strong></Button>:
-                    <Button style={{ color: '#F46841' }} onClick={endedProject}><strong>Active Project</strong></Button>}
+                    <Button style={{ color: '#F46841', marginRight: '2%' }} onClick={endedProject}><strong>End Project</strong></Button>:
+                    <Button style={{ color: '#F46841', marginRight: '2%' }} onClick={endedProject}><strong>Active Project</strong></Button>}
                 </>:
                 <span />}
+                <Link style={{ textDecoration: 'none' }} to={`/statistic/project/${projectId}`}><Button style={{ color: '#F46841', marginRight: '2%' }}><strong>Statistic</strong></Button></Link>
             </div>
         </>
     )

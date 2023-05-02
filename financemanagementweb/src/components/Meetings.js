@@ -19,6 +19,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import { UseContext } from "../configs/UseContext";
+import Loading from "../layouts/Loading";
 
 
 const Meetings = () => {
@@ -35,7 +36,7 @@ const Meetings = () => {
 
   useEffect(() => {
       const loadMeetings = async () => {
-        let e = `${endpoints['meetings']}?`
+        let e = `${endpoints['meetings']}?page_size=${pageSize}&page=${page}`
           
         let content = c.get("content")
         if (content !== null)
@@ -60,6 +61,15 @@ const Meetings = () => {
   const nextPage = () => setPage(current => current + 1)
   const prevPage = () => setPage(current => current - 1)
   const changePageSize = (evt) => setPageSize(evt.target.value)
+
+  if (meeting.length == 0)
+  {return(
+  <>
+    <div>
+        <h1 style={{ textAlign: 'center', color: '#F1C338' }}>MEETING SCHEDULE LIST</h1>
+      </div>
+    <Loading />
+  </>)}
 
   let meetingLogin = (
     <>
@@ -131,7 +141,7 @@ const Meetings = () => {
             <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
               <MenuItem value="" />
               <MenuItem value="">Increase</MenuItem>
-              <MenuItem value="">Decrease</MenuItem>
+              <MenuItem value="">Decrease</MenuItem> 
             </Select>
           </FormControl>
           {userCreateMeeting}

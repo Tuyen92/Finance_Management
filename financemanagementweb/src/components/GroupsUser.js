@@ -17,6 +17,7 @@ import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
 import { UseContext } from "../configs/UseContext";
+import Loading from "../layouts/Loading";
 
 
 const GroupsUser = () => {
@@ -39,7 +40,7 @@ const GroupsUser = () => {
     
     useEffect(() => {
         const loadGroups = async () => {
-            let e = `${endpoints['groups']}?`
+            let e = `${endpoints['groups']}?page_size=${pageSize}&page=${page}`
             
             let name = n.get("name")
             if (name !== null)
@@ -97,8 +98,15 @@ const GroupsUser = () => {
         setTypeFilter(evt.target.value)
       }
 
-    
-    
+    if (group.length == 0)
+    {return(
+        <>
+            <div>
+                <h1 style={{ textAlign: 'center', color: '#F1C338' }}>GROUP LIST</h1>
+            </div>  
+            <Loading />
+        </>
+    )}
 
     let groupLogin = (
         <>

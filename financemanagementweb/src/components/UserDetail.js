@@ -6,10 +6,11 @@ import { Container, TextField } from "@mui/material"
 import { format } from 'date-fns';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
+import Loading from "../layouts/Loading"
 
 const UserDetail = () => {
     const[currentUser, setCurrentUser] = useContext(UseContext)
-    const[user, setUser] = useState("")
+    const[user, setUser] = useState(null)
     const {userId} = useParams()
 
     useEffect(() => {
@@ -21,6 +22,13 @@ const UserDetail = () => {
         }
         loadUser()
     }, [userId])
+
+    if (user == null)
+    {return(
+    <>
+        <h1 style={{ textAlign: "center", color: "#F1C338" }}>USER</h1>
+        <Loading />
+    </>)}
 
     return (
         <>

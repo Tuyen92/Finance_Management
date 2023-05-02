@@ -2,10 +2,11 @@ import { useEffect, useState } from "react"
 import { authAPI, endpoints } from "../configs/API"
 import { Container, FormGroup, Input, TextField, Button } from "@mui/material"
 import { format } from 'date-fns';
+import Loading from "../layouts/Loading";
 
 
 const CurrentUser = () => {
-    const[currentUser, setCurrentUser] = useState("")
+    const[currentUser, setCurrentUser] = useState(null)
     const[password, setPassword] = useState({
         "old_password": "",
         "new_password": ""
@@ -71,6 +72,13 @@ const CurrentUser = () => {
         }
         process()
     }
+
+    if (currentUser == null)
+    {return(
+    <>
+        <h1 style={{ textAlign: "center", color: "#F1C338" }}>USER INFORMATION</h1>
+        <Loading />
+    </>)}
 
     return (
         <>

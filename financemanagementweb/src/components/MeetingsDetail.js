@@ -6,13 +6,15 @@ import { format } from 'date-fns';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import { id } from "date-fns/locale";
+import Loading from "../layouts/Loading";
 
 const MeetingDetail = () => {
-    const[meeting, setMeeting] = useState("")
+    const[meeting, setMeeting] = useState(null)
     const {meetingId} = useParams()
     const[voted, setVote] = useState([])
     const[changeVote, setChangeVote] = useState(0)
     const[showVoteButton, setShowVoteButton] = useState(0)
+    const[isEndMeeting, setEndMeeting] = useState("")
 
     useEffect(() => {
         const loadMeeting = async () => {
@@ -39,11 +41,17 @@ const MeetingDetail = () => {
                     setShowVoteButton(0)
                 }
             }
-            console.log(showVoteButton)
+            // console.log(showVoteButton)
         }
 
         loadMeeting()
-    }, [meetingId, changeVote, showVoteButton])
+    }, [meetingId, changeVote, showVoteButton, isEndMeeting])
+
+    const endMeeting = async () => {
+        let eEndMeeting = `${endpoints['meeting'](meetingId)}active/`
+        let resEndMeeting = await authAPI().put(eEndMeeting)
+        setEndMeeting(1)
+    }
 
     const vote = async (evt) => {
         evt.preventDefault()
@@ -52,6 +60,14 @@ const MeetingDetail = () => {
         setChangeVote(1)
         setShowVoteButton(0)
     }
+
+    if (meeting == null)
+    {return(
+        <>
+            <h1 style={{ textAlign: "center", color: "#F1C338" }}>MEETING SCHEDULE</h1>
+            <Loading />
+        </>
+    )}
 
     return (
         <>
@@ -103,7 +119,7 @@ const MeetingDetail = () => {
             <br />
             <div align="right">
                 <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841' }}><strong>Delete</strong></Button></Link>
-                <Button style={{ color: '#F46841' }}><strong>End meeting</strong></Button>
+                <Button style={{ color: '#F46841' }} onClick={endMeeting}><strong>End meeting</strong></Button>
             </div>
         </>
     )

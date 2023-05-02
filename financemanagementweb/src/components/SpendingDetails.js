@@ -11,9 +11,10 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import Loading from "../layouts/Loading";
 
 const SpendingDetail = () => {
-    const[spending, setSpending] = useState([])
+    const[spending, setSpending] = useState(null)
     const {spendingId} = useParams()
     const[user, dispatch] = useContext(UseContext)
     const nav = useNavigate()
@@ -38,6 +39,13 @@ const SpendingDetail = () => {
         let resAccept = await authAPI().put(eAccept)
         setAccept(1)
     }
+
+    if (spending == null)
+    {return(
+    <>
+        <h1 style={{ textAlign: "center", color: "#F1C338" }}>SPENDING</h1>
+        <Loading />
+    </>)}
 
     return (
         <>

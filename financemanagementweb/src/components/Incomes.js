@@ -18,6 +18,7 @@ import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
 import { UseContext } from "../configs/UseContext";
+import Loading from "../layouts/Loading";
 
 
 const Incomes = () => {
@@ -42,7 +43,7 @@ const Incomes = () => {
 
   useEffect(() => {
       const loadIncomes = async () => {
-        let e = `${endpoints['incomes']}?`
+        let e = `${endpoints['incomes']}?page_size=${pageSize}&page=${page}`
           
         let content = c.get("content")
         if (content !== null)
@@ -111,6 +112,17 @@ const Incomes = () => {
     evt.preventDefault()
     setTypeFilter(evt.target.value)
   }
+
+  if (income.length == 0)
+  {return (
+    <>
+      <div>
+        <h1 style={{ textAlign: 'center', color: '#F1C338' }}>INCOME LIST</h1>
+      </div>
+      <Loading />
+    </>
+  
+)}
 
   let incomeLogin = (
     <>

@@ -19,6 +19,7 @@ import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
 import { UseContext } from "../configs/UseContext";
+import Loading from "../layouts/Loading";
 
 
 const Spendings = () => {
@@ -30,7 +31,6 @@ const Spendings = () => {
     const[user, dispatch] = useContext(UseContext)
     const[page, setPage] = useState(1)
     const[pageSize, setPageSize] = useState(2)
-    const[total, setTotal] = useState(0)
     const[next, setNext] = useState(null)
     const[previous, setPrevious] = useState(null)
     const[typeFilter, setTypeFilter] = useState(null)
@@ -76,7 +76,6 @@ const Spendings = () => {
 
           // console.log(user)
           let res =  await authAPI().get(e)
-          setTotal(res.data.count)
           setNext(res.data.next)
           setPrevious(res.data.previous)
           setSpending(res.data.results)
@@ -120,6 +119,15 @@ const Spendings = () => {
       evt.preventDefault()
       setTypeFilter(evt.target.value)
     }
+
+    if (spending.length == 0)
+    {return (
+    <>
+      <div>
+        <h1 style={{ textAlign: 'center', color: '#F1C338' }}>SPENDING LIST</h1>
+      </div>
+      <Loading />
+    </>)}
 
     let spendingLogin = (
       <>

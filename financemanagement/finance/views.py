@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import requests
 from django.db.models.functions import ExtractQuarter
 from rest_framework import viewsets, permissions, generics, status, parsers
@@ -207,41 +209,32 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # Sum spending, income in project (test)
-    @action(methods=['put'], detail=True, url_path='report')
+    # Statistic project
+    @action(methods=['get'], detail=True, url_path='report')
     def report_project(self, request, pk):
         try:
-            if request.method.__eq__('PUT'):
+            if request.method.__eq__('GET'):
                 p = self.get_object()
                 spending_sum, income_sum = 0, 0
-                spending = Spending.objects.filter(project_id=pk)
-                income = Income.objects.filter(project_id=pk)
-                for s in spending:
-                    spending_sum += s.spending_amount
-                for i in income:
-                    income_sum += i.income_amount
-                p.income_amount = income_sum
-                p.spending_amount = spending_sum
-                p.save()
-                return Response(status=status.HTTP_200_OK)
-            else:
-                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        except:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    # Sum spending, income in each member (not done)
-    @action(methods=['put'], detail=True, url_path='report_member')
-    def report_sum(self, request, pk):
-        try:
-            if request.method.__eq__('PUT'):
-                p = self.get_object()
-                user = self.request.query_params.get('user')
-                spending_sum, income_sum = 0, 0
-                spending = Spending.filter(project_id=p.id)
-                income = Income.filter(project_id=p.id)
-                spending_sum += spending.filter(id_user=user)
-                income_sum += income.filter(id_user=user)
-                return spending_sum, income_sum
+                message = ""
+                now = datetime.now()
+                if now >= p.end_date:
+                    message = "Project is overdue!"
+                    return Response(message, status=status.HTTP_200_OK)
+                else:
+                    queryset_spending = Spending.objects.all()
+                    queryset_spending = queryset_spending.filter(project_id=pk)
+                    queryset_income = Income.objects.all()
+                    queryset_income = queryset_income.filter(project_id=pk)
+                    for s in queryset_spending:
+                        spending_sum = spending_sum + s.spending_amount
+                    for i in queryset_income:
+                        income_sum = income_sum + i.income_amount
+                    p.income_amount = income_sum
+                    p.spending_amount = spending_sum
+                    p.save()
+                    statistic, created = ProjectStatistic.objects.get_or_create(total_spending=spending_sum, total_income=income_sum, status=message, project=p)
+                    return Response(ProjectStatistic(statistic, context={'request': request}).data, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except:
@@ -423,6 +416,32 @@ class GroupViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveA
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    # Statistic
+    @action(methods=['get'], detail=True, url_path='statistic')
+    def statistic_group(self, request, pk):
+        try:
+            if request.method.__eq__('GET'):
+                group = self.get_object()
+                queryset_spending = Spending.objects.all()
+                queryset_income = Income.objects.all()
+                user_list = group.user
+                message=""
+                for u in user_list:
+                    income_sum, spending_sum = 0, 0
+                    queryset_spending = queryset_spending.filter(user=u.id)
+                    queryset_income = queryset_income.filter(user=u.id)
+
+                    for s in queryset_spending:
+                        spending_sum = spending_sum + s.spending_amount
+                    for i in queryset_income:
+                        income_sum = income_sum + i.income_amount
+                    statistic = GroupStatistic.objects.get_or_create(total_spending=spending_sum, total_income=income_sum, status=message, group=group, user=u)
+                return Response(StatisticGroupSerializer(statistic, context={'request': request}).data, status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class GroupViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = Group.objects.all()
@@ -467,7 +486,7 @@ class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIVi
             for k, v in request.data.items():
                 setattr(u, k, v)
             u.save()
-        return Response(UserSerializer(u, context={'request': request}).data, status=status.HTTP_200_OK)
+        return Response(UserDetailSerializer(u, context={'request': request}).data, status=status.HTTP_200_OK)
 
     # Block user
     @action(methods=['post'], detail=True, url_path="block_user")
@@ -524,33 +543,52 @@ class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIVi
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # Warning (not done)
+    # Warning
     @action(methods=['get'], detail=True, url_path='warning')
-    def warning(self, request):
+    def warning(self, request, pk):
         try:
             if request.method.__eq__('GET'):
                 user = self.get_object()
                 spending_sum, income_sum = 0, 0
-                limit_rule = LimitRule.filter(id=user.limit_rule__id)
-                if limit_rule.type.__eq__('Month'):
-                    month = self.request.query_params.get('month')
-                    spending = Spending.filter(id_user=user.id)
-                    income = Income.filter(id_user=user.id)
-                    spending_sum += spending.filter(implementation_date__month=month)
-                    income_sum += income.filter(implementation_date__month=month)
-                if limit_rule.type.__eq__('Year'):
-                    year = self.request.query_params.get('year')
-                    spending = Spending.filter(id_user=user.id)
-                    income = Income.filter(id_user=user.id)
-                    spending_sum += spending.filter(implementation_date__year=year)
-                    income_sum += income.filter(implementation_date__year=year)
-                if limit_rule.type.__eq__('Quarter'):
-                    quarter = self.request.query_params.get('quarter')
-                    spending = Spending.filter(id_user=user.id)
-                    income = Income.filter(id_user=user.id)
-                    spending_sum += spending.filter(implementation_date__quater=quarter)
-                    income_sum += income.filter(implementation_date__quater=quarter)
+                month = self.request.query_params.get("month")
+                quarter = self.request.query_params.get("quarter")
+                group = self.request.query_params.get("group")
+                limit_rule = LimitRule.objects.get(id=user.limit_rule.id)
                 message = ""
+                queryset_spending = Spending.objects.all()
+                queryset_spending = queryset_spending.filter(user=user.id)
+                queryset_income = Income.objects.all()
+                queryset_income = queryset_income.filter(user=user.id)
+                if limit_rule.id == 1:
+                    message = "Your limit rule id is 0"
+                    return Response(message, status=status.HTTP_200_OK)
+                if month:
+                    queryset_spending = queryset_spending.filter(implementation_date__month=month)
+                    for s in queryset_spending:
+                        spending_sum = spending_sum + s.spending_amount
+
+                    queryset_income = queryset_income.filter(implementation_date__month=month)
+                    for i in queryset_income:
+                        income_sum = income_sum + i.income_amount
+
+                if quarter:
+                    queryset_spending = queryset_spending.filter(implementation_date__quarter=quarter)
+                    for s in queryset_spending:
+                        spending_sum = spending_sum + s.spending_amount
+
+                    queryset_income = queryset_income.filter(implementation_date__quarter=quarter)
+                    for i in queryset_income:
+                        income_sum = income_sum + i.income_amount
+
+                if group:
+                    queryset_spending = queryset_spending.filter(group_id=group)
+                    for s in queryset_spending:
+                        spending_sum = spending_sum + s.spending_amount
+
+                    queryset_income = queryset_income.filter(group_id=group)
+                    for i in queryset_income:
+                        income_sum = income_sum + i.income_amount
+
                 if spending_sum >= limit_rule.spending_limit:
                     message = "Over spending! "
                 else:
@@ -559,7 +597,9 @@ class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIVi
                     message += "Over income!"
                 else:
                     message += "Stable income"
-                return Response(message)
+                warning, created = Warning.objects.get_or_create(total_income=income_sum, total_spending=spending_sum, status=message,
+                                                                 month=month, quarter=quarter, group=group, user=request.user)
+                return Response(WarningSerializer(warning, context={'request': request}).data, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
             return Response(status=status.HTTP_200_OK)
@@ -879,6 +919,7 @@ class LimitRuleViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retri
                 elif lr.active == False:
                     lr.active = True
                 lr.save()
+                return Response(status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except:

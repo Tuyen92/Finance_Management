@@ -127,3 +127,17 @@ class VotingSerializer(ModelSerializer):
     class Meta:
         model = Voting
         fields = ['voting_time', 'user', 'meeting_schedule', 'vote']
+
+
+class WarningSerializer(ModelSerializer):
+    class Meta:
+        model = Warning
+        fields = ['total_income', 'total_spending', 'status']
+
+
+class StatisticGroupSerializer(WarningSerializer):
+    user = UserDetailSerializer
+
+    class Meta:
+        model = WarningSerializer.Meta.model
+        fields = WarningSerializer.Meta.fields + ['user']
