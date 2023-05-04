@@ -52,6 +52,8 @@ class Group(models.Model):
     leader_id = models.CharField(max_length=10)
     project = models.ForeignKey('Project', on_delete=models.CASCADE, default=True)
     users = models.ManyToManyField('User', related_name='group')
+    income_amount = models.IntegerField(null=False, default=0)
+    spending_amount = models.IntegerField(null=False, default=0)
 
     def __str__(self):
         return self.name
@@ -61,11 +63,11 @@ class Project(models.Model):
     name_project = models.CharField(null=False, max_length=100)
     describe = RichTextField(null=False)
     target = models.IntegerField(null=False)
-    income_amount = models.IntegerField(null=False, default=0)
-    spending_amount = models.IntegerField(null=False, default=0)
     start_date = models.DateTimeField(null=False)
     end_date = models.DateTimeField(null=False)
     is_ended = models.BooleanField(default=False)
+    income_amount = models.IntegerField(null=False, default=0)
+    spending_amount = models.IntegerField(null=False, default=0)
 
     def __str__(self):
         return self.name_project
@@ -108,26 +110,31 @@ class Voting(models.Model):
 class Warning(models.Model):
     total_income = models.IntegerField()
     total_spending = models.IntegerField()
-    status = models.CharField(max_length=255)
-    month = models.CharField(max_length=255)
-    quarter = models.IntegerField()
-    group = models.IntegerField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=255, null=True)
+    month = models.CharField(max_length=255, null=True)
+    quarter = models.IntegerField(null=True)
+    group = models.IntegerField(null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=True)
 
 
 class Statistic(models.Model):
     total_income = models.IntegerField()
     total_spending = models.IntegerField()
     status = models.CharField(max_length=255)
+    statistic_date = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         abstract = True
 
 
 class GroupStatistic(Statistic):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    group = models.ForeignKey('Group', on_delete=models.CASCADE)
+    percent_spending = models.CharField(max_length=20, null=True, default=0)
+    percent_income = models.CharField(max_length=20, null=True, default=0)
 
 
 class ProjectStatistic(Statistic):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey('Project', on_delete=models.CASCADE)
+    percent_spending = models.CharField(max_length=20, null=True, default=0)
+    percent_income = models.CharField(max_length=20, null=True, default=0)

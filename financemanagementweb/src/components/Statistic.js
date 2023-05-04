@@ -21,6 +21,7 @@ import TableRow from '@mui/material/TableRow';
 import { Link } from "react-router-dom"
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
+import { wait } from "@testing-library/user-event/dist/utils"
 
 
 const Statistic = () => {
@@ -28,6 +29,8 @@ const Statistic = () => {
     const[group, setGroup] = useState(null)
     const[users, setUsers] = useState([])
     const[project, setProject] = useState(null)
+    const[groupStatistic, setGroupStatistic] = useState([])
+    const[projectStatistic, setProjectStatistic] = useState([])
     const {type, id} = useParams()
 
     useEffect(() => {
@@ -48,6 +51,11 @@ const Statistic = () => {
 
                 let eStatistic = e + "report/"
                 let resStatistic = await authAPI().get(eStatistic)
+
+                let eGetStatistic = `${endpoints['project_statistic']}?id=${id}`
+                let resGetStatistic = await authAPI().get(eGetStatistic)
+                setProjectStatistic(resGetStatistic.data.results)
+                console.log(projectStatistic)
             }
 
             if (type == 'group')
@@ -59,6 +67,12 @@ const Statistic = () => {
 
                 let eStatistic = e + "statistic/"
                 let resStatistic = await authAPI().get(eStatistic)
+
+                let eGetStatistic = `${endpoints['group_statistic']}?id=${id}`
+                let resGetStatistic = await authAPI().get(eGetStatistic)
+                // console.log(resGetStatistic)
+                setGroupStatistic(resGetStatistic.data.results)
+                // console.log(groupStatistic)
             }
         }
         loading()
@@ -86,7 +100,7 @@ const Statistic = () => {
                     </div>
                 </Container>
                 <div style={{ backgroundColor: "#609b56" }}>
-                    <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }}>Group's statistic: </h3>
+                    <h3 style={{ color: "#FFECC9", marginLeft: "20px" }}>Group's statistic: </h3>
                 </div>
                 <br />
                 <Container>
@@ -99,27 +113,34 @@ const Statistic = () => {
                                 <TableCell component="th" scope="row"><strong>Role</strong></TableCell>
                                 <TableCell component="th" scope="row"><strong>Total spending</strong></TableCell>
                                 <TableCell component="th" scope="row"><strong>Total income</strong></TableCell>
+                                <TableCell component="th" scope="row"><strong> % Spending</strong></TableCell>
+                                <TableCell component="th" scope="row"><strong>% Income</strong></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                            {users.map(u => {
-                                let url = `/user/${u.id}/`
+                            {groupStatistic.map(gs => {
+                                // let url = `/user/${u.id}/`
                                 return (
-                                <TableRow key={u.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                    <TableCell component="th" scope="row">{u.id}</TableCell>
-                                    <TableCell component="th" scope="row">{u.first_name} {u.last_name}</TableCell>
-                                    {u.is_superuser === true?
+                                <TableRow key={gs.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                    <TableCell component="th" scope="row">{gs.user.id}</TableCell>
+                                    <TableCell component="th" scope="row">{gs.user.first_name} {gs.user.last_name}</TableCell>
+                                    {gs.user.is_superuser === true?
                                         <TableCell component="th" scope="row" typeof="text" style={{ color: '#609b56' }}>Superuser</TableCell>:
-                                        u.is_staff === false?
+                                        gs.user.is_staff === false?
                                         <TableCell component="th" scope="row" typeof="text">User</TableCell>:
                                         <TableCell component="th" scope="row" typeof="text" style={{ color: '#F1C338' }}>Leader</TableCell>
                                     }
+                                    <TableCell component="th" scope="row">{gs.total_spending}</TableCell>
+                                    <TableCell component="th" scope="row">{gs.total_income}</TableCell>
+                                    <TableCell component="th" scope="row">{gs.percent_spending} %</TableCell>
+                                    <TableCell component="th" scope="row">{gs.percent_income} %</TableCell>
                                 </TableRow>)
                                 })} 
                             </TableBody>
                         </Table>
                     </TableContainer>
                 </Container>
+                <br />
             </>
         )
     }

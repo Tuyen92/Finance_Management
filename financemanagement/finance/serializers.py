@@ -66,14 +66,13 @@ class SpendingCreateSerializer(SpendingSerializer):
 class ProjectSerializer(ModelSerializer):
     class Meta:
         model = Project
-        fields = ['id', 'name_project', 'target', 'describe', 'income_amount', 'spending_amount', 'start_date',
-                  'end_date', 'is_ended']
+        fields = ['id', 'name_project', 'target', 'describe', 'start_date', 'end_date', 'is_ended', 'income_amount', 'spending_amount']
 
 
 class GroupSerializer(ModelSerializer):
     class Meta:
         model = Group
-        fields = ['id', 'name', 'number', 'is_active', 'leader_id', 'users']
+        fields = ['id', 'name', 'number', 'is_active', 'leader_id', 'users', 'income_amount', 'spending_amount']
 
 
 class GroupDetailSerializer(GroupSerializer):
@@ -132,12 +131,21 @@ class VotingSerializer(ModelSerializer):
 class WarningSerializer(ModelSerializer):
     class Meta:
         model = Warning
-        fields = ['total_income', 'total_spending', 'status']
+        fields = ['total_income', 'total_spending', 'status', 'group', 'user']
 
 
-class StatisticGroupSerializer(WarningSerializer):
-    user = UserDetailSerializer
+class GroupStatisticSerializer(ModelSerializer):
+    user = UserDetailSerializer()
+    group = GroupDetailSerializer()
 
     class Meta:
-        model = WarningSerializer.Meta.model
-        fields = WarningSerializer.Meta.fields + ['user']
+        model = GroupStatistic
+        fields = ['total_income', 'total_spending', 'status', 'group', 'user', 'statistic_date', 'percent_spending', 'percent_income']
+
+
+class ProjectStatisticSerializer(ModelSerializer):
+    project = ProjectSerializer()
+
+    class Meta:
+        model = ProjectStatistic
+        fields = ['total_income', 'total_spending', 'status', 'project', 'statistic_date', 'percent_spending', 'percent_income']

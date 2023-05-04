@@ -218,8 +218,10 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
                 spending_sum, income_sum = 0, 0
                 message = ""
                 now = datetime.now()
-                if now >= p.end_date:
-                    message = "Project is overdue!"
+                message = str(now) + " " + str(p.end_date)
+                if now.date() >= p.end_date.date():
+                    if now.time() >= p.end_date.time():
+                        message = "Project is overdue!"
                     return Response(message, status=status.HTTP_200_OK)
                 else:
                     queryset_spending = Spending.objects.all()
@@ -233,8 +235,13 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
                     p.income_amount = income_sum
                     p.spending_amount = spending_sum
                     p.save()
-                    statistic, created = ProjectStatistic.objects.get_or_create(total_spending=spending_sum, total_income=income_sum, status=message, project=p)
-                    return Response(ProjectStatistic(statistic, context={'request': request}).data, status=status.HTTP_200_OK)
+                    queryset_statistic = ProjectStatistic.objects.all()
+                    queryset_statistic = queryset_statistic.filter(project=p.id)
+                    if not queryset_statistic:
+                        statistic, _ = ProjectStatistic.objects.get_or_create(total_spending=spending_sum, total_income=income_sum,
+                                                                              status=message, project=p)
+                        return Response(ProjectStatisticSerializer(statistic, context={'request': request}).data, status=status.HTTP_200_OK)
+                    return Response(message, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except:
@@ -265,6 +272,20 @@ class ProjectViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
 
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
+
+
+# Get statistic
+class ProjectStatisticViewSet(viewsets.ViewSet, generics.ListAPIView):
+    queryset = ProjectStatistic.objects.all()
+    serializer_class = ProjectStatisticSerializer
+
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
+
+    def filter_queryset(self, queryset):
+        project_id = self.request.query_params.get("id")
+        queryset = queryset.filter(project=project_id)
+        return queryset
 
 
 # GROUP
@@ -424,19 +445,60 @@ class GroupViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveA
                 group = self.get_object()
                 queryset_spending = Spending.objects.all()
                 queryset_income = Income.objects.all()
-                user_list = group.user
-                message=""
-                for u in user_list:
-                    income_sum, spending_sum = 0, 0
+                message = ""
+                total_spending, total_income = 0, 0
+                for u in group.users.all():
                     queryset_spending = queryset_spending.filter(user=u.id)
                     queryset_income = queryset_income.filter(user=u.id)
 
                     for s in queryset_spending:
-                        spending_sum = spending_sum + s.spending_amount
+                        if str(s.group_id) == str(group.id):
+                            total_spending = total_spending + s.spending_amount
                     for i in queryset_income:
-                        income_sum = income_sum + i.income_amount
-                    statistic = GroupStatistic.objects.get_or_create(total_spending=spending_sum, total_income=income_sum, status=message, group=group, user=u)
-                return Response(StatisticGroupSerializer(statistic, context={'request': request}).data, status=status.HTTP_200_OK)
+                        if str(i.group_id) == str(group.id):
+                            total_income = total_income + i.income_amount
+                if not total_spending == 0:
+                    group.spending_amount = total_spending
+                if not total_income == 0:
+                    group.income_amount = total_income
+                group.save()
+
+                queryset_spending = Spending.objects.all()
+                queryset_income = Income.objects.all()
+                for u in group.users.all():
+                    queryset_spending = queryset_spending.filter(user=u.id)
+                    queryset_income = queryset_income.filter(user=u.id)
+                    income_sum, spending_sum = 0, 0
+                    percent_spending, percent_income = 0, 0
+                    for s in queryset_spending:
+                        if str(s.group_id) == str(group.id):
+                            spending_sum = spending_sum + s.spending_amount
+                        if not total_spending == 0:
+                            percent_spending = (spending_sum / total_spending) * 100
+                    for i in queryset_income:
+                        if str(i.group_id) == str(group.id):
+                            income_sum = income_sum + i.income_amount
+                        if not total_income == 0:
+                            percent_income = (income_sum / total_income) * 100
+
+                    statistic = GroupStatistic.objects.all()
+                    statistic = statistic.filter(group=group.id)
+                    statistic = statistic.filter(user=u.id)
+                    if statistic:
+                        for stt in statistic:
+                            stt.total_spending = spending_sum
+                            stt.total_income = income_sum
+                            stt.percent_spending = percent_spending
+                            stt.percent_income = percent_income
+                            stt.statistic_date = datetime.now()
+                            message = spending_sum
+                            stt.save()
+                    else:
+                        statistic, _ = GroupStatistic.objects.get_or_create(total_spending=spending_sum, total_income=income_sum,
+                                                                    percent_spending=percent_spending, percent_income=percent_income,
+                                                                    status=message, group=group, user=u)
+                # return Response(GroupStatisticSerializer(statistic, context={'request': request}).data, status=status.HTTP_200_OK)
+                return Response(message, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except:
@@ -446,9 +508,24 @@ class GroupViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveA
 class GroupViewSetCreate(viewsets.ViewSet, generics.CreateAPIView):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    pagination_class = Paginator
 
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
+
+
+# Get statistic
+class GroupStatisticViewSet(viewsets.ViewSet, generics.ListAPIView):
+    queryset = GroupStatistic.objects.all()
+    serializer_class = GroupStatisticSerializer
+
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
+
+    def filter_queryset(self, queryset):
+        group_id = self.request.query_params.get("id")
+        queryset = queryset.filter(group=group_id)
+        return queryset
 
 
 # USER
@@ -456,9 +533,6 @@ class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIVi
     queryset = User.objects.all()
     serializer_class = UserDetailSerializer
     pagination_class = Paginator
-
-    # authentication_classes = [BasicAuthentication, TokenAuthentication]
-    # parser_classes = [parsers.MultiPartParser, ]
 
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
