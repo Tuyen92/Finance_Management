@@ -19,6 +19,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
 import { UseContext } from "../configs/UseContext";
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 
 const GroupDetail = () => {
@@ -32,6 +33,7 @@ const GroupDetail = () => {
     })
     const[memberId, setMemberId] = useState("") 
     const[isActive, setActive] = useState("")
+    const[err, setErr] = useState(null)
 
     useEffect(() => {
         const loadGroup = async () => {
@@ -41,13 +43,20 @@ const GroupDetail = () => {
             res.data.project.income_amount = Numeral(res.data.project?.income_amount).format(0,0)
             res.data.project.start_date = format(new Date(res.data.project?.start_date), 'dd/MM/yyyy')
             res.data.project.end_date = format(new Date(res.data.project?.end_date), 'dd/MM/yyyy')
-            console.log(res.data)
-            setGroup(res.data)
-            setUser(res.data.users)
+            // console.log(res.data)
+            if (res.status === 200)
+            {
+                setGroup(res.data)
+                setUser(res.data.users)
+                setErr(null)
+            }
+            else
+                setErr(res.status)
+            
         }
 
         loadGroup()
-    }, [groupId, isActive])
+    }, [groupId, isActive, err])
 
     const updateGroup = async () => {
         let form = new FormData()
@@ -87,17 +96,32 @@ const GroupDetail = () => {
         setActive(1)
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+        alert = (
+            <>
+                <div align='center'>
+                    <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+                </div>
+                <br />
+            </>)
+    }
+
     if (group.length == 0)
     {return(
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>GROUP</h1>
             <Loading />
+            <br />
+            {alert}
         </>
     )}
 
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>GROUP&nbsp;-&nbsp;{group.name}</h1>
+            {alert}
             <div style={{ backgroundColor: "#609b56" }}>
                 <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }}>Group information: </h3>
             </div>
@@ -228,16 +252,14 @@ const GroupDetail = () => {
                     <form>
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '1%' }}>Name: </h4>
-                            <TextField id="name_project" label="New name of group..." type="text" name="name" value={updatedGroup.name} style={{ width: '100%' }} onChange={updateGroup} />
-                        </div>
-                        <br />
-                        <div style={{ display: 'flex' }}>
+                            <TextField id="name_project" label="New name of group..." type="text" name="name" value={updatedGroup.name} style={{ width: '60%', marginRight: '2%' }} onChange={updateGroup} />
+
                             <h4 style={{ color: "#F1C338", marginRight: '1%' }}>Project ID: </h4>
                             <TextField id="name_project" label="New project's Id..." type="text" name="project_id" value={updatedGroup.project_id} onChange={updateGroup} />
                         </div>
-
+                        <br />
                         <div  align="center">
-                            <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}>Update</Button>
+                            <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Update</strong></Button>
                         </div>
                     </form>
                     <br />

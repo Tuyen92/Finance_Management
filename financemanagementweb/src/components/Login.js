@@ -63,7 +63,7 @@ const Login = () => {
             <Box component="form" sx={{'& > :not(style)': { m: 1, width: '25ch' },}} noValidate autoComplete="off">
                 <TextField id="outlined-basic" type='password' label="Password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" />
             </Box>
-            <Button variant="contained" style={{ color: '#609b56', backgroundColor: '#F1C338'}} onClick={login} >Login</Button>
+            <Button variant="contained" style={{ color: '#609b56', backgroundColor: '#F1C338'}} onClick={login} ><strong>Login</strong></Button>
         </div>
     )
 }

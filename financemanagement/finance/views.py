@@ -218,7 +218,6 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
                 spending_sum, income_sum = 0, 0
                 message = ""
                 now = datetime.now()
-                message = str(now) + " " + str(p.end_date)
                 if now.date() >= p.end_date.date():
                     if now.time() >= p.end_date.time():
                         message = "Project is overdue!"
@@ -235,12 +234,40 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
                     p.income_amount = income_sum
                     p.spending_amount = spending_sum
                     p.save()
-                    queryset_statistic = ProjectStatistic.objects.all()
-                    queryset_statistic = queryset_statistic.filter(project=p.id)
-                    if not queryset_statistic:
-                        statistic, _ = ProjectStatistic.objects.get_or_create(total_spending=spending_sum, total_income=income_sum,
-                                                                              status=message, project=p)
-                        return Response(ProjectStatisticSerializer(statistic, context={'request': request}).data, status=status.HTTP_200_OK)
+
+                    group = Group.objects.get(project_id=p.id)
+                    queryset_spending = Spending.objects.all()
+                    queryset_income = Income.objects.all()
+                    for u in group.users.all():
+                        income_user, spending_user = 0, 0
+                        percent_spending, percent_income = 0, 0
+
+                        for s in queryset_spending:
+                            if s.project_id == p.id:
+                                spending_user = spending_user + s.spending_amount
+                            if not spending_sum == 0:
+                                percent_spending = (spending_user / spending_sum) * 100
+                        for i in queryset_income:
+                            if i.project_id == p.id:
+                                income_user = income_user + i.income_amount
+                            if not income_sum == 0:
+                                percent_income = (income_user / income_sum) * 100
+
+                        queryset_statistic = ProjectStatistic.objects.all()
+                        queryset_statistic = queryset_statistic.filter(project=p.id)
+                        queryset_statistic = queryset_statistic.filter(user=u.id)
+                        if queryset_statistic:
+                            for stt in queryset_statistic:
+                                stt.total_income = income_user
+                                stt.total_spending = spending_user
+                                stt.statistic_date = datetime.now()
+                                stt.percent_income = percent_income
+                                stt.percent_spending = percent_spending
+                                stt.save()
+                        else:
+                            statistic, _ = ProjectStatistic.objects.get_or_create(total_spending=spending_sum, total_income=income_sum, status=message, project=p, user=u.id,
+                                                                                  percent_income=percent_income, percent_spending=percent_spending)
+                            # return Response(ProjectStatisticSerializer(statistic, context={'request': request}).data, status=status.HTTP_200_OK)
                     return Response(message, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -546,8 +573,19 @@ class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIVi
 
             # Filter by role
             role = self.request.query_params.get("role")
-            if role:
-                queryset = queryset.filter(role__role_name__icontains=role)
+            if role == "superuser":
+                queryset = queryset.filter(is_superuser=True)
+            if role == "leader":
+                queryset = queryset.filter(is_superuser=False)
+                queryset = queryset.filter(is_staff=True)
+            if role == "user":
+                queryset = queryset.filter(is_superuser=False)
+                queryset = queryset.filter(is_staff=False)
+
+            # Filter by group
+            group = self.request.query_params.get("group")
+            if group:
+                queryset = queryset.filter(group__id=group)
             return queryset
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -628,7 +666,8 @@ class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIVi
                 quarter = self.request.query_params.get("quarter")
                 group = self.request.query_params.get("group")
                 limit_rule = LimitRule.objects.get(id=user.limit_rule.id)
-                message = ""
+                status_spending = "1"
+                status_income = "1"
                 queryset_spending = Spending.objects.all()
                 queryset_spending = queryset_spending.filter(user=user.id)
                 queryset_income = Income.objects.all()
@@ -664,16 +703,35 @@ class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIVi
                         income_sum = income_sum + i.income_amount
 
                 if spending_sum >= limit_rule.spending_limit:
-                    message = "Over spending! "
+                    status_spending = "3"
+                if spending_sum >= limit_rule.spending_limit / 2:
+                    status_spending = "2"
+                if income_sum < limit_rule.income_limit:
+                    status_income = "3"
+                if income_sum >= limit_rule.income_limit * 2:
+                    status_income = "2"
+
+                queryset_warning = Warning.objects.all()
+                queryset_warning = queryset_warning.filter(user=self.request.user.id)
+                if queryset_warning:
+                    for w in queryset_warning:
+                        w.status_spending = status_spending
+                        w.status_income = status_income
+                        w.total_income = income_sum
+                        w.total_spending = spending_sum
+                        w.statistic_date = datetime.now()
+                        if month:
+                            w.month = month
+                        if quarter:
+                            w.quarter = quarter
+                        if group:
+                            w.group = group
+                        w.save()
+                    return Response(WarningSerializer(w, context={'request': request}).data, status=status.HTTP_200_OK)
                 else:
-                    message = "Stable spending "
-                if income_sum >= limit_rule.income_limit:
-                    message += "Over income!"
-                else:
-                    message += "Stable income"
-                warning, created = Warning.objects.get_or_create(total_income=income_sum, total_spending=spending_sum, status=message,
-                                                                 month=month, quarter=quarter, group=group, user=request.user)
-                return Response(WarningSerializer(warning, context={'request': request}).data, status=status.HTTP_200_OK)
+                    warning, _ = Warning.objects.get_or_create(total_income=income_sum, total_spending=spending_sum, status_income=status_income,
+                                                                    status_spending=status_spending, month=month, quarter=quarter, group=group, user=request.user)
+                    return Response(WarningSerializer(warning, context={'request': request}).data, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
             return Response(status=status.HTTP_200_OK)

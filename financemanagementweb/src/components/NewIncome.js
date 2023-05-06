@@ -1,10 +1,10 @@
-import { Container, FormGroup, Input, TextField } from "@mui/material"
-import { useContext, useState } from "react"
-import { UseContext } from "../configs/UseContext"
-import { useNavigate } from "react-router-dom"
-import { authAPI, endpoints } from "../configs/API"
+import { Container, FormGroup, Input, TextField } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
+import { UseContext } from "../configs/UseContext";
+import { useNavigate } from "react-router-dom";
+import { authAPI, endpoints } from "../configs/API";
 import Button from '@mui/material/Button';
-
+import Alert from '@mui/material/Alert';
 
 const NewIncome = () => {
     const[user, dispatch] = useContext(UseContext)
@@ -17,6 +17,7 @@ const NewIncome = () => {
         "group": "",
         "project": ""
     })
+    const[err, setErr] = useState(null)
 
     const create = (evt) => {
         evt.preventDefault()
@@ -33,7 +34,12 @@ const NewIncome = () => {
                 console.log(form)
                 let res = await authAPI().post(endpoints['new_income'], form)
                 if (res.status === 201)
+                {
+                    setErr(null)
                     nav("/incomes/")
+                }
+                else
+                    setErr(res.status)
             } catch (ex) {
                 console.log(ex)
             }
@@ -41,14 +47,30 @@ const NewIncome = () => {
         process()
     }
 
+    useEffect(() => {}, [err])
+
     const setValue = e => {
         const { name, value } = e.target
         setIncome(current => ({...current, [name]:value}))
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+        alert = (
+            <>
+                <div align='center'>
+                    <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+                </div>
+                <br />
+            </>
+        )
+    }
+
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>NEW INCOME</h1>
+            {alert}
             <div style={{ backgroundColor: '#609b56'}}>
                 <br />
             </div>
@@ -78,7 +100,7 @@ const NewIncome = () => {
                         </div>
                         <br />
                         <div align='center'>
-                            <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}>Create</Button>
+                            <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}><strong>Create</strong></Button>
                         </div>
                     </form>
                 </FormGroup>

@@ -1,7 +1,7 @@
-import { useContext, useEffect } from "react"
-import { useState } from "react"
-import API, { authAPI, endpoints } from "../configs/API"
-import { Link } from 'react-router-dom'
+import { useContext, useEffect } from "react";
+import { useState } from "react";
+import { authAPI, endpoints } from "../configs/API";
+import { Link } from 'react-router-dom';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,7 +10,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
-import Pagination from '@mui/material/Pagination';
 import { format } from 'date-fns';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
@@ -20,6 +19,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import { UseContext } from "../configs/UseContext";
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 
 const Meetings = () => {
@@ -30,9 +30,9 @@ const Meetings = () => {
   const[user, dispatch] = useContext(UseContext)
   const[page, setPage] = useState(1)
   const[pageSize, setPageSize] = useState(2)
-  const[total, setTotal] = useState(0)
   const[next, setNext] = useState(null)
   const[previous, setPrevious] = useState(null)
+  const[err, setErr] = useState(null)
 
   useEffect(() => {
       const loadMeetings = async () => {
@@ -42,16 +42,21 @@ const Meetings = () => {
         if (content !== null)
           e += `&content=${content}`
 
-        
         let res =  await authAPI().get(e)
-        setNext(res.data.next)
-        setPrevious(res.data.previous)
-        // console.log(res.data.results)
-        setMeeting(res.data.results)
+        if (res.status == 200)
+        {
+          setNext(res.data.next)
+          setPrevious(res.data.previous)
+          // console.log(res.data.results)
+          setMeeting(res.data.results)
+          setErr(null)
+        }
+        else
+          setErr(res.status)
       }
 
       loadMeetings()
-  }, [c, page, pageSize])
+  }, [c, page, pageSize, err])
   
   const search = (evt) => {
     evt.preventDefault()
@@ -62,6 +67,18 @@ const Meetings = () => {
   const prevPage = () => setPage(current => current - 1)
   const changePageSize = (evt) => setPageSize(evt.target.value)
 
+  let alert = (<></>)
+  if (err !== null)
+  {
+    alert = (
+    <>
+      <div align='center'>
+        <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+      </div>
+      <br />
+    </>)
+  }
+
   if (meeting.length == 0)
   {return(
   <>
@@ -69,6 +86,7 @@ const Meetings = () => {
         <h1 style={{ textAlign: 'center', color: '#F1C338' }}>MEETING SCHEDULE LIST</h1>
       </div>
     <Loading />
+    {alert}
   </>)}
 
   let meetingLogin = (
@@ -172,6 +190,7 @@ const Meetings = () => {
         <div>
           <h1 style={{ textAlign: 'center', color: '#F1C338' }}>MEETING SCHEDULE LIST</h1>
         </div>
+        {alert}
         {meetingLogin}
       </>
   )

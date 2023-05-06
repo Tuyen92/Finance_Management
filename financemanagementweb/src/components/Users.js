@@ -1,10 +1,8 @@
-import { useContext, useState } from "react"
-import { useEffect } from "react"
-import API, { authAPI, endpoints } from "../configs/API"
-import cookie from 'react-cookies';
+import { useContext, useState } from "react";
+import { useEffect } from "react";
+import { authAPI, endpoints } from "../configs/API";
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import Pagination from '@mui/material/Pagination';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom'
 import TextField from '@mui/material/TextField';
@@ -18,20 +16,19 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Numeral from 'numeral';
-import { format } from 'date-fns';
 import { UseContext } from "../configs/UseContext";
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 
 const Users = () => {
     const[users, setUsers] = useState([])
     const[kw, setKeyWord] = useState("")
+    const[f] = useSearchParams()
     const nav = useNavigate()
     const[user, dispatch] = useContext(UseContext)
     const[page, setPage] = useState(1)
     const[pageSize, setPageSize] = useState(2)
-    const[total, setTotal] = useState(0)
     const[next, setNext] = useState(null)
     const[previous, setPrevious] = useState(null)
     const[typeFilter, setTypeFilter] = useState(null)
@@ -39,23 +36,39 @@ const Users = () => {
       "group": "",
       "role": ""
     })
+    const[err, setErr] = useState(null)
 
     useEffect(() => {
         const loadUsers = async () => {
             let e = `${endpoints['users']}?page_size=${pageSize}&page=${page}`
+
+            let role = f.get("role")
+            if (role !== null)
+                e += `&role=${role}`
+
+            let group = f.get("group")
+            if (group !== null)
+                e += `&group=${group}`
+
             let res = await authAPI().get(e)
-            setUsers(res.data.results)
-            setNext(res.data.next)
-            setPrevious(res.data.previous)
-            // console.log(res.data.results)
+            if (res.status == 200)
+            {
+                setUsers(res.data.results)
+                setNext(res.data.next)
+                setPrevious(res.data.previous)
+                // console.log(res.data.results)
+                setErr(null)
+            }
+            else
+                setErr(res.status)
         }
 
         loadUsers()
-    }, [page, pageSize])
+    }, [f, page, pageSize, err])
 
     const search = (evt) => {
         evt.preventDefault()
-        nav(`/user/?content=${kw}`)
+        nav(`/user/?name=${kw}`)
     }
 
     const filtGroup = (evt) => {
@@ -82,6 +95,18 @@ const Users = () => {
         setTypeFilter(evt.target.value)
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+        alert = (
+        <>
+        <div align='center'>
+            <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+        </>)
+    }
+
     if (users.length == 0)
     {
         return(<>
@@ -89,6 +114,8 @@ const Users = () => {
                 <h1 style={{ textAlign: 'center', color: '#F1C338' }}>USER LIST</h1>
             </div>
             <Loading />
+            <br />
+            {alert}
         </>)
     }
 
@@ -119,8 +146,8 @@ const Users = () => {
                     typeFilter === 'role'?
                     <>
                         <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
-                        <InputLabel id="demo-select-small">Accept</InputLabel>
-                        <Select labelId="demo-select-small" id="demo-select-small" name="is_accept" value={filter.role} onChange={setValue}>
+                        <InputLabel id="demo-select-small">Role</InputLabel>
+                        <Select labelId="demo-select-small" id="demo-select-small" name="role" value={filter.role} onChange={setValue}>
                             <MenuItem value="user">User</MenuItem>
                             <MenuItem value="leader">Leader</MenuItem>
                             <MenuItem value="superuser">Superuser</MenuItem>
@@ -202,6 +229,7 @@ const Users = () => {
             <div>
                 <h1 style={{ textAlign: 'center', color: '#F1C338' }}>USER LIST</h1>
             </div>
+            {alert}
             {userLogin}
         </>
     )

@@ -20,7 +20,7 @@ import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
 import { UseContext } from "../configs/UseContext";
 import Loading from '../layouts/Loading'
-
+import Alert from '@mui/material/Alert';
 
 
 const Projects = () => {
@@ -45,6 +45,7 @@ const Projects = () => {
       "year": "",
       "ended": ""
     })
+    const[err, setErr] = useState(null)
 
     useEffect(() => {
         const loadProjects = async () => {
@@ -54,20 +55,55 @@ const Projects = () => {
           if (name !== null)
             e += `&name_project=${name}`
 
-          let res =  await authAPI().get(e)
-          setNext(res.data.next)
-          setPrevious(res.data.previous)
+          if (filter.target_from != "" && filter.target_to != "")
+          {
+            if (filter.target_from >= filter.target_to)
+            {
+              setErr("Wrong target!")
+            }
+            else
+            {
+              let res =  await authAPI().get(e)
+              if (res.status == 200)
+              {
+                setNext(res.data.next)
+                setPrevious(res.data.previous)
+                setProject(res.data.results)
+                if (project.length == 0)
+                  setErr("No data")
+                else
+                  setErr(null)
+              }
+              else
+                setErr(res.status)
+            }
+          }
+          else
+          {
+            let res =  await authAPI().get(e)
+              if (res.status == 200)
+              {
+                setNext(res.data.next)
+                setPrevious(res.data.previous)
+                setProject(res.data.results)
+                if (project.length == 0)
+                  setErr("No data")
+                else
+                  setErr(null)
+              }
+              else
+                setErr(res.status)
+          }
           // console.log(res.data.results)
-          console.log(user)
-          setProject(res.data.results)
+          // console.log(user)
         }
 
         loadProjects()
-    }, [n, page, pageSize])
+    }, [n, page, pageSize, err, kw])
 
     const search = (evt) => {
       evt.preventDefault()
-      nav(`/spendings/?content=${kw}`)
+      nav(`/projects/?name=${kw}`)
     }
 
     const setValue = e => {
@@ -118,6 +154,18 @@ const Projects = () => {
       setTypeFilter(evt.target.value)
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+    alert = (
+    <>
+        <div align='center'>
+        <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+    </>)
+    }
+
     if (project.length == 0)
     {return(
     <>
@@ -125,6 +173,8 @@ const Projects = () => {
         <h1 style={{ textAlign: 'center', color: '#F1C338' }}>PROJECT LIST</h1>
       </div>
       <Loading />
+      <br />
+      {alert}
     </>)}
     
     let projectLogin = (
@@ -309,10 +359,11 @@ const Projects = () => {
 
     return (
         <>
-        <div>
-          <h1 style={{ textAlign: 'center', color: '#F1C338' }}>PROJECT LIST</h1>
-        </div>
-       {projectLogin}
+          <div>
+            <h1 style={{ textAlign: 'center', color: '#F1C338' }}>PROJECT LIST</h1>
+          </div>
+          {alert}
+          {projectLogin}
         </>
     )
 }

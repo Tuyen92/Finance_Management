@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react"
-import API, { authAPI, endpoints } from "../configs/API"
-import { useParams, Link } from "react-router-dom"
-import { Container, Input, TextField } from "@mui/material"
+import { useEffect, useState } from "react";
+import { authAPI, endpoints } from "../configs/API";
+import { useParams, Link } from "react-router-dom";
+import { Container, TextField } from "@mui/material";
 import { format } from 'date-fns';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
-import { id } from "date-fns/locale";
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
+
 
 const MeetingDetail = () => {
     const[meeting, setMeeting] = useState(null)
@@ -15,6 +16,7 @@ const MeetingDetail = () => {
     const[changeVote, setChangeVote] = useState(0)
     const[showVoteButton, setShowVoteButton] = useState(0)
     const[isEndMeeting, setEndMeeting] = useState("")
+    const[err, setErr] = useState(null)
 
     useEffect(() => {
         const loadMeeting = async () => {
@@ -22,30 +24,35 @@ const MeetingDetail = () => {
             res.data.date_time = format(new Date(res.data.date_time), 'dd/MM/yyyy HH:mm:ss')
             let resVote = await authAPI().get(endpoints['vote'])
             // console.log(res.data)
-            console.log(resVote.data.results)
-            setMeeting(res.data)
-            setVote(resVote.data.results)
-
-            if (voted.length === 0)
+            if (res.status == 200)
             {
-                setShowVoteButton(1)
-            }
-            for (let i = 0; i < voted.length; i++) {
-                if (voted[i].meeting_schedule?.id !== meeting.id)
+                console.log(resVote.data.results)
+                setMeeting(res.data)
+                setVote(resVote.data.results)
+
+                if (voted.length === 0)
                 {
                     setShowVoteButton(1)
-                    break;
                 }
-                else
-                {
-                    setShowVoteButton(0)
+                for (let i = 0; i < voted.length; i++) {
+                    if (voted[i].meeting_schedule?.id !== meeting.id)
+                    {
+                        setShowVoteButton(1)
+                        break;
+                    }
+                    else
+                        setShowVoteButton(0)
                 }
+                // console.log(showVoteButton)
+                setErr(null)
             }
-            // console.log(showVoteButton)
+            else
+                setErr(res.data)
+            
         }
 
         loadMeeting()
-    }, [meetingId, changeVote, showVoteButton, isEndMeeting])
+    }, [meetingId, changeVote, showVoteButton, isEndMeeting, err])
 
     const endMeeting = async () => {
         let eEndMeeting = `${endpoints['meeting'](meetingId)}active/`
@@ -61,17 +68,32 @@ const MeetingDetail = () => {
         setShowVoteButton(0)
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+        alert = (
+        <>
+        <div align='center'>
+            <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+        </>)
+    }
+
     if (meeting == null)
     {return(
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>MEETING SCHEDULE</h1>
             <Loading />
+            <br />
+            {alert}
         </>
     )}
 
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>MEETING&nbsp;SCHEDULE&nbsp;{meeting.id}. {meeting.content}</h1>
+            {alert}
             <div style={{ backgroundColor: "#609b56" }}>
                 <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }}>Meeting schedule: </h3>
             </div>

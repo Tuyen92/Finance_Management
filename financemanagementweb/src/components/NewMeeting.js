@@ -8,6 +8,8 @@ import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Alert from '@mui/material/Alert';
+
 
 const NewMeeting = () => {
     const[user, dispatch] = useContext(UseContext)
@@ -22,8 +24,9 @@ const NewMeeting = () => {
     const[time, setTime] = useState([])
     const d = []
     const t = []
+    const[err, setErr] = useState(null)
 
-    useEffect(() => {}, [schedule])
+    useEffect(() => {}, [schedule, err])
 
     const create = (evt) => {
         evt.preventDefault()
@@ -45,7 +48,13 @@ const NewMeeting = () => {
                 }
                 
                 if (res.status === 201)
+                {
+                    setErr(null)
                     nav("/meeting_schedules/")
+                }
+                else
+                    setErr(res.status)
+
             } catch (ex) {
                 console.log(ex)
             }
@@ -98,9 +107,22 @@ const NewMeeting = () => {
         })
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+        alert = (
+        <>
+        <div align='center'>
+            <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+        </>)
+    }
+
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>NEW MEETING SCHEDULE</h1>
+            {alert}
             <div style={{ backgroundColor: '#609b56'}}>
                 <br />
             </div>
@@ -135,7 +157,7 @@ const NewMeeting = () => {
                         {numSchedule}
                         <br />
                         <div align='center'>
-                            <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}>Create</Button>
+                            <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}><strong>Create</strong></Button>
                         </div>
                     </form>
                 </FormGroup>

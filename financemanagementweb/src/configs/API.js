@@ -28,7 +28,8 @@ export const endpoints = {
     "register": "/register/",
     "change_password": "/user/change_password/",
     "group_statistic": "/statistic/group/",
-    "project_statistic": "/statistic/project/"
+    "project_statistic": "/statistic/project/",
+    "warning": (IdUser) => `/user/${IdUser}/warning/`
 }
 
 export const authAPI = () => axios.create({

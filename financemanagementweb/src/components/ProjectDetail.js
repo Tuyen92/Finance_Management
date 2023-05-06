@@ -12,6 +12,7 @@ import FormControl from '@mui/material/FormControl';
 import Checkbox from '@mui/material/Checkbox';
 import { UseContext } from "../configs/UseContext";
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 
 const ProjectDetail = () => {
@@ -26,6 +27,7 @@ const ProjectDetail = () => {
     })
     const {projectId} = useParams()
     const[ended, setEnded] = useState("")
+    const[err, setErr] = useState(null)
 
     useEffect(() => {
         const loadProject = async () => {
@@ -37,11 +39,17 @@ const ProjectDetail = () => {
             res.data.start_date = format(new Date(res.data.start_date), 'dd/MM/yyyy')
             res.data.end_date = format(new Date(res.data.end_date), 'dd/MM/yyyy')
             // console.log(res.data)
-            setProject(res.data)
+            if (res.status == 200)
+            {
+                setProject(res.data)
+                setErr(null)
+            }
+            else
+                setErr(res.status)
         }
 
         loadProject()
-    }, [projectId, ended])
+    }, [projectId, ended, err])
 
     const endedProject = async () => {
         let eEnded = `${endpoints['project'](projectId)}ended/`
@@ -65,16 +73,31 @@ const ProjectDetail = () => {
         setUpdateProject(current => ({...current, [name]:value}))
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+        alert = (
+            <>
+                <div align='center'>
+                    <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+                </div>
+                <br />
+            </>)
+    }
+
     if (project == null)
     {return(
     <>
         <h1 style={{ textAlign: "center", color: "#F1C338" }}>PROJECT</h1>
         <Loading />
+        <br />
+        {alert}
     </>)}
 
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>PROJECT&nbsp;{project.id}. {project.name_project}</h1>
+            {alert}
             <div style={{ backgroundColor: "#609b56" }}>
                 <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }}>Project's information: </h3>
             </div>
@@ -160,7 +183,7 @@ const ProjectDetail = () => {
                         </div>
                         <br />
                         <div  align="center">
-                            <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}>Update</Button>
+                            <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Update</strong></Button>
                         </div>
                     </form>
                 </Container>

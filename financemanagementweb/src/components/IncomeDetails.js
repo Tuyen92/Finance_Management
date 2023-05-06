@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react"
-import API, { authAPI, endpoints } from "../configs/API"
-import { Container, Input, TextField } from "@mui/material"
-import { useParams, Link } from "react-router-dom"
+import { useContext, useEffect, useState } from "react";
+import { authAPI, endpoints } from "../configs/API";
+import { Container, TextField, } from "@mui/material";
+import { useParams, Link } from "react-router-dom";
 import Numeral from 'numeral';
 import { format } from 'date-fns';
 import Checkbox from '@mui/material/Checkbox';
@@ -12,6 +12,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { UseContext } from "../configs/UseContext";
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 
 const IncomeDetail = () => {
@@ -19,6 +20,7 @@ const IncomeDetail = () => {
     const[income, setIncome] = useState(null)
     const {incomeId} = useParams()
     const[isConfirm, setConfirm] = useState("")
+    const[err, setErr] = useState(null)
 
     useEffect(() => {
         const loadIncome = async () => {
@@ -26,11 +28,17 @@ const IncomeDetail = () => {
             res.data.income_amount = Numeral(res.data.income_amount).format('0,0')
             res.data.implementation_date = format(new Date(res.data.implementation_date), 'dd/MM/yyyy HH:mm:ss')
             // console.log(res.data)
-            setIncome(res.data)
+            if (res.status === 200)
+            {
+                setIncome(res.data)
+                setErr(null)
+            }
+            else
+                setErr(res.status)
         }
 
         loadIncome()
-    }, [incomeId, isConfirm])
+    }, [incomeId, isConfirm, err])
 
     const confirm = async () => {
         let eConfirm = `${endpoints['income'](incomeId)}/confirm/`
@@ -38,17 +46,31 @@ const IncomeDetail = () => {
         setConfirm(1)
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+        alert = (
+            <>
+                <div align='center'>
+                    <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+                </div>
+                <br />
+            </>)
+    }
+
     if (income == null)
     {return(
     <>
         <h1 style={{ textAlign: "center", color: "#F1C338" }}>INCOME</h1>
         <Loading />
+        {alert}
     </>
     )}
 
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>INCOME&nbsp;-&nbsp;{income.id}. {income.content}</h1>
+            {alert}
             <div style={{ backgroundColor: "#609b56" }}>
                 <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }}>Income information: </h3>
             </div>
@@ -87,7 +109,7 @@ const IncomeDetail = () => {
                     <>
                         <Checkbox checked={false} style={{ color: "#F1C338", marginRight: '1%' }} />
                         {user.is_supperuser === true || user.is_staff === true?
-                        <Button variant="contained" onClick={confirm} style={{ backgroundColor: "#609b56", color: '#FFECC9', height: '10%', marginTop: '1%' }}>Confirm</Button>:
+                        <Button variant="contained" onClick={confirm} style={{ backgroundColor: "#609b56", color: '#FFECC9', height: '10%', marginTop: '1%' }}><strong>Confirm</strong></Button>:
                         <span />}
                     </>
                     }
@@ -108,7 +130,7 @@ const IncomeDetail = () => {
                     <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Phone: </h4>
                     <TextField id="content" type="text" value={income.user?.phone} style={{ width: '20%', marginRight: '2%' }} />
 
-                    <Link style={{ textDecoration: 'none', marginTop: '1%' }} to={`/user/${income.user?.id}/`}><Button style={{ width: '100%', color: '#F46841' }}><strong>User detail</strong></Button></Link>
+                    <Link style={{ textDecoration: 'none', marginTop: '1%' }} to={`/user/${income.user?.id}/`}><Button variant="outline-primary" style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>User detail</strong></Button></Link>
                 </div>
             </Container>
             <div style={{ backgroundColor: "#609b56" }}>
@@ -120,12 +142,12 @@ const IncomeDetail = () => {
                     <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Group: </h4>
                     <TextField id="id" type="text" value={income.group_id} style={{ marginRight: '2%' }} />
 
-                    <Link style={{ textDecoration: 'none', marginTop: '1%', marginRight: '10%' }} to={`/groups/${income.id_user?.id}/`}><Button style={{ width: '100%', color: '#F46841' }}><strong>Group detail</strong></Button></Link>
+                    <Link style={{ textDecoration: 'none', marginTop: '1%', marginRight: '10%' }} to={`/groups/${income.id_user?.id}/`}><Button variant="outline-primary" style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Group detail</strong></Button></Link>
                 
                     <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Project: </h4>
                     <TextField id="content" type="text" value={income.project_id} style={{ marginRight: '2%' }} />
 
-                    <Link style={{ textDecoration: 'none', marginTop: '1%' }} to={`/projects/${income.id_user?.id}/`}><Button style={{ color: '#F46841' }}><strong>Project detail</strong></Button></Link>
+                    <Link style={{ textDecoration: 'none', marginTop: '1%' }} to={`/projects/${income.id_user?.id}/`}><Button variant="outline-primary" style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Project detail</strong></Button></Link>
                 </div>
                 <br />
             </Container>

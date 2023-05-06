@@ -1,6 +1,6 @@
-import { useContext, useEffect } from "react"
-import { useState } from "react"
-import API, { authAPI, endpoints } from "../configs/API"
+import { useContext, useEffect } from "react";
+import { useState } from "react";
+import API, { authAPI, endpoints } from "../configs/API";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -18,6 +18,7 @@ import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
 import { UseContext } from "../configs/UseContext";
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 
 const GroupsUser = () => {
@@ -28,7 +29,6 @@ const GroupsUser = () => {
     const[user, dispatch] = useContext(UseContext)
     const[page, setPage] = useState(1)
     const[pageSize, setPageSize] = useState(2)
-    const[total, setTotal] = useState(0)
     const[next, setNext] = useState(null)
     const[previous, setPrevious] = useState(null)
     const[typeFilter, setTypeFilter] = useState(null)
@@ -37,6 +37,7 @@ const GroupsUser = () => {
       "number": "",
       "created_date": ""
     })
+    const[err, setErr] = useState(null)
     
     useEffect(() => {
         const loadGroups = async () => {
@@ -55,14 +56,23 @@ const GroupsUser = () => {
                 e += `&created_date=${created_date}`
 
             let res =  await authAPI().get(e)
-            setNext(res.data.next)
-            setPrevious(res.data.previous)
             // console.log(res.data)
-            setGroup(res.data.results)
+            if (res.status === 200)
+            {
+                setNext(res.data.next)
+                setPrevious(res.data.previous)
+                setGroup(res.data.results)
+                if (group.length == 0)
+                    setErr("No data")
+                else
+                    setErr(null)
+            }
+            else
+                setErr(res.status)
         }
         
         loadGroups()
-    }, [n])
+    }, [n, page, pageSize, err])
 
     const search = (evt) => {
         evt.preventDefault()
@@ -98,6 +108,18 @@ const GroupsUser = () => {
         setTypeFilter(evt.target.value)
       }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+    alert = (
+    <>
+        <div align='center'>
+        <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+    </>)
+    }
+
     if (group.length == 0)
     {return(
         <>
@@ -105,6 +127,8 @@ const GroupsUser = () => {
                 <h1 style={{ textAlign: 'center', color: '#F1C338' }}>GROUP LIST</h1>
             </div>  
             <Loading />
+            <br />
+            {alert}
         </>
     )}
 
@@ -233,6 +257,7 @@ const GroupsUser = () => {
             <div>
                 <h1 style={{ textAlign: 'center', color: '#F1C338' }}>GROUP LIST</h1>
             </div>
+            {alert}
             {groupLogin}
         </>
     )

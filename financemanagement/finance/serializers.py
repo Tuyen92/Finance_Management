@@ -131,7 +131,7 @@ class VotingSerializer(ModelSerializer):
 class WarningSerializer(ModelSerializer):
     class Meta:
         model = Warning
-        fields = ['total_income', 'total_spending', 'status', 'group', 'user']
+        fields = ['total_income', 'total_spending', 'status_spending', 'status_income', 'group', 'user', 'quarter', 'group', 'month', 'statistic_date']
 
 
 class GroupStatisticSerializer(ModelSerializer):
@@ -148,4 +148,4 @@ class ProjectStatisticSerializer(ModelSerializer):
 
     class Meta:
         model = ProjectStatistic
-        fields = ['total_income', 'total_spending', 'status', 'project', 'statistic_date', 'percent_spending', 'percent_income']
+        fields = ['total_income', 'total_spending', 'status', 'project', 'statistic_date', 'percent_spending', 'percent_income', 'user']

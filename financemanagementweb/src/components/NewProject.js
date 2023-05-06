@@ -1,9 +1,12 @@
 import Button from '@mui/material/Button';
 import { Container, FormGroup, Input, TextField } from "@mui/material";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UseContext } from "../configs/UseContext";
 import { useNavigate } from "react-router-dom";
 import { authAPI, endpoints } from "../configs/API";
+import Alert from '@mui/material/Alert';
+import { ElectricScooterSharp } from '@mui/icons-material';
+
 
 const NewProject = () => {
     const[user, dispatch] = useContext(UseContext)
@@ -17,6 +20,9 @@ const NewProject = () => {
         "start_date": "",
         "end_date": "",
     })
+    const[err, setErr] = useState(null)
+
+    useEffect(() => {}, [err])
 
     const create = (evt) => {
         evt.preventDefault()
@@ -34,7 +40,12 @@ const NewProject = () => {
 
                 let res = await authAPI().post(endpoints['new_project'], form)
                 if (res.status === 201)
+                {
+                    setErr(null)
                     nav("/projects/")
+                }
+                else
+                    setErr(res.status)
             } catch (ex) {
                 console.log(ex)
             }
@@ -47,9 +58,22 @@ const NewProject = () => {
         setProject(current => ({...current, [name]:value}))
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+    alert = (
+    <>
+        <div align='center'>
+        <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+    </>)
+    }
+
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>NEW PROJECT</h1>
+            {alert}
             <div style={{ backgroundColor: '#609b56'}}>
                 <br />
             </div>
@@ -79,7 +103,7 @@ const NewProject = () => {
                         </div>
                         <br />
                         <div align='center'>
-                            <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}>Create</Button>
+                            <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}><strong>Create</strong></Button>
                         </div>
                     </form>
                 </FormGroup>

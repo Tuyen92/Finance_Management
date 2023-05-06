@@ -1,7 +1,7 @@
-import { useContext, useEffect } from "react"
-import { useState } from "react"
-import { authAPI, endpoints } from "../configs/API"
-import { Link } from 'react-router-dom'
+import { useContext, useEffect } from "react";
+import { useState } from "react";
+import { authAPI, endpoints } from "../configs/API";
+import { Link } from 'react-router-dom';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -20,6 +20,7 @@ import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
 import { UseContext } from "../configs/UseContext";
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 
 const Spendings = () => {
@@ -41,6 +42,7 @@ const Spendings = () => {
       "date_from": "",
       "date_to": ""
     })
+    const[err, setErr] = useState(null)
 
     useEffect(() => {
         const loadSpendings = async () => {
@@ -67,24 +69,56 @@ const Spendings = () => {
             e += `&is_accept=${filter.is_accept}`
 
           let date_from = c.get("date_from")
-          if (date_from != null)
+          if (date_from !== null)
             e += `&date_from=${filter.date_from}`
   
           let date_to = c.get("date_to")
-          if (date_to != null)
+          if (date_to !== null)
             e += `&date_to=${filter.date_to}`
-
-          // console.log(user)
-          let res =  await authAPI().get(e)
-          setNext(res.data.next)
-          setPrevious(res.data.previous)
-          setSpending(res.data.results)
-          // console.log(user)
-          // console.log(res)
+          
+          if (filter.date_from !== "" && filter.date_to !== "")
+          {
+            if (filter.date_from >= filter.date_to === true)
+              setErr("Wrong date!")
+            else
+            {
+              // console.log(user)
+              let res =  await authAPI().get(e)
+              if (res.status === 200)
+              {
+                setNext(res.data.next)
+                setPrevious(res.data.previous)
+                setSpending(res.data.results)
+                if (spending.length == 0)
+                  setErr("No Data!")
+                else
+                  setErr(null)
+              }
+              else
+                setErr(res.status)
+            }
+          }
+          else
+          {
+            let res =  await authAPI().get(e)
+            if (res.status === 200)
+            {
+              setNext(res.data.next)
+              setPrevious(res.data.previous)
+              setSpending(res.data.results)
+              if (spending.length == 0)
+                setErr("No Data!")
+              else
+                setErr(null)
+              console.log(res)
+            }
+            else
+              setErr(res.status)
+          }
         }
 
         loadSpendings()
-    }, [c, page, pageSize])
+    }, [c, page, pageSize, err])
 
     const search = (evt) => {
       evt.preventDefault()
@@ -120,6 +154,18 @@ const Spendings = () => {
       setTypeFilter(evt.target.value)
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+      alert = (
+      <>
+        <div align='center'>
+          <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+      </>)
+    }
+
     if (spending.length == 0)
     {return (
     <>
@@ -127,6 +173,8 @@ const Spendings = () => {
         <h1 style={{ textAlign: 'center', color: '#F1C338' }}>SPENDING LIST</h1>
       </div>
       <Loading />
+      <br />
+      {alert}
     </>)}
 
     let spendingLogin = (
@@ -250,6 +298,7 @@ const Spendings = () => {
           <div>
             <h1 style={{ textAlign: 'center', color: '#F1C338' }}>SPENDING LIST</h1>
           </div>
+          {alert}
           {spendingLogin}
         </>
     )

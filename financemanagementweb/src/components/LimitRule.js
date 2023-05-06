@@ -19,6 +19,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import { UseContext } from "../configs/UseContext";
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 
 const LimitRules = () => {
@@ -41,6 +42,7 @@ const LimitRules = () => {
       "to_date": ""
     })
     const[inactive, setInactive] = useState("")
+    const[err, setErr] = useState(null)
 
     useEffect(() => {
         const loadLimitRules = async () => {
@@ -75,14 +77,20 @@ const LimitRules = () => {
             e += `&date_to=${filter.date_to}`
 
           let res =  await authAPI().get(e)
-          setNext(res.data.next)
-          setPrevious(res.data.previous)
-          // console.log(res.data.results)
-          setLimitRule(res.data.results)
+          if (res.status == 200)
+          {
+            setNext(res.data.next)
+            setPrevious(res.data.previous)
+            // console.log(res.data.results)
+            setLimitRule(res.data.results)
+            setErr(null)
+          }
+          else
+            setErr(res.status)
         }
 
         loadLimitRules()
-    }, [t, page, pageSize, inactive])
+    }, [t, page, pageSize, inactive, err])
 
     const search = (evt) => {
       evt.preventDefault()
@@ -118,6 +126,18 @@ const LimitRules = () => {
       setTypeFilter(evt.target.value)
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+      alert = (
+      <>
+        <div align='center'>
+          <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+      </>)
+    }
+
     if (limitRule.length == 0)
     {return(
     <>
@@ -125,6 +145,8 @@ const LimitRules = () => {
         <h1 style={{ textAlign: 'center', color: '#F1C338' }}>LIMIT RULE LIST</h1>
       </div>
       <Loading />
+      <br />
+      {alert}
     </>)}
 
     let userCreateLimitRule = (<></>)
@@ -260,6 +282,7 @@ const LimitRules = () => {
         <div>
           <h1 style={{ textAlign: 'center', color: '#F1C338' }}>LIMIT RULE LIST</h1>
         </div>
+        {alert}
         {limitRulLogin}
       </>
     )

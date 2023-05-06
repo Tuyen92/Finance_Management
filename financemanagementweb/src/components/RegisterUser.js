@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextField, Button, Container, FormGroup, Stack, FormLabel } from '@mui/material';
 import { Link, useNavigate } from "react-router-dom"
 import { authAPI, endpoints } from '../configs/API';
@@ -11,6 +11,7 @@ import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputItem from '../layouts/InputItem';
 import { useRef } from 'react';
+import Alert from '@mui/material/Alert';
 
 
 const RegisterUser = () => {
@@ -34,7 +35,9 @@ const RegisterUser = () => {
             "Content-Type": "multipart/form-data"}
     }
     const avatar = useRef()
+    const[err, setErr] = useState(null)
     
+    useEffect(() => {}, [err])
         
     const register = (evt) => {
         evt.preventDefault()
@@ -71,7 +74,12 @@ const RegisterUser = () => {
                 let res = await authAPI().post(endpoints['register'], form, headers)
 
                 if (res.status === 201)
+                {
+                    setErr(null)
                     nav("/user/")
+                }
+                else
+                    setErr(res.status)   
             } catch (ex) {
                 console.log(ex)
             }
@@ -84,11 +92,25 @@ const RegisterUser = () => {
         setUser(current => ({...current, [name]:value}))
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+        alert = (
+        <>
+        <div align='center'>
+            <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+        </>)
+    }
+
     return (
         <>
             <div>
                 <h1 style={{ textAlign: 'center', color: '#F1C338' }}>REGISTER USER</h1>
             </div>
+            {alert}
+            <br />
             <Container>
                 <FormGroup  style={{ width: '100%' }}>
                     <h3  style={{ textAlign: 'center', backgroundColor: '#609b56', color: "#FFECC9", marginLeft: "20px" }}>User's information: </h3>

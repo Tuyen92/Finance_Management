@@ -19,6 +19,7 @@ import TextField from '@mui/material/TextField';
 import { useNavigate, useSearchParams } from "react-router-dom/dist";
 import { UseContext } from "../configs/UseContext";
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 
 const Incomes = () => {
@@ -40,6 +41,7 @@ const Incomes = () => {
     "date_from": "",
     "date_to": ""
   })
+  const[err, setErr] = useState(null)
 
   useEffect(() => {
       const loadIncomes = async () => {
@@ -69,15 +71,50 @@ const Incomes = () => {
         if (date_to != null)
           e += `&date_to=${filter.date_to}`
 
-        let res =  await authAPI().get(e)
-        // console.log(res.data.results)
-        setNext(res.data.next)
-        setPrevious(res.data.previous)
-        setIncome(res.data.results)
+        if (filter.date_from !== "" && filter.date_to !== "")
+        {
+          if (filter.date_from >= filter.date_to === true)
+          {
+            setErr("Wrong date!")
+          }
+          else
+          {
+            let res =  await authAPI().get(e)
+            // console.log(res.data.results)
+            if (res.status === 200)
+            {
+              setNext(res.data.next)
+              setPrevious(res.data.previous)
+              setIncome(res.data.results)
+              if (income.length == 0)
+                setErr("No data")
+              else
+                setErr(null)
+            }
+            else
+              setErr(res.status)
+          }
+        }
+        else
+        {
+          let res =  await authAPI().get(e)
+          if (res.status === 200)
+          {
+            setNext(res.data.next)
+            setPrevious(res.data.previous)
+            setIncome(res.data.results)
+            if (income.length == 0)
+              setErr("No data")
+            else
+              setErr(null)
+          }
+          else
+            setErr(res.status)
+        }
       }
 
       loadIncomes()
-  }, [c, page, pageSize])
+  }, [c, page, pageSize, err])
 
   const search = (evt) => {
     evt.preventDefault()
@@ -113,6 +150,18 @@ const Incomes = () => {
     setTypeFilter(evt.target.value)
   }
 
+  let alert = (<></>)
+  if (err !== null)
+  {
+    alert = (
+      <>
+        <div align='center'>
+          <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+      </>)
+  }
+
   if (income.length == 0)
   {return (
     <>
@@ -120,6 +169,8 @@ const Incomes = () => {
         <h1 style={{ textAlign: 'center', color: '#F1C338' }}>INCOME LIST</h1>
       </div>
       <Loading />
+      <br />
+      {alert}
     </>
   
 )}
@@ -243,6 +294,7 @@ const Incomes = () => {
         <div>
           <h1 style={{ textAlign: 'center', color: '#F1C338' }}>INCOME LIST</h1>
         </div>
+        {alert}
         {incomeLogin}
       </>
   )

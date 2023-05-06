@@ -35,7 +35,7 @@ const Statistic = () => {
 
     useEffect(() => {
         const loading = async () => {
-            console.log(type)
+            // console.log(type)
             if (type == 'project')
             {
                 let e = `${endpoints['project'](id)}`
@@ -46,8 +46,13 @@ const Statistic = () => {
                 res.data.start_date = format(new Date(res.data.start_date), 'dd/MM/yyyy')
                 res.data.end_date = format(new Date(res.data.end_date), 'dd/MM/yyyy')
                 setProject(res.data)
-                setUsers(res.data.users)
-                // console.log(project)
+                // console.log(res.data.users)
+
+                let eGroup = `${endpoints['group'](id)}`
+                let resGroup = await authAPI().get(eGroup)
+                setGroup(resGroup.data)
+                setUsers(resGroup.data.users)
+                console.log(resGroup.data)
 
                 let eStatistic = e + "report/"
                 let resStatistic = await authAPI().get(eStatistic)
@@ -55,7 +60,7 @@ const Statistic = () => {
                 let eGetStatistic = `${endpoints['project_statistic']}?id=${id}`
                 let resGetStatistic = await authAPI().get(eGetStatistic)
                 setProjectStatistic(resGetStatistic.data.results)
-                console.log(projectStatistic)
+                // console.log(projectStatistic)
             }
 
             if (type == 'group')
@@ -202,6 +207,48 @@ const Statistic = () => {
                     </div>
                 </Container>
                 <br />
+                <Container>
+                    <TableContainer component={Paper}>
+                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                <TableCell component="th" scope="row"><strong>ID</strong></TableCell>
+                                <TableCell component="th" scope="row"><strong>Full name</strong></TableCell>
+                                <TableCell component="th" scope="row"><strong>Role</strong></TableCell>
+                                <TableCell component="th" scope="row"><strong>Total spending</strong></TableCell>
+                                <TableCell component="th" scope="row"><strong>Total income</strong></TableCell>
+                                <TableCell component="th" scope="row"><strong> % Spending</strong></TableCell>
+                                <TableCell component="th" scope="row"><strong>% Income</strong></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                            {projectStatistic.map(ps => {
+                                let dataTable = ([<></>])
+                                return (
+                                <TableRow key={ps.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                    {users.map(u => {u.id === ps.user?
+                                    dataTable.push(<>
+                                        <TableCell component="th" scope="row">{u.id}</TableCell>
+                                        <TableCell component="th" scope="row">{u.first_name} {u.last_name}</TableCell>
+                                        {u.is_superuser === true?
+                                            <TableCell component="th" scope="row" typeof="text" style={{ color: '#609b56' }}>Superuser</TableCell>:
+                                            u.is_staff === false?
+                                            <TableCell component="th" scope="row" typeof="text">User</TableCell>:
+                                            <TableCell component="th" scope="row" typeof="text" style={{ color: '#F1C338' }}>Leader</TableCell>
+                                        }
+                                        <TableCell component="th" scope="row">{ps.total_spending}</TableCell>
+                                        <TableCell component="th" scope="row">{ps.total_income}</TableCell>
+                                        <TableCell component="th" scope="row">{ps.percent_spending} %</TableCell>
+                                        <TableCell component="th" scope="row">{ps.percent_income} %</TableCell>
+                                    </>):
+                                    dataTable.push(<></>)})}
+                                    {dataTable}
+                                </TableRow>)
+                                })} 
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Container>
             </>
         )
     }

@@ -1,9 +1,11 @@
-import { useContext, useState } from "react"
-import { UseContext } from "../configs/UseContext"
-import { useNavigate } from "react-router-dom"
-import { Container, FormGroup, Input, TextField } from "@mui/material"
+import { useContext, useEffect, useState } from "react";
+import { UseContext } from "../configs/UseContext";
+import { useNavigate } from "react-router-dom";
+import { Container, FormGroup, Input, TextField } from "@mui/material";
 import Button from '@mui/material/Button';
-import { authAPI, endpoints } from "../configs/API"
+import { authAPI, endpoints } from "../configs/API";
+import Alert from '@mui/material/Alert';
+
 
 const NewLimitRule = () => {
     const[user, dispatch] = useContext(UseContext)
@@ -15,6 +17,9 @@ const NewLimitRule = () => {
         "to_date": "",
         "type": ""
     })
+    const[err, setErr] = useState(null)
+
+    useEffect(() => {}, [err])
 
     const create = (evt) => {
         evt.preventDefault()
@@ -30,7 +35,12 @@ const NewLimitRule = () => {
                 // console.log(form)
                 let res = await authAPI().post(endpoints['new_limit_rule'], form)
                 if (res.status === 201)
+                {
+                    setErr(null)
                     nav("/limit_rules/")
+                }
+                else
+                    setErr(res.status)
             } catch (ex) {
                 console.log(ex)
             }
@@ -43,9 +53,22 @@ const NewLimitRule = () => {
         setLimitRule(current => ({...current, [name]:value}))
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+      alert = (
+      <>
+        <div align='center'>
+          <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+      </>)
+    }
+
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>NEW LIMIT RULE</h1>
+            {alert}
             <div style={{ backgroundColor: '#609b56'}}>
                 <br />
             </div>
@@ -75,7 +98,7 @@ const NewLimitRule = () => {
                         </div>
                         <br />
                         <div align='center'>
-                            <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}>Create</Button>
+                            <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}><strong>Create</strong></Button>
                         </div>
                     </form>         
                 </FormGroup>

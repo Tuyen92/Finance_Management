@@ -110,11 +110,13 @@ class Voting(models.Model):
 class Warning(models.Model):
     total_income = models.IntegerField()
     total_spending = models.IntegerField()
-    status = models.CharField(max_length=255, null=True)
+    status_spending = models.CharField(max_length=255, null=True)
+    status_income = models.CharField(max_length=255, null=True)
     month = models.CharField(max_length=255, null=True)
     quarter = models.IntegerField(null=True)
     group = models.IntegerField(null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=True)
+    statistic_date = models.DateTimeField(auto_now=True, null=True)
 
 
 class Statistic(models.Model):
@@ -136,5 +138,6 @@ class GroupStatistic(Statistic):
 
 class ProjectStatistic(Statistic):
     project = models.ForeignKey('Project', on_delete=models.CASCADE)
+    user = models.IntegerField(null=True)
     percent_spending = models.CharField(max_length=20, null=True, default=0)
     percent_income = models.CharField(max_length=20, null=True, default=0)

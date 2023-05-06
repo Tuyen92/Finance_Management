@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react"
-import { authAPI, endpoints } from "../configs/API"
-import { Container, FormGroup, Input, TextField, Button } from "@mui/material"
+import { useEffect, useState } from "react";
+import { authAPI, endpoints } from "../configs/API";
+import { Container, TextField, Button } from "@mui/material";
 import { format } from 'date-fns';
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 
 const CurrentUser = () => {
@@ -16,17 +17,25 @@ const CurrentUser = () => {
         "email": "",
         "phone": ""
     })
+    const[err, setErr] = useState(null)
     let e = `${endpoints['current_user']}`
 
     useEffect(() => {
         const loadCurrentUser = async () => {
             let res = await authAPI().get(e)
-            res.data.birthday = format(new Date(res.data.birthday), 'dd/MM/yyyy')
-            // console.log(res)
-            setCurrentUser(res.data)
+            if (res.status == 200)
+            {
+                res.data.birthday = format(new Date(res.data.birthday), 'dd/MM/yyyy')
+                // console.log(res)
+                setCurrentUser(res.data)
+                setErr(null)
+            }
+            else
+                setErr(res.status)
+            
         }
         loadCurrentUser()
-    }, [])
+    }, [err])
 
     const updatePassword = (evt) => {
         evt.preventDefault()
@@ -67,10 +76,22 @@ const CurrentUser = () => {
 
                 let res = await authAPI().put(e, form)
             } catch (ex) {
-
+                console.log(ex)
             }
         }
         process()
+    }
+
+    let alert = (<></>)
+    if (err !== null)
+    {
+        alert = (
+        <>
+        <div align='center'>
+            <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+        </>)
     }
 
     if (currentUser == null)
@@ -78,11 +99,14 @@ const CurrentUser = () => {
     <>
         <h1 style={{ textAlign: "center", color: "#F1C338" }}>USER INFORMATION</h1>
         <Loading />
+        <br />
+        {alert}
     </>)}
 
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>USER INFORMATION</h1>
+            {alert}
             <div style={{ backgroundColor: '#609b56'}}>
                 <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }} >Your information</h3> 
             </div>

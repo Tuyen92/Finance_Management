@@ -134,6 +134,20 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     )
   }
 
+  let warningForm = (<></>)
+  if (user !== null)
+  {
+    let eWarning = `/user/${user.id}/warning/`
+    warningForm = (
+      <>
+        <ListItem key='warning' style={{ marginTop: '20px', marginBottom: '20px' }}>
+          <i className="material-icons" style={{ color: '#FFECC9' }}>warning</i>
+          <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to={eWarning}>Warning</Link>
+        </ListItem>
+        <Divider />
+      </>
+    )
+  }
   let userSuperuser = (<></>)
   if (user !== null && user.is_superuser === true)
   {
@@ -221,11 +235,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                 </ListItem>
                 <Divider />
 
-                <ListItem key='warning' style={{ marginTop: '20px', marginBottom: '20px' }}>
-                  <i className="material-icons" style={{ color: '#FFECC9' }}>warning</i>
-                  <Link style={{ color: '#FFECC9', textDecoration: 'none', marginLeft: '20px' }} to="/warning/">Warning</Link>
-                </ListItem>
-                <Divider />
+                {warningForm}
               </List>
             </Drawer>
 
@@ -256,7 +266,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
                   <Route path='/meeting_schedule/' element={<NewMeeting />}/>
                   <Route path='/limit_rules/' element={<LimiteRule />}/>
                   <Route path='/limit_rule/' element={<NewLimitRule />}/>
-                  <Route path='/warning/' element={<Warning />}/>
+                  <Route path='/user/:IdUser/warning/' element={<Warning />}/>
                   <Route path='/statistic/:type/:id/' element={<Statistic />}/>
                 </Routes>
                 <Footer />

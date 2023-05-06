@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react"
-import { authAPI, endpoints } from "../configs/API"
-import { Container, Input, TextField } from "@mui/material"
-import { useParams, Link, useNavigate } from "react-router-dom"
+import { useContext, useEffect, useState } from "react";
+import { authAPI, endpoints } from "../configs/API";
+import { Container, TextField } from "@mui/material";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Numeral from 'numeral';
 import { format } from 'date-fns';
 import Checkbox from '@mui/material/Checkbox';
@@ -12,27 +12,32 @@ import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Loading from "../layouts/Loading";
+import Alert from '@mui/material/Alert';
 
 const SpendingDetail = () => {
     const[spending, setSpending] = useState(null)
     const {spendingId} = useParams()
     const[user, dispatch] = useContext(UseContext)
-    const nav = useNavigate()
     const[isAccept, setAccept] = useState("")
+    const[err, setErr] = useState(null)
 
     useEffect(() => {
         const loadSpending = async () => {
-            // let e = `${endpoints['spendings'](spendingId)}`
-            // let res = await authAPI().get(e)
             let res = await authAPI().get(endpoints['spending'](spendingId))
             res.data.spending_amount = Numeral(res.data.spending_amount).format('0,0')
             res.data.implementation_date = format(new Date(res.data.implementation_date), 'dd/MM/yyyy HH:mm:ss')
-            console.log(res.data)
-            setSpending(res.data)
+            // console.log(res.data)
+            if (res.status === 200)
+            {
+                setSpending(res.data)
+                setErr(null)
+            }
+            else
+                setErr(res.status)
         }
 
         loadSpending()
-    }, [spendingId, isAccept])
+    }, [spendingId, isAccept, err])
 
     const accept = async () => {
         let eAccept = `${endpoints['spending'](spendingId)}/accept/`
@@ -40,16 +45,30 @@ const SpendingDetail = () => {
         setAccept(1)
     }
 
+    let alert = (<></>)
+    if (err !== null)
+    {
+        alert = (
+            <>
+                <div align='center'>
+                    <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+                </div>
+                <br />
+            </>)
+    }
+
     if (spending == null)
     {return(
     <>
         <h1 style={{ textAlign: "center", color: "#F1C338" }}>SPENDING</h1>
         <Loading />
+        {alert}
     </>)}
 
     return (
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>SPENDING&nbsp;-&nbsp;{spending.id}. {spending.content}</h1>
+            {alert}
             <div style={{ backgroundColor: "#609b56" }}>
                 <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }}>Spending information: </h3>
             </div>
@@ -112,7 +131,7 @@ const SpendingDetail = () => {
                     <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Phone: </h4>
                     <TextField id="content" type="text" value={spending.user?.phone} style={{ width: '20%', marginRight: '2%' }} />
 
-                    <Link style={{ textDecoration: 'none', marginTop: '1%' }} to={`/user/${spending.user?.id}/`}><Button style={{ width: '100%', color: '#F46841' }}><strong>User detail</strong></Button></Link>
+                    <Link style={{ textDecoration: 'none', marginTop: '1%' }} to={`/user/${spending.user?.id}/`}><Button variant="outline-primary" style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>User detail</strong></Button></Link>
                 </div>
             </Container>
             <br />
@@ -125,12 +144,12 @@ const SpendingDetail = () => {
                     <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Group: </h4>
                     <TextField id="id" type="text" value={spending.group_id} style={{ marginRight: '2%' }} />
 
-                    <Link style={{ textDecoration: 'none', marginTop: '1%', marginRight: '10%' }} to={`/groups/${spending.id_user?.id}/`}><Button style={{ width: '100%', color: '#F46841' }}><strong>Group detail</strong></Button></Link>
+                    <Link style={{ textDecoration: 'none', marginTop: '1%', marginRight: '10%' }} to={`/groups/${spending.id_user?.id}/`}><Button variant="outline-primary" style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Group detail</strong></Button></Link>
                 
                     <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Project: </h4>
                     <TextField id="content" type="text" value={spending.project_id} style={{ marginRight: '2%' }} />
 
-                    <Link style={{ textDecoration: 'none', marginTop: '1%' }} to={`/projects/${spending.id_user?.id}/`}><Button style={{ width: '100%', color: '#F46841', marginRight: '2%' }}><strong>Project detail</strong></Button></Link>
+                    <Link style={{ textDecoration: 'none', marginTop: '1%' }} to={`/projects/${spending.id_user?.id}/`}><Button variant="outline-primary" style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Project detail</strong></Button></Link>
                 </div>
                 <br />
             </Container>
