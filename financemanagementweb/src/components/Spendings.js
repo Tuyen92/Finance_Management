@@ -11,7 +11,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Numeral from 'numeral';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -75,46 +75,29 @@ const Spendings = () => {
           let date_to = c.get("date_to")
           if (date_to !== null)
             e += `&date_to=${filter.date_to}`
-          
-          if (filter.date_from !== "" && filter.date_to !== "")
+
+          if (filter.date_from != "" && filter.date_to != "")
+            if (filter.date_from >= filter.date_to == true)
+                setErr("Wrong date!")
+              
+          if (filter.amount_from != "" && filter.amount_to != "")
+            if (filter.amount_from >= filter.amount_to == true)
+              setErr("Wrong amount!")
+              
+
+          let res =  await authAPI().get(e)
+          // console.log(err)
+          if (res.status === 200)
           {
-            if (filter.date_from >= filter.date_to === true)
-              setErr("Wrong date!")
-            else
-            {
-              // console.log(user)
-              let res =  await authAPI().get(e)
-              if (res.status === 200)
-              {
-                setNext(res.data.next)
-                setPrevious(res.data.previous)
-                setSpending(res.data.results)
-                if (spending.length == 0)
-                  setErr("No Data!")
-                else
-                  setErr(null)
-              }
-              else
-                setErr(res.status)
-            }
+            setNext(res.data.next)
+            setPrevious(res.data.previous)
+            setSpending(res.data.results)
+            console.log(res)
+            if (res.count == 0)
+              setErr("No Data!")
           }
           else
-          {
-            let res =  await authAPI().get(e)
-            if (res.status === 200)
-            {
-              setNext(res.data.next)
-              setPrevious(res.data.previous)
-              setSpending(res.data.results)
-              if (spending.length == 0)
-                setErr("No Data!")
-              else
-                setErr(null)
-              console.log(res)
-            }
-            else
-              setErr(res.status)
-          }
+            setErr(res.status)
         }
 
         loadSpendings()
@@ -166,7 +149,7 @@ const Spendings = () => {
       </>)
     }
 
-    if (spending.length == 0)
+    if (spending.length == 0 && err == null)
     {return (
     <>
       <div>
@@ -174,7 +157,6 @@ const Spendings = () => {
       </div>
       <Loading />
       <br />
-      {alert}
     </>)}
 
     let spendingLogin = (

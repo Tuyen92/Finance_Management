@@ -24,7 +24,6 @@ const UserDetail = () => {
                 res.data.birthday = format(new Date(res.data.birthday), 'dd/MM/yyyy')
                 // console.log(res.data)
                 setUser(res.data)
-                setErr(null)
             }
             else
                 setErr(res.status)

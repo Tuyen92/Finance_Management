@@ -21,6 +21,7 @@ import { useNavigate, useSearchParams } from "react-router-dom/dist";
 import { UseContext } from "../configs/UseContext";
 import Loading from '../layouts/Loading'
 import Alert from '@mui/material/Alert';
+import { ContentCopy } from '@mui/icons-material'
 
 
 const Projects = () => {
@@ -53,53 +54,74 @@ const Projects = () => {
             
           let name = n.get("name")
           if (name !== null)
-            e += `&name_project=${name}`
+            e += `&name=${name}`
+
+          let sort = n.get("sort")
+          if (sort !== null)
+            e += `&sort=${sort}`
+
+          let target_from = n.get("target_from")
+          if (target_from !== null)
+            e += `&target_from=${target_from}`
+
+          let target_to = n.get("target_to")
+          if (target_to !== null)
+            e += `&target_to=${target_to}`
+
+          let date_to = n.get("date_to")
+          if (date_to !== null)
+            e += `&date_to=${date_to}`
+
+          let date_from = n.get("date_from")
+          if (date_from !== null)
+            e += `&date_from=${date_from}`
+
+          let type = typeFilter
+          if (type == "start_date" || type == "end_date")
+            e += `&type=${type}`
+          
+          let month = n.get("month")
+          if (month !== null)
+            e += `&month=${month}`
+
+          let year = n.get("year")
+          if (year !== null)
+            e += `&year=${year}`
+
+          let ended = n.get("ended")
+          if (ended !== null)
+            e += `&ended=${ended}`
 
           if (filter.target_from != "" && filter.target_to != "")
-          {
-            if (filter.target_from >= filter.target_to)
-            {
+            if (filter.target_from >= filter.target_to == true)
               setErr("Wrong target!")
-            }
-            else
-            {
-              let res =  await authAPI().get(e)
-              if (res.status == 200)
-              {
-                setNext(res.data.next)
-                setPrevious(res.data.previous)
-                setProject(res.data.results)
-                if (project.length == 0)
-                  setErr("No data")
-                else
-                  setErr(null)
-              }
-              else
-                setErr(res.status)
-            }
-          }
-          else
+
+          if (filter.date_from != "" && filter.date_to != "")
+            if (filter.date_from >= filter.date_to == true)
+              setErr("Wrong date!")
+
+          console.log(err)
+          if (err == null)
           {
             let res =  await authAPI().get(e)
               if (res.status == 200)
               {
+                console.log(res)
                 setNext(res.data.next)
                 setPrevious(res.data.previous)
                 setProject(res.data.results)
-                if (project.length == 0)
+                if (res.count == 0)
                   setErr("No data")
-                else
-                  setErr(null)
               }
               else
                 setErr(res.status)
+            // console.log(res.data.results)
+            // console.log(user)
           }
-          // console.log(res.data.results)
-          // console.log(user)
         }
 
         loadProjects()
-    }, [n, page, pageSize, err, kw])
+    }, [n, page, pageSize, err])
 
     const search = (evt) => {
       evt.preventDefault()
@@ -122,25 +144,25 @@ const Projects = () => {
 
     const filtDate = (evt) => {
       evt.preventDefault()
-      if (filter.type == 'start_date')
+      if (typeFilter == 'start_date')
         nav(`/projects/?type=start_date&date_from=${filter.date_from}&date_to=${filter.date_to}`)
-      if (filter.type == 'end_date')
+      if (typeFilter == 'end_date')
         nav(`/projects/?type=end_date&date_from=${filter.date_from}&date_to=${filter.date_to}`)
     }
 
     const filtMonth = (evt) => {
       evt.preventDefault()
-      if (filter.type == 'start_date')
+      if (typeFilter == 'start_date')
         nav(`/projects/?type=start_date&month=${filter.month}`)
-      if (filter.type == 'end_date')
+      if (typeFilter == 'end_date')
         nav(`/projects/?type=end_date&month=${filter.month}`)
     }
 
     const filtYear = (evt) => {
       evt.preventDefault()
-      if (filter.type == 'start_date')
+      if (typeFilter == 'start_date')
         nav(`/projects/?type=start_date&year=${filter.year}`)
-      if (filter.type == 'end_date')
+      if (typeFilter == 'end_date')
         nav(`/projects/?type=end_date&year=${filter.year}`)
     }
 
@@ -166,7 +188,7 @@ const Projects = () => {
     </>)
     }
 
-    if (project.length == 0)
+    if (project.length == 0 && err == null)
     {return(
     <>
       <div>
@@ -174,7 +196,6 @@ const Projects = () => {
       </div>
       <Loading />
       <br />
-      {alert}
     </>)}
     
     let projectLogin = (
@@ -208,10 +229,8 @@ const Projects = () => {
             </FormControl>
             {typeFilter === 'target'?
           <>
-            <label style={{ color: '#609b56' }}><strong>From: </strong></label>
-            <TextField id="outlined-basic" label="From amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="target_from" value={filter.target_from} onChange={setValue}/>
-            <label style={{ color: '#609b56' }}><strong>To: </strong></label>
-            <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="target_to" value={filter.target_to} onChange={setValue}/>
+            <TextField id="outlined-basic" label="From target" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="target_from" value={filter.target_from} onChange={setValue}/>
+            <TextField id="outlined-basic" label="To target" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="target_to" value={filter.target_to} onChange={setValue}/>
             <Button variant="contained" onClick={filtTarget} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
           </>:
           typeFilter === 'working'?
@@ -245,13 +264,13 @@ const Projects = () => {
             </>:
             filter.type === 'month'?
             <>
-              <label style={{ color: '#609b56' }}><strong>Month: </strong></label>
-            <TextField id="outlined-basic" onClick={filtMonth} type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.month} onChange={setValue}/>
+              <TextField id="outlined-basic" type="text" label="Month..." variant="outlined" size="small" style={{ marginRight: '1%' }} name="month" value={filter.month} onChange={setValue}/>
+              <Button variant="contained" onClick={filtMonth} style={{ backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
             </>:
             filter.type === 'year'?
             <>
-              <label style={{ color: '#609b56' }}><strong>Year: </strong></label>
-            <TextField id="outlined-basic" onClick={filtYear} type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.year} onChange={setValue}/>
+              <TextField id="outlined-basic" type="text" label="Year..." variant="outlined" size="small" style={{ marginRight: '1%' }} name="year" value={filter.year} onChange={setValue}/>
+              <Button variant="contained" onClick={filtYear} style={{ backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
             </>:
             <span />
             }
@@ -272,17 +291,19 @@ const Projects = () => {
               <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.date_from} onChange={setValue}/>
               <label style={{ color: '#609b56' }}><strong>To: </strong></label>
               <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_to" value={filter.date_to} onChange={setValue}/>
-              <Button variant="contained" style={{  backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+              <Button variant="contained" onClick={filtDate} style={{  backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
             </>:
             filter.type === 'month'?
             <>
               <label style={{ color: '#609b56' }}><strong>Month: </strong></label>
-            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.month} onChange={setValue}/>
+              <TextField id="outlined-basic" type="text" label="Month..." variant="outlined" size="small" style={{ marginRight: '1%' }} name="month" value={filter.month} onChange={setValue}/>
+              <Button variant="contained" onClick={filtMonth} style={{  backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
             </>:
             filter.type === 'year'?
             <>
               <label style={{ color: '#609b56' }}><strong>Year: </strong></label>
-            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.year} onChange={setValue}/>
+              <TextField id="outlined-basic" type="text" label="Year..." variant="outlined" size="small" style={{ marginRight: '1%' }} name="year" value={filter.year} onChange={setValue}/>
+              <Button variant="contained" onClick={filtYear} style={{  backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
             </>:
             <span />
             }
@@ -331,8 +352,8 @@ const Projects = () => {
                   e.preventDefault()
                   nav(`/projects/?sort=${e.target.value}`)}
                 }>
-                  <MenuItem value="1">Increase</MenuItem>
-                  <MenuItem value="0">Decrease</MenuItem>
+                  <MenuItem value="1">Increase Target</MenuItem>
+                  <MenuItem value="0">Decrease Target</MenuItem>
                 </Select>
               </FormControl>
               {userCreateProject}

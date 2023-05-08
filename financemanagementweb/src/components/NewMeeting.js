@@ -48,10 +48,7 @@ const NewMeeting = () => {
                 }
                 
                 if (res.status === 201)
-                {
-                    setErr(null)
                     nav("/meeting_schedules/")
-                }
                 else
                     setErr(res.status)
 

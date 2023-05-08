@@ -23,6 +23,7 @@ import Alert from '@mui/material/Alert';
 
 const GroupsUser = () => {
     const[group, setGroup] = useState([])
+    const[s, setSort] = useState("")
     const[kw, setKeyWord] = useState("")
     const nav = useNavigate()
     const[n] = useSearchParams()
@@ -47,9 +48,17 @@ const GroupsUser = () => {
             if (name !== null)
                 e += `&name=${name}`
 
+            let sort = n.get("sort")
+            if (sort !== null)
+                e += `&sort=${sort}`
+
             let active = n.get("active")
             if (active !== null)
                 e += `&active=${active}`
+
+            let number = n.get("number")
+            if (number !== null)
+                e += `&number=${number}`
 
             let created_date = n.get("created_date")
             if (created_date !== null)
@@ -62,10 +71,8 @@ const GroupsUser = () => {
                 setNext(res.data.next)
                 setPrevious(res.data.previous)
                 setGroup(res.data.results)
-                if (group.length == 0)
+                if (res.count == 0)
                     setErr("No data")
-                else
-                    setErr(null)
             }
             else
                 setErr(res.status)
@@ -81,7 +88,7 @@ const GroupsUser = () => {
 
     const filtNumber = (evt) => {
         evt.preventDefault()
-        nav(`/groups/?number=${filter.amount_from}`)
+        nav(`/groups/?number=${filter.number}`)
       }
   
       const filtActive = (evt) => {
@@ -91,7 +98,7 @@ const GroupsUser = () => {
   
       const filtDate = (evt) => {
         evt.preventDefault()
-        nav(`/groups/?created_date=${filter.date_from}`)
+        nav(`/groups/?created_date=${filter.created_date}`)
       }
 
     const setValue = e => {
@@ -114,13 +121,13 @@ const GroupsUser = () => {
     alert = (
     <>
         <div align='center'>
-        <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+            <Alert severity="error">Happend an error: {err} — check it out!</Alert>
         </div>
         <br />
     </>)
     }
 
-    if (group.length == 0)
+    if (group.length == 0 && err == null)
     {return(
         <>
             <div>
@@ -128,7 +135,6 @@ const GroupsUser = () => {
             </div>  
             <Loading />
             <br />
-            {alert}
         </>
     )}
 
@@ -162,14 +168,14 @@ const GroupsUser = () => {
                 </FormControl>
                 {typeFilter === 'number'?
                 <>
-                    <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="amount_to" value={filter.amount_to} onChange={setValue}/>
+                    <TextField id="outlined-basic" label="Number of member" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="number" value={filter.number} onChange={setValue}/>
                     <Button variant="contained" onClick={filtNumber} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
                 </>:
                 typeFilter === 'active'?
                 <>
                     <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
                     <InputLabel id="demo-select-small">Active</InputLabel>
-                    <Select labelId="demo-select-small" id="demo-select-small" name="is_accept" value={filter.is_accept} onChange={setValue}>
+                    <Select labelId="demo-select-small" id="demo-select-small" name="active" value={filter.active} onChange={setValue}>
                         <MenuItem value="1">Active</MenuItem>
                         <MenuItem value="0">Not Active</MenuItem>
                     </Select>
@@ -178,7 +184,7 @@ const GroupsUser = () => {
                 </>:
                 typeFilter === 'created_date'?
                 <>
-                    <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="date_from" value={filter.date_from} onChange={setValue}/>
+                    <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%' }} name="created_date" value={filter.created_date} onChange={setValue}/>
                     <Button variant="contained" onClick={filtDate} style={{  backgroundColor: "#609b56", marginRight: '1%' }} ><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
                 </>:
                 <span />}
@@ -224,10 +230,13 @@ const GroupsUser = () => {
             <div align="right">
                 <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
                     <InputLabel id="demo-select-small">Sort</InputLabel>
-                    <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
-                        <MenuItem value="" />
-                        <MenuItem value="">Increase</MenuItem>
-                        <MenuItem value="">Decrease</MenuItem>
+                    <Select labelId="demo-select-small" id="demo-select-small" label="Filter" value={s} onChange={e => {
+                        setSort(e.target.value)
+                        e.preventDefault()
+                        nav(`/groups/?sort=${e.target.value}`)}
+                    }>
+                        <MenuItem value="1">Increase</MenuItem>
+                        <MenuItem value="0">Decrease</MenuItem>
                     </Select>
                 </FormControl>
                 {userCreateGroup}

@@ -38,21 +38,19 @@ const GroupDetail = () => {
     useEffect(() => {
         const loadGroup = async () => {
             let res = await authAPI().get(endpoints['group'](groupId))
-            res.data.project.target = Numeral(res.data.project?.target).format(0,0)
-            res.data.project.spending_amount = Numeral(res.data.project?.spending_amount).format(0,0)
-            res.data.project.income_amount = Numeral(res.data.project?.income_amount).format(0,0)
-            res.data.project.start_date = format(new Date(res.data.project?.start_date), 'dd/MM/yyyy')
-            res.data.project.end_date = format(new Date(res.data.project?.end_date), 'dd/MM/yyyy')
             // console.log(res.data)
             if (res.status === 200)
             {
+                res.data.project.target = Numeral(res.data.project?.target).format(0,0)
+                res.data.project.spending_amount = Numeral(res.data.project?.spending_amount).format(0,0)
+                res.data.project.income_amount = Numeral(res.data.project?.income_amount).format(0,0)
+                res.data.project.start_date = format(new Date(res.data.project?.start_date), 'dd/MM/yyyy')
+                res.data.project.end_date = format(new Date(res.data.project?.end_date), 'dd/MM/yyyy')
                 setGroup(res.data)
                 setUser(res.data.users)
-                setErr(null)
             }
             else
                 setErr(res.status)
-            
         }
 
         loadGroup()
@@ -108,13 +106,12 @@ const GroupDetail = () => {
             </>)
     }
 
-    if (group.length == 0)
+    if (group.length == 0 && err == null)
     {return(
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>GROUP</h1>
             <Loading />
             <br />
-            {alert}
         </>
     )}
 

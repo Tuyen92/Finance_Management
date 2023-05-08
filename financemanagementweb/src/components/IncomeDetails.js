@@ -29,10 +29,7 @@ const IncomeDetail = () => {
             res.data.implementation_date = format(new Date(res.data.implementation_date), 'dd/MM/yyyy HH:mm:ss')
             // console.log(res.data)
             if (res.status === 200)
-            {
                 setIncome(res.data)
-                setErr(null)
-            }
             else
                 setErr(res.status)
         }

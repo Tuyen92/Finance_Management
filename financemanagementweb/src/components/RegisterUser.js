@@ -74,10 +74,7 @@ const RegisterUser = () => {
                 let res = await authAPI().post(endpoints['register'], form, headers)
 
                 if (res.status === 201)
-                {
-                    setErr(null)
                     nav("/user/")
-                }
                 else
                     setErr(res.status)   
             } catch (ex) {

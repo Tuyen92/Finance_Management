@@ -24,6 +24,7 @@ import Alert from '@mui/material/Alert';
 
 const Meetings = () => {
   const[meeting, setMeeting] = useState([])
+  const[s, setSort] = useState("")
   const[kw, setKeyWord] = useState("")
   const nav = useNavigate()
   const [c] = useSearchParams()
@@ -32,27 +33,62 @@ const Meetings = () => {
   const[pageSize, setPageSize] = useState(2)
   const[next, setNext] = useState(null)
   const[previous, setPrevious] = useState(null)
+  const[typeFilter, setTypeFilter] = useState(null)
+  const[filter, setFilter] = useState({
+    "date_from": "",
+    "date_to": "",
+    "active": "",
+    "group": ""
+  })
   const[err, setErr] = useState(null)
 
   useEffect(() => {
       const loadMeetings = async () => {
         let e = `${endpoints['meetings']}?page_size=${pageSize}&page=${page}`
           
-        let content = c.get("content")
-        if (content !== null)
-          e += `&content=${content}`
+        let group = c.get("group")
+        if (group !== null)
+          e += `&group=${group}`
 
-        let res =  await authAPI().get(e)
-        if (res.status == 200)
+        let sort = c.get("sort")
+        if (sort !== null)
+          e += `&sort=${sort}`
+        
+        let name = c.get("name")
+        if (name !== null)
+          e += `&name=${name}`
+
+        let date_from = c.get("date_from")
+        if (date_from != null)
+          e += `&date_from=${date_from}`
+
+        let date_to = c.get("date_to")
+        if (date_to != null)
+          e += `&date_to=${date_to}`
+
+        let active = c.get("active")
+        if (active != null)
+          e += `&active=${active}`
+
+        if (filter.date_from != "" && filter.date_to != "")
+          if (filter.date_from >= filter.date_to == true)
+            setErr("Wrong date!")
+
+        if (err == null)
         {
-          setNext(res.data.next)
-          setPrevious(res.data.previous)
-          // console.log(res.data.results)
-          setMeeting(res.data.results)
-          setErr(null)
+          let res =  await authAPI().get(e)
+          if (res.status == 200)
+          {
+            setNext(res.data.next)
+            setPrevious(res.data.previous)
+            // console.log(res.data.results)
+            setMeeting(res.data.results)
+            if (res.count == 0)
+              setErr("No Data!")
+          }
+          else
+            setErr(res.status)
         }
-        else
-          setErr(res.status)
       }
 
       loadMeetings()
@@ -60,7 +96,32 @@ const Meetings = () => {
   
   const search = (evt) => {
     evt.preventDefault()
-    nav(`/spendings/?content=${kw}`)
+    nav(`/meeting_schedules/?name=${kw}`)
+  }
+
+  const changeFilter = (evt) => {
+    evt.preventDefault()
+    setTypeFilter(evt.target.value)
+  }
+
+  const setValue = e => {
+    const { name, value } = e.target
+    setFilter(current => ({...current, [name]:value}))
+  }
+
+  const filtGroup = (evt) => {
+    evt.preventDefault()
+    nav(`/meeting_schedules/?group=${filter.group}`)
+  }
+
+  const filtActive = (evt) => {
+    evt.preventDefault()
+    nav(`/meeting_schedules/?active=${filter.active}`)
+  }
+
+  const filtDate = (evt) => {
+    evt.preventDefault()
+    nav(`/meeting_schedules/?date_from=${filter.date_from}&date_to=${filter.date_to}`)
   }
 
   const nextPage = () => setPage(current => current + 1)
@@ -79,7 +140,7 @@ const Meetings = () => {
     </>)
   }
 
-  if (meeting.length == 0)
+  if (meeting.length == 0 && user != null)
   {return(
   <>
     <div>
@@ -112,13 +173,37 @@ const Meetings = () => {
         <div align="leaf">
           <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
             <InputLabel id="demo-select-small">Filter</InputLabel>
-            <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
-              <MenuItem value="" />
-              <MenuItem value="">Group</MenuItem>
-              <MenuItem value="">User</MenuItem>
-              <MenuItem value="">Date</MenuItem>
+            <Select labelId="demo-select-small" id="demo-select-small" label="Filter" value={typeFilter} onChange={changeFilter}>
+              <MenuItem value="group">Group</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="date">Date</MenuItem>
             </Select>
           </FormControl>
+          {typeFilter === "group"?
+          <>
+            <TextField id="outlined-basic" type="text" label="Group ID..." variant="outlined" size="small" style={{ marginRight: '1%'}} name="group" value={filter.group} onChange={setValue}/>
+            <Button variant="contained" onClick={filtGroup} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          typeFilter === "active"?
+          <>
+            <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
+              <InputLabel id="demo-select-small">Active</InputLabel>
+              <Select labelId="demo-select-small" id="demo-select-small" name="active" value={filter.active} onChange={setValue}>
+                <MenuItem value="1">Activated</MenuItem>
+                <MenuItem value="0">Not Activated</MenuItem>
+              </Select>
+            </FormControl>
+            <Button variant="contained" onClick={filtActive} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          typeFilter === "date"?
+          <>
+            <label style={{ color: '#609b56' }}><strong>From: </strong></label>
+            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%'}} name="date_from" value={filter.date_from} onChange={setValue}/>
+            <label style={{ color: '#609b56' }}><strong>To: </strong></label>
+            <TextField id="outlined-basic" type="date" variant="outlined" size="small" style={{ marginRight: '1%'}} name="date_to" value={filter.date_to} onChange={setValue}/>
+            <Button variant="contained" onClick={filtDate} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
+          </>:
+          <></>}
           <TextField id="outlined-basic" label="Search" variant="outlined" size="small" value={kw} onChange={e => setKeyWord(e.target.value)} style={{ marginRight: '1%' }}/>
           <Button onClick={search} variant="contained" style={{  backgroundColor: "#609b56" }}><i className="material-icons" style={{ color: '#FFECC9' }}>search</i></Button>
         </div>
@@ -156,10 +241,13 @@ const Meetings = () => {
         <div align="right">
           <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
             <InputLabel id="demo-select-small">Sort</InputLabel>
-            <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
-              <MenuItem value="" />
-              <MenuItem value="">Increase</MenuItem>
-              <MenuItem value="">Decrease</MenuItem> 
+            <Select labelId="demo-select-small" id="demo-select-small" label="Filter" name={s} onChange={e => {
+              setSort(e.target.value)
+              e.preventDefault()
+              nav(`/meeting_schedules/?sort=${e.target.value}`)}
+            }>
+              <MenuItem value="1">Increase</MenuItem>
+              <MenuItem value="0">Decrease</MenuItem> 
             </Select>
           </FormControl>
           {userCreateMeeting}

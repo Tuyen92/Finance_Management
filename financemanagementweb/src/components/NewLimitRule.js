@@ -35,10 +35,7 @@ const NewLimitRule = () => {
                 // console.log(form)
                 let res = await authAPI().post(endpoints['new_limit_rule'], form)
                 if (res.status === 201)
-                {
-                    setErr(null)
                     nav("/limit_rules/")
-                }
                 else
                     setErr(res.status)
             } catch (ex) {

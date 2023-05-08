@@ -31,10 +31,7 @@ const NewGroup = () => {
                 console.log(form)
                 let res = await authAPI().post(endpoints['new_group'], form)
                 if (res.status === 201)
-                {
-                    setErr(null)
                     nav("/groups/")
-                }
                 else
                     setErr(res.status)
             } catch (ex) {

@@ -42,6 +42,10 @@ const Users = () => {
         const loadUsers = async () => {
             let e = `${endpoints['users']}?page_size=${pageSize}&page=${page}`
 
+            let name = f.get("name")
+            if (name !== null)
+                e += `&name=${name}`
+
             let role = f.get("role")
             if (role !== null)
                 e += `&role=${role}`
@@ -57,7 +61,8 @@ const Users = () => {
                 setNext(res.data.next)
                 setPrevious(res.data.previous)
                 // console.log(res.data.results)
-                setErr(null)
+                if (res.count == 0)
+                    setErr("No data!")
             }
             else
                 setErr(res.status)
@@ -107,7 +112,7 @@ const Users = () => {
         </>)
     }
 
-    if (users.length == 0)
+    if (users.length == 0 && err != null)
     {
         return(<>
             <div>
@@ -140,7 +145,7 @@ const Users = () => {
                     </FormControl>
                     {typeFilter === 'group'?
                     <>
-                        <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="spending_limit_to" value={filter.group} onChange={setValue}/>
+                        <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="group" value={filter.group} onChange={setValue}/>
                         <Button variant="contained" onClick={filtGroup} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
                     </>:
                     typeFilter === 'role'?

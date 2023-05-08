@@ -24,6 +24,7 @@ import Alert from '@mui/material/Alert';
 
 const LimitRules = () => {
     const[limitRule, setLimitRule] = useState([])
+    const[s, setSort] = useState("")
     const[kw, setKeyWord] = useState("")
     const nav = useNavigate()
     const[t] = useSearchParams()
@@ -50,7 +51,11 @@ const LimitRules = () => {
             
           let type = t.get("type")
           if (type !== null)
-            e += `&content=${type}`
+            e += `&type=${type}`
+
+          let sort = t.get("sort")
+          if (sort !== null)
+            e += `&sort=${sort}`
 
           let spending_limit_from = t.get("spending_limit_from")
           if (spending_limit_from !== null)
@@ -66,7 +71,7 @@ const LimitRules = () => {
 
           let income_limit_to = t.get("income_limit_to")
           if (income_limit_to !== null)
-            e += `&income_limit_from=${filter.income_limit_to}`
+            e += `&income_limit_to=${filter.income_limit_to}`
 
           let date_from = t.get("date_from")
           if (date_from !== null)
@@ -76,17 +81,34 @@ const LimitRules = () => {
           if (date_to !== null)
             e += `&date_to=${filter.date_to}`
 
-          let res =  await authAPI().get(e)
-          if (res.status == 200)
+          if (filter.spending_limit_from != "" && filter.spending_limit_to != "")
+            if (filter.spending_limit_from >= filter.spending_limit_to == true)
+              setErr("Wrong spending limit!")
+
+          if (filter.income_limit_from != "" && filter.income_limit_to != "")
+            if (filter.income_limit_from >= filter.income_limit_to == true)
+              setErr("Wrong income limit!")
+
+          if (filter.date_from != "" && filter.date_to != "")
+            if (filter.date_from >= filter.date_to == true)
+              setErr("Wrong date!")
+
+          console.log(err)
+          if (err == null)
           {
-            setNext(res.data.next)
-            setPrevious(res.data.previous)
-            // console.log(res.data.results)
-            setLimitRule(res.data.results)
-            setErr(null)
-          }
-          else
-            setErr(res.status)
+            let res =  await authAPI().get(e)
+            if (res.status == 200)
+            {
+              setNext(res.data.next)
+              setPrevious(res.data.previous)
+              // console.log(res.data.results)
+              setLimitRule(res.data.results)
+              if (res.count == 0)
+                setErr("No Data!")
+            }
+            else
+              setErr(res.status)
+            }
         }
 
         loadLimitRules()
@@ -94,22 +116,22 @@ const LimitRules = () => {
 
     const search = (evt) => {
       evt.preventDefault()
-      nav(`/limit_rule/?content=${kw}`)
+      nav(`/limit_rules/?type=${kw}`)
     }
 
     const filtSpending = (evt) => {
       evt.preventDefault()
-      nav(`/limit_rule/?spending_limit_from=${filter.spending_limit_from}&spending_limit_to=${filter.spending_limit_to}`)
+      nav(`/limit_rules/?spending_limit_from=${filter.spending_limit_from}&spending_limit_to=${filter.spending_limit_to}`)
     }
 
     const filtIncome = (evt) => {
       evt.preventDefault()
-      nav(`/limit_rule/?income_limit_from=${filter.income_limit_from}&income_limit_to=${filter.income_limit_to}`)
+      nav(`/limit_rules/?income_limit_from=${filter.income_limit_from}&income_limit_to=${filter.income_limit_to}`)
     }
 
     const filtDate = (evt) => {
       evt.preventDefault()
-      nav(`/limit_rule/?from_date=${filter.from_date}&to_date=${filter.to_date}`)
+      nav(`/limit_rules/?from_date=${filter.from_date}&to_date=${filter.to_date}`)
     }
 
     const setValue = e => {
@@ -138,7 +160,7 @@ const LimitRules = () => {
       </>)
     }
 
-    if (limitRule.length == 0)
+    if (limitRule.length == 0 && err != null)
     {return(
     <>
       <div>
@@ -146,11 +168,10 @@ const LimitRules = () => {
       </div>
       <Loading />
       <br />
-      {alert}
     </>)}
 
     let userCreateLimitRule = (<></>)
-    if (user.is_superuser === true )
+    if (user != null && user.is_superuser === true )
     {
       userCreateLimitRule = (
         <>
@@ -180,17 +201,13 @@ const LimitRules = () => {
             </FormControl>
             {typeFilter === 'spending_limit'?
               <>
-                <label style={{ color: '#609b56' }}><strong>From: </strong></label>
                 <TextField id="outlined-basic" label="From amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="spending_limit_from" value={filter.spending_limit_from} onChange={setValue}/>
-                <label style={{ color: '#609b56' }}><strong>To: </strong></label>
                 <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="spending_limit_to" value={filter.spending_limit_to} onChange={setValue}/>
                 <Button variant="contained" onClick={filtSpending} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
               </>:
               typeFilter === 'income_limit'?
               <>
-                <label style={{ color: '#609b56' }}><strong>From: </strong></label>
                 <TextField id="outlined-basic" label="From amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="income_limit_from" value={filter.income_limit_from} onChange={setValue}/>
-                <label style={{ color: '#609b56' }}><strong>To: </strong></label>
                 <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="income_limit_to" value={filter.income_limit_to} onChange={setValue}/>
                 <Button variant="contained" onClick={filtIncome} style={{  backgroundColor: "#609b56", marginRight: '1%' }}><i className="material-icons" style={{ color: '#FFECC9' }}>filter_alt</i></Button>
               </>:
@@ -248,10 +265,15 @@ const LimitRules = () => {
           <div align="right">
             <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
               <InputLabel id="demo-select-small">Sort</InputLabel>
-              <Select labelId="demo-select-small" id="demo-select-small" label="Filter">
-                <MenuItem value="" />
-                <MenuItem value="">Increase</MenuItem>
-                <MenuItem value="">Decrease</MenuItem>
+              <Select labelId="demo-select-small" id="demo-select-small" label="Filter" name={s} onChange={e => {
+              setSort(e.target.value)
+              e.preventDefault()
+              nav(`/limit_rules/?sort=${e.target.value}`)}
+            }>
+                <MenuItem value="1">Increase Spending</MenuItem>
+                <MenuItem value="2">Decrease Spending</MenuItem>
+                <MenuItem value="3">Increase Income</MenuItem>
+                <MenuItem value="4">Decrease Income</MenuItem>
               </Select>
             </FormControl>
             {userCreateLimitRule}

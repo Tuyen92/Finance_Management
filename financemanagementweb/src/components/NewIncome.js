@@ -34,10 +34,7 @@ const NewIncome = () => {
                 console.log(form)
                 let res = await authAPI().post(endpoints['new_income'], form)
                 if (res.status === 201)
-                {
-                    setErr(null)
                     nav("/incomes/")
-                }
                 else
                     setErr(res.status)
             } catch (ex) {

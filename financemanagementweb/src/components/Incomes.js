@@ -10,7 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Numeral from 'numeral';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -51,6 +51,10 @@ const Incomes = () => {
         if (content !== null)
           e += `&content=${content}`
 
+        let sort = c.get("sort")
+        if (sort !== null)
+          e += `&sort=${s}`
+
         let amount_from = c.get("amount_from")
         if (amount_from !== null)
           e += `&amount_from=${filter.amount_from}`
@@ -71,46 +75,26 @@ const Incomes = () => {
         if (date_to != null)
           e += `&date_to=${filter.date_to}`
 
-        if (filter.date_from !== "" && filter.date_to !== "")
-        {
-          if (filter.date_from >= filter.date_to === true)
-          {
+        if (filter.date_from != "" && filter.date_to != "")
+          if (filter.date_from >= filter.date_to == true)
             setErr("Wrong date!")
-          }
-          else
-          {
-            let res =  await authAPI().get(e)
-            // console.log(res.data.results)
-            if (res.status === 200)
-            {
-              setNext(res.data.next)
-              setPrevious(res.data.previous)
-              setIncome(res.data.results)
-              if (income.length == 0)
-                setErr("No data")
-              else
-                setErr(null)
-            }
-            else
-              setErr(res.status)
-          }
+        
+        if  (filter.amount_from != "" && filter.amount_to != "")
+          if (filter.amount_from >= filter.amount_to == true)
+            setErr("Wrong amount!")
+
+        let res =  await authAPI().get(e)
+        // console.log(res.data.results)
+        if (res.status === 200)
+        {
+          setNext(res.data.next)
+          setPrevious(res.data.previous)
+          setIncome(res.data.results)
+          if (res.count == 0)
+            setErr("No data")
         }
         else
-        {
-          let res =  await authAPI().get(e)
-          if (res.status === 200)
-          {
-            setNext(res.data.next)
-            setPrevious(res.data.previous)
-            setIncome(res.data.results)
-            if (income.length == 0)
-              setErr("No data")
-            else
-              setErr(null)
-          }
-          else
-            setErr(res.status)
-        }
+          setErr(res.status)
       }
 
       loadIncomes()
@@ -162,7 +146,7 @@ const Incomes = () => {
       </>)
   }
 
-  if (income.length == 0)
+  if (income.length == 0 && err == null)
   {return (
     <>
       <div>
@@ -170,7 +154,6 @@ const Incomes = () => {
       </div>
       <Loading />
       <br />
-      {alert}
     </>
   
 )}
@@ -190,12 +173,12 @@ const Incomes = () => {
         <FormControl sx={{ minWidth: 120 }} size="small" style={{ marginRight: '1%'}}>
             <InputLabel id="demo-select-small">Filter</InputLabel>
             <Select labelId="demo-select-small" id="demo-select-small" label="Filter" value={typeFilter} onChange={changeFilter}>
-              <MenuItem value="spending_amount">Spending amount</MenuItem>
+              <MenuItem value="income_amount">Income amount</MenuItem>
               <MenuItem value="is_accept">Accepted</MenuItem>
               <MenuItem value="date">Date</MenuItem>
             </Select>
           </FormControl>
-          {typeFilter === 'spending_amount'?
+          {typeFilter === 'income_amount'?
           <>
               <TextField id="outlined-basic" label="From amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="amount_from" value={filter.amount_from} onChange={setValue}/>
               <TextField id="outlined-basic" label="To amount" type="number" variant="outlined" size="small" style={{ marginRight: '1%'}} name="amount_to" value={filter.amount_to} onChange={setValue}/>

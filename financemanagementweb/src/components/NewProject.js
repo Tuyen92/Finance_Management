@@ -35,19 +35,30 @@ const NewProject = () => {
                 form.append("describe", project.describe)
                 form.append("income_amount", project.income_amount)
                 form.append("spending_amount", project.spending_amount)
-                form.append("start_date", project.start_date)
-                form.append("end_date", project.end_date)
-
-                let res = await authAPI().post(endpoints['new_project'], form)
-                if (res.status === 201)
+                if (project.start_date != "" && project.end_date != "")
                 {
-                    setErr(null)
-                    nav("/projects/")
+                    if (project.start_date >= project.end_date == true)
+                    {
+                        
+                        setErr("Wrong date!") 
+                    }                
+                    else
+                    {
+                        form.append("start_date", project.start_date)
+                        form.append("end_date", project.end_date)
+                        if (err == null)
+                        {
+                            let res = await authAPI().post(endpoints['new_project'], form)
+                            if (res.status === 201)
+                                nav("/projects/")
+                            else
+                                setErr(res.status)
+                        }
+                    }
                 }
-                else
-                    setErr(res.status)
             } catch (ex) {
                 console.log(ex)
+                setErr(ex)
             }
         }
         process()

@@ -44,7 +44,6 @@ const MeetingDetail = () => {
                         setShowVoteButton(0)
                 }
                 // console.log(showVoteButton)
-                setErr(null)
             }
             else
                 setErr(res.data)
@@ -80,13 +79,12 @@ const MeetingDetail = () => {
         </>)
     }
 
-    if (meeting == null)
+    if (meeting == null && err == null)
     {return(
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>MEETING SCHEDULE</h1>
             <Loading />
             <br />
-            {alert}
         </>
     )}
 

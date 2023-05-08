@@ -35,10 +35,7 @@ const NewSpending = () => {
                 // console.log(form)
                 let res = await authAPI().post(endpoints['new_spending'], form)
                 if (res.status === 201)
-                {
-                    setErr(null)
                     nav("/spendings/")
-                }
                 else
                     setErr(res.status)
             } catch (ex) {

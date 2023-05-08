@@ -40,10 +40,7 @@ const ProjectDetail = () => {
             res.data.end_date = format(new Date(res.data.end_date), 'dd/MM/yyyy')
             // console.log(res.data)
             if (res.status == 200)
-            {
                 setProject(res.data)
-                setErr(null)
-            }
             else
                 setErr(res.status)
         }
@@ -197,8 +194,8 @@ const ProjectDetail = () => {
                 <>
                     <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841', marginRight: '2%' }}><strong>Delete</strong></Button></Link>
                     {project.is_ended === true?
-                    <Button style={{ color: '#F46841', marginRight: '2%' }} onClick={endedProject}><strong>End Project</strong></Button>:
-                    <Button style={{ color: '#F46841', marginRight: '2%' }} onClick={endedProject}><strong>Active Project</strong></Button>}
+                    <Button style={{ color: '#F46841', marginRight: '2%' }} onClick={endedProject}><strong>Active Project</strong></Button>:
+                    <Button style={{ color: '#F46841', marginRight: '2%' }} onClick={endedProject}><strong>End Project</strong></Button>}
                 </>:
                 <span />}
                 <Link style={{ textDecoration: 'none' }} to={`/statistic/project/${projectId}`}><Button style={{ color: '#F46841', marginRight: '2%' }}><strong>Statistic</strong></Button></Link>
