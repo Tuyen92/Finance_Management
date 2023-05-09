@@ -39,7 +39,6 @@ const NewProject = () => {
                 {
                     if (project.start_date >= project.end_date == true)
                     {
-                        
                         setErr("Wrong date!") 
                     }                
                     else

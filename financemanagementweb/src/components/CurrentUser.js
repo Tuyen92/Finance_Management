@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { authAPI, endpoints } from "../configs/API";
 import { Container, TextField, Button } from "@mui/material";
 import { format } from 'date-fns';
@@ -18,6 +19,7 @@ const CurrentUser = () => {
         "phone": ""
     })
     const[err, setErr] = useState(null)
+    const nav = useNavigate()
     let e = `${endpoints['current_user']}`
 
     useEffect(() => {
@@ -47,6 +49,8 @@ const CurrentUser = () => {
                 form.append("new_password", password.new_password)
 
                 let res = await authAPI().put(endpoints['change_password'], form)
+                if (res.status === 200)
+                    nav("/")
             } catch (ex) {
                 console.log(ex)
             }
@@ -151,13 +155,13 @@ const CurrentUser = () => {
                         <br />
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Limit Rule: </h4>
-                            <TextField id="name_group" type="text" value={currentUser.limit_rule} />
+                            <TextField id="name_group" type="text" value={currentUser.limit_rule.id} />
                         </div>
                     </div>
                 </div>
                 <br />
                 <div  align="center">
-                    <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}>Update</Button>
+                    <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Update</strong></Button>
                 </div>
             </Container>
             <div style={{ backgroundColor: '#609b56'}}>
@@ -180,7 +184,7 @@ const CurrentUser = () => {
                         </div>
                         <br />
                         <div  align="center">
-                            <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}>Change password</Button>
+                            <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Change password</strong></Button>
                         </div>
                     </form>
             </Container>
@@ -206,7 +210,7 @@ const CurrentUser = () => {
                     </div>
                     <br />
                     <div  align="center">
-                        <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}>Update</Button>
+                        <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Update</strong></Button>
                     </div>
                 </form>
             </Container>

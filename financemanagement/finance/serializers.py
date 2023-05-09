@@ -84,6 +84,11 @@ class GroupDetailSerializer(GroupSerializer):
         fields = GroupSerializer.Meta.fields + ['project', 'users']
 
 
+class GroupCreateSerializer(GroupSerializer):
+    class Meta:
+        model = GroupSerializer.Meta.model
+        fields = GroupSerializer.Meta.fields + ['project']
+
 class IncomeSerializer(ModelSerializer):
     class Meta:
         model = Income

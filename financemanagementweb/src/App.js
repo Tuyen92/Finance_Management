@@ -128,7 +128,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     userLogin = 
     (
       <>
-        <Link style={{ color: '#FFECC9', textDecoration: 'none', marginRight: '1%' }} to="/user/current_user/"><Avatar src={user.avatar?user.avatat:"./user.jpg"} /></Link>
+        <Link style={{ color: '#FFECC9', textDecoration: 'none', marginRight: '1%' }} to="/user/current_user/"><Avatar src={user.avatar?user.avatar:"./user.jpg"} /></Link>
         <Button style={{ color: '#FFECC9', textDecoration: 'none' }} onClick={logout}><strong>Logout</strong></Button>
       </>
     )

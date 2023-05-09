@@ -239,20 +239,27 @@ class ProjectViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.Retriev
                     p.spending_amount = spending_sum
                     p.save()
 
-                    group = Group.objects.get(project_id=p.id)
-                    queryset_spending = Spending.objects.all()
-                    queryset_income = Income.objects.all()
+                    try:
+                        group = Group.objects.get(project_id=pk)
+                    except:
+                        message = "Project not in any group!"
+                        return Response(message, status=status.HTTP_200_OK)
+
                     for u in group.users.all():
+                        queryset_spending = Spending.objects.all()
+                        queryset_income = Income.objects.all()
                         income_user, spending_user = 0, 0
                         percent_spending, percent_income = 0, 0
+                        queryset_spending = queryset_spending.filter(user_id=u.id)
+                        queryset_income = queryset_income.filter(user_id=u.id)
 
                         for s in queryset_spending:
-                            if s.project_id == p.id:
+                            if s.project_id == str(p.id):
                                 spending_user = spending_user + s.spending_amount
                             if not spending_sum == 0:
                                 percent_spending = (spending_user / spending_sum) * 100
                         for i in queryset_income:
-                            if i.project_id == p.id:
+                            if i.project_id == str(p.id):
                                 income_user = income_user + i.income_amount
                             if not income_sum == 0:
                                 percent_income = (income_user / income_sum) * 100
@@ -363,7 +370,7 @@ class GroupViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveA
             # Search by project id
             project = self.request.query_params.get("project")
             if project:
-                if Project.objects.filter(id=project):
+                if Project.objects.get(id=project):
                     queryset = queryset.filter(project_id=project)
                 else:
                     return "No Project ID"
@@ -483,31 +490,33 @@ class GroupViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveA
                 group = self.get_object()
                 queryset_spending = Spending.objects.all()
                 queryset_income = Income.objects.all()
+                queryset_spending = queryset_spending.filter(group_id=pk)
+                queryset_income = queryset_income.filter(group_id=pk)
                 message = ""
                 total_spending, total_income = 0, 0
-                for u in group.users.all():
-                    queryset_spending = queryset_spending.filter(user=u.id)
-                    queryset_income = queryset_income.filter(user=u.id)
 
-                    for s in queryset_spending:
-                        if str(s.group_id) == str(group.id):
-                            total_spending = total_spending + s.spending_amount
-                    for i in queryset_income:
-                        if str(i.group_id) == str(group.id):
-                            total_income = total_income + i.income_amount
+                for s in queryset_spending:
+                    if str(s.group_id) == str(group.id):
+                        total_spending = total_spending + s.spending_amount
+                for i in queryset_income:
+                    if str(i.group_id) == str(group.id):
+                        total_income = total_income + i.income_amount
                 if not total_spending == 0:
                     group.spending_amount = total_spending
                 if not total_income == 0:
                     group.income_amount = total_income
                 group.save()
 
-                queryset_spending = Spending.objects.all()
-                queryset_income = Income.objects.all()
                 for u in group.users.all():
-                    queryset_spending = queryset_spending.filter(user=u.id)
-                    queryset_income = queryset_income.filter(user=u.id)
+                    queryset_spending = Spending.objects.all()
+                    queryset_income = Income.objects.all()
+                    queryset_spending = queryset_spending.filter(group_id=pk)
+                    queryset_income = queryset_income.filter(group_id=pk)
+                    queryset_spending = queryset_spending.filter(user_id=u.id)
+                    queryset_income = queryset_income.filter(user_id=u.id)
                     income_sum, spending_sum = 0, 0
                     percent_spending, percent_income = 0, 0
+
                     for s in queryset_spending:
                         if str(s.group_id) == str(group.id):
                             spending_sum = spending_sum + s.spending_amount
@@ -529,7 +538,6 @@ class GroupViewSetGet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveA
                             stt.percent_spending = percent_spending
                             stt.percent_income = percent_income
                             stt.statistic_date = datetime.now()
-                            message = spending_sum
                             stt.save()
                     else:
                         statistic, _ = GroupStatistic.objects.get_or_create(total_spending=spending_sum, total_income=income_sum,
@@ -661,7 +669,7 @@ class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIVi
                 if user.check_password(old_password):
                     user.set_password(new_password)
                     user.save()
-                    return Response(status=status.HTTP_200_OK)
+                return Response(status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except:

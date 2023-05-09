@@ -5,23 +5,20 @@ import Loading from "../layouts/Loading"
 import { useParams } from "react-router-dom"
 import { Container, TextField } from "@mui/material"
 import { authAPI, endpoints } from "../configs/API"
-import { load } from "react-cookies"
 import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Numeral from 'numeral';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { Link } from "react-router-dom"
-import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
-import { wait } from "@testing-library/user-event/dist/utils"
+import Alert from '@mui/material/Alert';
 
 
 const Statistic = () => {
@@ -32,10 +29,10 @@ const Statistic = () => {
     const[groupStatistic, setGroupStatistic] = useState([])
     const[projectStatistic, setProjectStatistic] = useState([])
     const {type, id} = useParams()
+    const[err, setErr] = useState(null)
 
     useEffect(() => {
         const loading = async () => {
-            // console.log(type)
             if (type == 'project')
             {
                 let e = `${endpoints['project'](id)}`
@@ -46,21 +43,25 @@ const Statistic = () => {
                 res.data.start_date = format(new Date(res.data.start_date), 'dd/MM/yyyy')
                 res.data.end_date = format(new Date(res.data.end_date), 'dd/MM/yyyy')
                 setProject(res.data)
-                // console.log(res.data.users)
 
-                let eGroup = `${endpoints['group'](id)}`
+                let eGroup = `${endpoints['groups']}?`
+                eGroup += `project=${id}`
                 let resGroup = await authAPI().get(eGroup)
-                setGroup(resGroup.data)
-                setUsers(resGroup.data.users)
-                console.log(resGroup.data)
+                console.log(resGroup)
+                setGroup(resGroup.data.results)
+                setUsers(resGroup.data.results[0].users)
 
                 let eStatistic = e + "report/"
                 let resStatistic = await authAPI().get(eStatistic)
-
                 let eGetStatistic = `${endpoints['project_statistic']}?id=${id}`
                 let resGetStatistic = await authAPI().get(eGetStatistic)
-                setProjectStatistic(resGetStatistic.data.results)
-                // console.log(projectStatistic)
+                if (resStatistic.data == "")
+                {
+                    if (resGetStatistic.data.count > 0)
+                        setProjectStatistic(resGetStatistic.data.results)
+                }
+                else
+                    setErr(resStatistic.data)
             }
 
             if (type == 'group')
@@ -68,20 +69,34 @@ const Statistic = () => {
                 let e = `${endpoints['group'](id)}`
                 let res = await authAPI().get(e)
                 setGroup(res.data)
-                // console.log(res.data)
 
                 let eStatistic = e + "statistic/"
                 let resStatistic = await authAPI().get(eStatistic)
-
                 let eGetStatistic = `${endpoints['group_statistic']}?id=${id}`
                 let resGetStatistic = await authAPI().get(eGetStatistic)
-                // console.log(resGetStatistic)
-                setGroupStatistic(resGetStatistic.data.results)
-                // console.log(groupStatistic)
+                if (resStatistic.data == "")
+                {
+                    if (resGetStatistic.data.count > 0)
+                        setGroupStatistic(resGetStatistic.data.results)
+                }
+                else
+                    setErr(resStatistic.data)
             }
         }
         loading()
-    }, [id])
+    }, [id, err])
+
+    let alert = (<></>)
+    if (err !== null)
+    {
+      alert = (
+      <>
+        <div align='center'>
+          <Alert severity="error">Happend an error: {err} — check it out!</Alert>
+        </div>
+        <br />
+      </>)
+    }
 
     let statisticData = (<></>)
     if (type == 'group')
@@ -91,6 +106,7 @@ const Statistic = () => {
         statisticData = (
             <>
                 <h1 style={{ textAlign: "center", color: "#F1C338" }}>STATISTIC GROUP</h1>
+                {alert}
                 <div style={{ backgroundColor: "#609b56" }}>
                     <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }}>Group's information: </h3>
                 </div>
@@ -135,8 +151,8 @@ const Statistic = () => {
                                         <TableCell component="th" scope="row" typeof="text">User</TableCell>:
                                         <TableCell component="th" scope="row" typeof="text" style={{ color: '#F1C338' }}>Leader</TableCell>
                                     }
-                                    <TableCell component="th" scope="row">{gs.total_spending}</TableCell>
-                                    <TableCell component="th" scope="row">{gs.total_income}</TableCell>
+                                    <TableCell component="th" scope="row">{Numeral(gs.total_spending).format('0,0')}</TableCell>
+                                    <TableCell component="th" scope="row">{Numeral(gs.total_income).format('0,0')}</TableCell>
                                     <TableCell component="th" scope="row">{gs.percent_spending} %</TableCell>
                                     <TableCell component="th" scope="row">{gs.percent_income} %</TableCell>
                                 </TableRow>)
@@ -157,6 +173,7 @@ const Statistic = () => {
         statisticData = (
             <>
                 <h1 style={{ textAlign: "center", color: "#F1C338" }}>STATISTIC PROJECT</h1>
+                {alert}
                 <div style={{ backgroundColor: "#609b56" }}>
                     <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }}>Project's information: </h3>
                 </div>
@@ -236,8 +253,8 @@ const Statistic = () => {
                                             <TableCell component="th" scope="row" typeof="text">User</TableCell>:
                                             <TableCell component="th" scope="row" typeof="text" style={{ color: '#F1C338' }}>Leader</TableCell>
                                         }
-                                        <TableCell component="th" scope="row">{ps.total_spending}</TableCell>
-                                        <TableCell component="th" scope="row">{ps.total_income}</TableCell>
+                                        <TableCell component="th" scope="row">{Numeral(ps.total_spending).format('0,0')}</TableCell>
+                                        <TableCell component="th" scope="row">{Numeral(ps.total_income).format('0,0')}</TableCell>
                                         <TableCell component="th" scope="row">{ps.percent_spending} %</TableCell>
                                         <TableCell component="th" scope="row">{ps.percent_income} %</TableCell>
                                     </>):
@@ -249,6 +266,7 @@ const Statistic = () => {
                         </Table>
                     </TableContainer>
                 </Container>
+                <br />
             </>
         )
     }

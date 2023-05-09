@@ -23,12 +23,20 @@ const NewGroup = () => {
 
         const process = async () => {
             try {
+                let members = []
+                members.push(parseInt(group.users))
+                members.push(parseInt(group.leader_id))
+                console.log(parseInt(members))
+
                 let form = new FormData
                 form.append("name", group.name)
                 form.append("leader_id", parseInt(group.leader_id))
                 form.append("project", parseInt(group.project))
-                form.append("users", group.users)
-                console.log(form)
+                form.append("number", members.length)
+                for (let i = 0; i < members.length; i++)
+                    form.append("users", parseInt(members[i]))
+                
+                // console.log(form)
                 let res = await authAPI().post(endpoints['new_group'], form)
                 if (res.status === 201)
                     nav("/groups/")
@@ -47,6 +55,11 @@ const NewGroup = () => {
         const { name, value } = e.target
         setGroup(current => ({...current, [name]:value}))
     }
+
+    // const addUser = (evt) => {
+    //     group.users = evt.target.value
+    //     setU([...u, group.users])
+    // }
 
     let alert = (<></>)
     if (err !== null)

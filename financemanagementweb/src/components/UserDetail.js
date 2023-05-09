@@ -105,8 +105,8 @@ const UserDetail = () => {
                 <div align='center'>
                     {currentUser.is_superuser === true?
                         user.is_active === true?
-                        <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}>Inactivate</Button>:
-                        <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}>Active</Button>:
+                        <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}><strong>Inactivate</strong></Button>:
+                        <Button variant="contained" type="submit" style={{ backgroundColor: "#609b56", color: '#FFECC9' }}><strong>Active</strong></Button>:
                         <span />
                     }
                 </div>

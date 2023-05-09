@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { authAPI, endpoints } from "../configs/API";
 import { useParams, Link } from "react-router-dom";
 import { Container, TextField } from "@mui/material";
@@ -7,9 +7,11 @@ import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import Loading from "../layouts/Loading";
 import Alert from '@mui/material/Alert';
+import { UseContext } from "../configs/UseContext";
 
 
 const MeetingDetail = () => {
+    const[user, setUser] = useContext(UseContext)
     const[meeting, setMeeting] = useState(null)
     const {meetingId} = useParams()
     const[voted, setVote] = useState([])
@@ -26,7 +28,7 @@ const MeetingDetail = () => {
             // console.log(res.data)
             if (res.status == 200)
             {
-                console.log(resVote.data.results)
+                // console.log(resVote.data.results)
                 setMeeting(res.data)
                 setVote(resVote.data.results)
 
@@ -35,13 +37,16 @@ const MeetingDetail = () => {
                     setShowVoteButton(1)
                 }
                 for (let i = 0; i < voted.length; i++) {
-                    if (voted[i].meeting_schedule?.id !== meeting.id)
-                    {
+                    if (voted[i].meeting_schedule.id !== meeting.id && voted[i].user.id !== user.id )
+                    {   
                         setShowVoteButton(1)
-                        break;
+                        console.log(showVoteButton)
                     }
-                    else
+                    if (voted[i].meeting_schedule.id === meeting.id && voted[i].user.id === user.id )
+                    {
                         setShowVoteButton(0)
+                        console.log(showVoteButton)
+                    }
                 }
                 // console.log(showVoteButton)
             }
@@ -61,10 +66,11 @@ const MeetingDetail = () => {
 
     const vote = async (evt) => {
         evt.preventDefault()
-        let eVote = `${endpoints['meeting'](meetingId)}/vote/`
+        let eVote = `${endpoints['meeting'](meetingId)}vote/`
         let resVote = await authAPI().put(eVote)
         setChangeVote(1)
         setShowVoteButton(0)
+        console.log(showVoteButton)
     }
 
     let alert = (<></>)
@@ -117,7 +123,7 @@ const MeetingDetail = () => {
                     <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Vote: </h4>
                     <TextField id="id" type="text" value={meeting.vote} style={{ width: '10%', marginRight: '2%' }} />
 
-                    <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Status: </h4>
+                    <h4 style={{ color: "#F1C338", marginRight: '2%' }}>Is ended: </h4>
                     <span></span>
                     {meeting.is_active === true?
                         <Checkbox checked={true} style={{ color: "#F1C338", marginRight: '1%' }} />:
@@ -139,7 +145,9 @@ const MeetingDetail = () => {
             <br />
             <div align="right">
                 <Link style={{ textDecoration: 'none' }}><Button style={{ color: '#F46841' }}><strong>Delete</strong></Button></Link>
-                <Button style={{ color: '#F46841' }} onClick={endMeeting}><strong>End meeting</strong></Button>
+                {user.is_staff === true?
+                <Button style={{ color: '#F46841' }} onClick={endMeeting}><strong>End meeting</strong></Button>:
+                <span />}
             </div>
         </>
     )

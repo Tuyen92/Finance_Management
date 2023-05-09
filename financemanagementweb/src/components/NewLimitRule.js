@@ -33,11 +33,18 @@ const NewLimitRule = () => {
                 form.append("from_date", limitRule.from_date)
                 form.append("to_date", limitRule.to_date)
                 // console.log(form)
-                let res = await authAPI().post(endpoints['new_limit_rule'], form)
-                if (res.status === 201)
-                    nav("/limit_rules/")
+                if (limitRule.from_date >= limitRule.to_date == true)
+                {
+                    setErr("Wrong date!")
+                }
                 else
-                    setErr(res.status)
+                {
+                    let res = await authAPI().post(endpoints['new_limit_rule'], form)
+                    if (res.status === 201)
+                        nav("/limit_rules/")
+                    else
+                        setErr(res.status)
+                }
             } catch (ex) {
                 console.log(ex)
             }
@@ -88,10 +95,10 @@ const NewLimitRule = () => {
                         <br />
                         <div style={{ display: 'flex' }}>
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>From date: </h4>
-                            <TextField id="content" type="date" style={{ marginRight: '2%' }} name="spending_limit" value={limitRule.spending_limit} onChange={setValue}/>
+                            <TextField id="content" type="date" style={{ marginRight: '2%' }} name="from_date" value={limitRule.from_date} onChange={setValue}/>
 
                             <h4 style={{ color: "#F1C338", marginRight: '2%' }}>To date: </h4>
-                            <TextField id="id" type="date" style={{ marginRight: '2%' }} name="income_limit" value={limitRule.income_limit} onChange={setValue}/>
+                            <TextField id="id" type="date" style={{ marginRight: '2%' }} name="to_date" value={limitRule.to_date} onChange={setValue}/>
                         </div>
                         <br />
                         <div align='center'>

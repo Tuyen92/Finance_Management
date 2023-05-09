@@ -53,19 +53,21 @@ const RegisterUser = () => {
                 form.append("sex", user.sex)
                 form.append("address", user.address)
                 form.append("phone", user.phone)
+                form.append("is_active", true)
 
                 // console.log(avatar)
                 if (avatar.current.files.length > 0)
                     form.append("avatar", avatar.current.files[0])
 
-                if (user.role === 3)
+                console.log(user.role)
+                if (user.role === '3')
                 {
-                    form.append("is_superuser", 1)
-                    form.append("is_staff", 1)
+                    form.append("is_superuser", true)
+                    form.append("is_staff", true)
                 }
-                if (user.role === 2)
+                if (user.role === '2')
                 {
-                    form.append("is_staff", 1)
+                    form.append("is_staff", true)
                 }
                 if (user.password === user.confirm_password)
                 {
