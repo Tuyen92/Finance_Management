@@ -128,16 +128,33 @@ const GroupsUser = () => {
     }
 
     if (group.length == 0 && err == null)
-    {return(
+    {
+        let userCreateGroup = (<></>)
+        if (user !== null)
+        {
+            if (user.is_superuser === true || user.is_staff === true)
+            {
+                userCreateGroup = (
+                    <>
+                        <Link style={{ textDecoration: 'none' }} to={`/group/`}><Button style={{ color: '#F1C338' }}><strong>New group</strong></Button></Link>
+                    </>)
+            }
+        }
+        
+        return(
         <>
             <div>
                 <h1 style={{ textAlign: 'center', color: '#F1C338' }}>GROUP LIST</h1>
             </div>  
             <Loading />
             <br />
+            <div align='right'>
+                {userCreateGroup}
+            </div>
         </>
     )}
 
+    
     let groupLogin = (
         <>
             <div align="center">

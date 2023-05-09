@@ -171,7 +171,7 @@ const RegisterUser = () => {
                                 required style={{ width: '100%', marginBottom: '2%' }} />
                         </Stack>
                         <div align="center">
-                            <Button variant="outline-primary" style={{ backgroundColor: '#609b56', color: '#FFECC9' }} type="submit">Register</Button>
+                            <Button variant="outline-primary" style={{ backgroundColor: '#609b56', color: '#FFECC9' }} type="submit"><strong>Register</strong></Button>
                         </div>
                         <br />
                     </form>

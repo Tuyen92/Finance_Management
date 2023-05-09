@@ -16,7 +16,8 @@ const CurrentUser = () => {
     const[updatedUser, setUpdateUser] = useState({
         "address": "",
         "email": "",
-        "phone": ""
+        "phone": "",
+        "limit_rule": ""
     })
     const[err, setErr] = useState(null)
     const nav = useNavigate()
@@ -77,6 +78,14 @@ const CurrentUser = () => {
                 form.append("address", updatedUser.address)
                 form.append("email", updatedUser.email)
                 form.append("phone", updatedUser.phone)
+                
+                if (updatedUser.limit_rule != "")
+                {
+                    let formLR = new FormData()
+                    formLR.append("limit_rule", updatedUser.limit_rule)
+                    let eLR = `${endpoints['choose_lr']}`
+                    let resLR = await authAPI().put(eLR, formLR)
+                }
 
                 let res = await authAPI().put(e, form)
             } catch (ex) {
@@ -159,10 +168,6 @@ const CurrentUser = () => {
                         </div>
                     </div>
                 </div>
-                <br />
-                <div  align="center">
-                    <Button variant="outline-primary" type='submit' style={{ backgroundColor: '#609b56', color: '#FFECC9' }}><strong>Update</strong></Button>
-                </div>
             </Container>
             <div style={{ backgroundColor: '#609b56'}}>
                 <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }} >Update your password</h3> 
@@ -202,11 +207,15 @@ const CurrentUser = () => {
                     <br />
                     <div style={{ display: 'flex' }}>
                         <h4 style={{ color: "#F1C338", marginRight: '2%' }} >Email:</h4>
-                        <TextField className='col form-control' type="text" label="New email..." name='old_password' value={updatedUser.email}  onChange={setValueUser}
+                        <TextField className='col form-control' type="text" label="New email..." name='email' value={updatedUser.email}  onChange={setValueUser}
                             style={{ marginRight: '2%'}} />
                     
                         <h4 style={{ color: "#F1C338", marginRight: '2%' }} >Phone:</h4>
-                        <TextField className='col form-control' type="text" label="New phone..." name='old_password' value={updatedUser.phone} onChange={setValueUser} />
+                        <TextField className='col form-control' type="text" label="New phone..." name='phone' value={updatedUser.phone} onChange={setValueUser} 
+                            style={{ marginRight: '2%'}} />
+
+                        <h4 style={{ color: "#F1C338", marginRight: '2%' }} >Limit rule:</h4>
+                        <TextField className='col form-control' type="text" label="New limit rule..." name='limit_rule' value={updatedUser.limit_rule} onChange={setValueUser} />
                     </div>
                     <br />
                     <div  align="center">

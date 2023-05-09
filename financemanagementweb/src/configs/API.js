@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useId } from "react";
 import * as cookie from 'react-cookies';
 
 export const endpoints = {
@@ -29,7 +28,8 @@ export const endpoints = {
     "change_password": "/user/change_password/",
     "group_statistic": "/statistic/group/",
     "project_statistic": "/statistic/project/",
-    "warning": (IdUser) => `/user/${IdUser}/warning/`
+    "warning": (IdUser) => `/user/${IdUser}/warning/`,
+    "choose_lr": "/user/limit_rule/"
 }
 
 export const authAPI = () => axios.create({

@@ -140,15 +140,33 @@ const Meetings = () => {
     </>)
   }
 
-  if (meeting.length == 0 && user != null)
-  {return(
-  <>
-    <div>
-        <h1 style={{ textAlign: 'center', color: '#F1C338' }}>MEETING SCHEDULE LIST</h1>
+  if (meeting.length == 0 && err == null)
+  {
+    let userCreateMeeting = (<></>)
+    if (user !== null)
+    {
+      if (user.is_staff === true || user.is_superuser === true)
+      {
+        userCreateMeeting = (
+          <>
+            <Link style={{ textDecoration: 'none' }} to={`/meeting_schedule/`}><Button style={{ color: '#F1C338' }}><strong>New meetings</strong></Button></Link>
+          </>
+        )
+      }
+    }
+
+    return(
+    <>
+      <div>
+          <h1 style={{ textAlign: 'center', color: '#F1C338' }}>MEETING SCHEDULE LIST</h1>
+        </div>
+      <Loading />
+      <br />
+      <div align="right">
+        {userCreateMeeting}
       </div>
-    <Loading />
-    {alert}
-  </>)}
+    </>)
+  }
 
   let meetingLogin = (
     <>

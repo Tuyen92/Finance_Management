@@ -154,6 +154,9 @@ const Incomes = () => {
       </div>
       <Loading />
       <br />
+      <div align="right">
+        <Link style={{ textDecoration: 'none' }} to={`/income/`}><Button style={{ color: '#F1C338' }}><strong>New income</strong></Button></Link>
+      </div>
     </>
   
 )}

@@ -189,14 +189,31 @@ const Projects = () => {
     }
 
     if (project.length == 0 && err == null)
-    {return(
-    <>
-      <div>
-        <h1 style={{ textAlign: 'center', color: '#F1C338' }}>PROJECT LIST</h1>
-      </div>
-      <Loading />
-      <br />
-    </>)}
+    {
+      let userCreateProject = (<></>)
+      if (user !== null)
+      {
+        if (user.is_staff === true || user.is_superuser === true)
+        {
+          userCreateProject = (
+            <>
+              <Link style={{ textDecoration: 'none' }} to={`/project/`}><Button style={{ color: '#F1C338' }}><strong>New project</strong></Button></Link>
+            </>)
+        }
+      }
+
+      return(
+      <>
+        <div>
+          <h1 style={{ textAlign: 'center', color: '#F1C338' }}>PROJECT LIST</h1>
+        </div>
+        <Loading />
+        <br />
+        <div align="right">
+          {userCreateProject}
+        </div>
+      </>)
+    }
     
     let projectLogin = (
       <>

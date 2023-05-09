@@ -653,6 +653,8 @@ class UserViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.ListAPIVi
                     user.limit_rule = LimitRule.objects.get(id=lr_id)
                     user.save()
                     return Response(UserSerializer(user, context={'request': request}).data, status=status.HTTP_200_OK)
+                else:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except:

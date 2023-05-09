@@ -157,6 +157,9 @@ const Spendings = () => {
       </div>
       <Loading />
       <br />
+      <div align="right">
+        <Link style={{ textDecoration: 'none' }} to={`/spending/`}><Button style={{ color: '#F1C338' }}><strong>New spending</strong></Button></Link>
+      </div>
     </>)}
 
     let spendingLogin = (
