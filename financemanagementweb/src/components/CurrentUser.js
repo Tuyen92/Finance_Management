@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authAPI, endpoints } from "../configs/API";
 import { Container, TextField, Button } from "@mui/material";
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import Loading from "../layouts/Loading";
 import Alert from '@mui/material/Alert';
 
@@ -20,6 +20,8 @@ const CurrentUser = () => {
         "limit_rule": ""
     })
     const[err, setErr] = useState(null)
+    const[anounce, setAnouce] = useState(null)
+
     const nav = useNavigate()
     let e = `${endpoints['current_user']}`
 
@@ -51,7 +53,7 @@ const CurrentUser = () => {
 
                 let res = await authAPI().put(endpoints['change_password'], form)
                 if (res.status === 200)
-                    nav("/")
+                    setAnouce("Changed passsword!")
             } catch (ex) {
                 console.log(ex)
             }
@@ -74,10 +76,17 @@ const CurrentUser = () => {
 
         const process = async () => {
             try {
-                let form = new FormData()
-                form.append("address", updatedUser.address)
-                form.append("email", updatedUser.email)
-                form.append("phone", updatedUser.phone)
+                if (updatedUser.address != "" || updatedUser.email != "" || updatedUser.phone != "")
+                {
+                    let form = new FormData()
+                    form.append("address", updatedUser.address)
+                    form.append("email", updatedUser.email)
+                    form.append("phone", updatedUser.phone)
+
+                    let res = await authAPI().put(e, form)
+                    if (res.status === 200)
+                        setAnouce("Updated user")
+                }
                 
                 if (updatedUser.limit_rule != "")
                 {
@@ -85,11 +94,12 @@ const CurrentUser = () => {
                     formLR.append("limit_rule", updatedUser.limit_rule)
                     let eLR = `${endpoints['choose_lr']}`
                     let resLR = await authAPI().put(eLR, formLR)
+                    if (resLR.status === 200)
+                        setAnouce("Updated user")
                 }
-
-                let res = await authAPI().put(e, form)
             } catch (ex) {
                 console.log(ex)
+                setErr("Happened error!")
             }
         }
         process()
@@ -107,6 +117,17 @@ const CurrentUser = () => {
         </>)
     }
 
+    let anoucement = (<></>)
+    if (anounce !== null)
+    {
+        anoucement = (
+        <>
+        <div align='center'>
+            <Alert severity="success">{anounce}!</Alert>
+        </div>
+        </>)
+    }
+
     if (currentUser == null)
     {return(
     <>
@@ -120,6 +141,7 @@ const CurrentUser = () => {
         <>
             <h1 style={{ textAlign: "center", color: "#F1C338" }}>USER INFORMATION</h1>
             {alert}
+            {anoucement}
             <div style={{ backgroundColor: '#609b56'}}>
                 <h3 style={{ color: "#FFECC9", marginLeft: "20px"  }} >Your information</h3> 
             </div>
@@ -201,7 +223,7 @@ const CurrentUser = () => {
                 <form onSubmit={updateUser}>
                     <div style={{ display: 'flex' }}>
                         <h4 style={{ color: "#F1C338", marginRight: '2%' }} >Address:</h4>
-                        <TextField className='col form-control' type="text" label="New address..." name='old_password' value={updatedUser.address}  onChange={setValueUser} 
+                        <TextField className='col form-control' type="text" label="New address..." name='address' value={updatedUser.address}  onChange={setValueUser} 
                         style={{ width: '100%' }}/>
                     </div>
                     <br />
